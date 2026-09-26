@@ -2,7 +2,7 @@
 import { locale, t } from '../../../i18n';
 import { getCollection } from 'astro:content';
 import { getDocSets, type DocTreeNode } from '../../../utils/docs-utils';
-import { getAllCategories } from '../../../utils/data-utils';
+import { getAllCategories, getPostSlug } from '../../../utils/data-utils';
 import { slugify } from '../../../utils/common-utils';
 
 const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -14,7 +14,7 @@ const blogItems = posts.map((p) => ({
     id: p.id,
     title: p.data.title,
     date: p.data.publishDate.toISOString(),
-    href: `/views/minimal/blog/${p.id}/`,
+    href: `/views/minimal/blog/${getPostSlug(p)}/`,
     // 站点其他地方按「任意一级分类匹配」筛选，极简模式以前只取最后一级，
     // 导致「技术」「前端」这类上级分类的标签点进去永远是空的
     categoryIds: (p.data.categories || []).map((c) => slugify(c))

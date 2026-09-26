@@ -17,23 +17,30 @@ import RelatedPosts from '../../components/widgets/RelatedPosts.astro';
 import FeaturedPosts from '../../components/widgets/FeaturedPosts.astro';
 import SeriesNav from '../../components/widgets/SeriesNav.astro';
 import siteConfig from '../../data/site-config';
-import { sortItemsByDateDesc } from '../../utils/data-utils';
+import { assertNoDuplicateSlugs, getPostSlug, resolvePostSeries, sortItemsByDateDesc } from '../../utils/data-utils';
 import { slugify } from '../../utils/common-utils';
 import QRCode from 'qrcode-svg';
 
 export async function getStaticPaths() {
     const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
+    assertNoDuplicateSlugs(posts);
     const postCount = posts.length;
+    // 专栏可以用 dir 认领一整个目录，所以归属不能只看 frontmatter
+    const seriesDefs = (await getCollection('series')).map((s) => ({
+        id: s.id,
+        name: s.data.name,
+        dir: s.data.dir
+    }));
 
     // 预计算每个专栏的文章列表（按发布时间正序）
     const seriesMap = new Map<string, CollectionEntry<'blog'>[]>();
     posts.forEach((post) => {
-        if (post.data.series) {
-            const sid = slugify(post.data.series);
-            if (!seriesMap.has(sid)) {
-                seriesMap.set(sid, []);
+        const def = resolvePostSeries(post, seriesDefs);
+        if (def) {
+            if (!seriesMap.has(def.id)) {
+                seriesMap.set(def.id, []);
             }
-            seriesMap.get(sid)!.push(post);
+            seriesMap.get(def.id)!.push(post);
         }
     });
     seriesMap.forEach((list) => {
@@ -49,9 +56,9 @@ export async function getStaticPaths() {
         let seriesPrev: CollectionEntry<'blog'> | null = null;
         let seriesNext: CollectionEntry<'blog'> | null = null;
         let seriesRecommend: CollectionEntry<'blog'> | null = null;
-        if (post.data.series) {
-            const sid = slugify(post.data.series);
-            const seriesPosts = seriesMap.get(sid) || [];
+        const postSeries = resolvePostSeries(post, seriesDefs);
+        if (postSeries) {
+            const seriesPosts = seriesMap.get(postSeries.id) || [];
             const sIndex = seriesPosts.findIndex((p) => p.id === post.id);
             seriesPrev = sIndex > 0 ? seriesPosts[sIndex - 1] : null;
             seriesNext = sIndex < seriesPosts.length - 1 ? seriesPosts[sIndex + 1] : null;
@@ -59,15 +66,18 @@ export async function getStaticPaths() {
             // 当前专栏没有下一篇时，推荐其他专栏的最新文章
             if (!seriesNext) {
                 const otherSeriesPosts = posts
-                    .filter((p) => p.data.series && slugify(p.data.series) !== sid && p.id !== post.id)
+                    .filter((p) => {
+                        const d = resolvePostSeries(p, seriesDefs);
+                        return d && d.id !== postSeries.id && p.id !== post.id;
+                    })
                     .sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime());
                 seriesRecommend = otherSeriesPosts[0] || null;
             }
         }
 
         return {
-            params: { id: post.id },
-            props: { post, prevPost, nextPost, seriesPrev, seriesNext, seriesRecommend }
+            params: { id: getPostSlug(post) },
+            props: { post, prevPost, nextPost, seriesPrev, seriesNext, seriesRecommend, seriesName: postSeries?.name ?? null }
         };
     });
 }
@@ -79,11 +89,14 @@ type Props = {
     seriesPrev: CollectionEntry<'blog'> | null;
     seriesNext: CollectionEntry<'blog'> | null;
     seriesRecommend: CollectionEntry<'blog'> | null;
+    seriesName: string | null;
 };
 
 const { href } = Astro.url;
-const { post, prevPost, nextPost, seriesPrev, seriesNext, seriesRecommend } = Astro.props;
-const { title, publishDate, updatedDate, excerpt, tags = [], seo, series, categories, fonts, banner } = post.data;
+const { post, prevPost, nextPost, seriesPrev, seriesNext, seriesRecommend, seriesName } = Astro.props;
+const { title, publishDate, updatedDate, excerpt, tags = [], seo, categories, fonts, banner } = post.data;
+// 专栏可能来自 frontmatter，也可能来自文章所在目录，统一用解析结果
+const series = seriesName;
 
 const navPrev = series ? seriesPrev : prevPost;
 const navNext = series ? seriesNext : nextPost;
@@ -101,7 +114,7 @@ const bannerUrl = resolveBannerUrl(banner);
 const { Content, headings } = await render(post);
 
 // 生成微信分享二维码
-const pageUrl = new URL(`/blog/${post.id}/`, siteConfig.website).toString();
+const pageUrl = new URL(`/blog/${getPostSlug(post)}/`, siteConfig.website).toString();
 const qrCode = new QRCode({ content: pageUrl, width: 160, height: 160 });
 const qrCodeSvg = qrCode.svg();
 
@@ -231,13 +244,13 @@ const postBreadcrumbs = [
     </article>
     {hasNav && (
         <PrevNext
-            prev={navPrev ? { href: `/blog/${navPrev.id}/`, title: navPrev.data.title } : null}
+            prev={navPrev ? { href: `/blog/${getPostSlug(navPrev)}/`, title: navPrev.data.title } : null}
             next={
                 navNext
-                    ? { href: `/blog/${navNext.id}/`, title: navNext.data.title }
+                    ? { href: `/blog/${getPostSlug(navNext)}/`, title: navNext.data.title }
                     : recommendNext
                       ? {
-                            href: `/blog/${recommendNext.id}/`,
+                            href: `/blog/${getPostSlug(recommendNext)}/`,
                             title: recommendNext.data.title,
                             label: t.nav.recommend,
                             note: recommendNext.data.series ? t.nav.fromSeries(recommendNext.data.series) : undefined,
@@ -261,7 +274,7 @@ const postBreadcrumbs = [
         <FeaturedPosts />
     </div>
 
-    {siteConfig.comments?.enabled && <Comments pageId={`/blog/${post.id}/`} pageTitle={title} />}
+    {siteConfig.comments?.enabled && <Comments pageId={`/blog/${getPostSlug(post)}/`} pageTitle={title} />}
 
     <!-- 微信分享二维码弹窗 -->
     <div class="wechat-qrcode-modal hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" data-url={pageUrl}>

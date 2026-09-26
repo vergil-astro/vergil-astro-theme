@@ -1,4 +1,5 @@
 ---
+import { getPostSlug } from '../../utils/data-utils';
 import { type CollectionEntry } from 'astro:content';
 import { Calendar, Clock } from '@lucide/astro';
 import FormattedDate from '../ui/FormattedDate.astro';
@@ -24,7 +25,7 @@ const hasBanner = !!banner;
 
 <div class:list={['', className]}>
     {hasBanner ? (
-        <a href={`/blog/${post.id}/`} class="block relative -m-4 overflow-hidden rounded-[20px] group">
+        <a href={`/blog/${getPostSlug(post)}/`} class="block relative -m-4 overflow-hidden rounded-[20px] group">
             <img
                 src={banner}
                 alt={title}
@@ -53,7 +54,7 @@ const hasBanner = !!banner;
             </div>
         </a>
     ) : (
-        <a href={`/blog/${post.id}/`} class="block mb-2">
+        <a href={`/blog/${getPostSlug(post)}/`} class="block mb-2">
             <TitleTag class="font-display text-lg font-medium text-main hover:text-accent transition-colors line-clamp-2">
                 {title}
             </TitleTag>
@@ -63,7 +64,7 @@ const hasBanner = !!banner;
     {!hasBanner && (
         <>
             {excerpt && (
-                <a href={`/blog/${post.id}/`} class="text-[15px] text-secondary leading-relaxed line-clamp-3 hover:text-accent transition-colors mb-3">
+                <a href={`/blog/${getPostSlug(post)}/`} class="text-[15px] text-secondary leading-relaxed line-clamp-3 hover:text-accent transition-colors mb-3">
                     {excerpt}
                 </a>
             )}

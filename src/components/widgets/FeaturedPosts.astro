@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { sortItemsByDateDesc } from '../../utils/data-utils';
+import { getPostSlug, sortItemsByDateDesc } from '../../utils/data-utils';
 import { t } from '../../i18n';
 
 const allPosts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
@@ -14,7 +14,7 @@ const featured = allPosts.filter((p) => p.data.isFeatured).slice(0, 3);
             {featured.map((post) => (
                 <li>
                     <a
-                        href={`/blog/${post.id}/`}
+                        href={`/blog/${getPostSlug(post)}/`}
                         class="group block title-scroll"
                     >
                         <span class="text-[11px] tracking-tight text-secondary group-hover:text-accent transition-colors leading-snug title-scroll-text">

@@ -4,11 +4,16 @@ import { t } from '../../i18n';
 import PostPreview from '../../components/content/PostPreview.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
-import { getAllSeries, getPostsBySeries, sortItemsByDateDesc } from '../../utils/data-utils';
+import { getAllSeries, getPostDir, getPostsBySeries, sortItemsByDateDesc } from '../../utils/data-utils';
 
 export async function getStaticPaths() {
     const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
-    const allSeries = getAllSeries(posts);
+    const defs = (await getCollection('series')).map((s) => ({ id: s.id, name: s.data.name, dir: s.data.dir }));
+    // 专栏可能完全靠 dir 认领目录，文章里一个 series 都没写，
+    // 只从文章 frontmatter 推导会漏掉这种专栏
+    const fromPosts = getAllSeries(posts);
+    const fromDirs = defs.filter((d) => d.dir && posts.some((p) => getPostDir(p)?.toLowerCase() === d.dir!.toLowerCase()));
+    const allSeries = [...fromPosts, ...fromDirs.filter((d) => !fromPosts.some((f) => f.id === d.id))];
     if (allSeries.length === 0) {
         return [{ params: { id: '_empty' }, props: { seriesName: '' } }];
     }
@@ -23,10 +28,10 @@ const { seriesName } = Astro.props;
 const { id } = Astro.params;
 
 const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const seriesPosts = getPostsBySeries(allPosts, id);
-
-// 从 series collection 读取描述
 const seriesEntries = await getCollection('series');
+const seriesDefs = seriesEntries.map((s) => ({ id: s.id, name: s.data.name, dir: s.data.dir }));
+const seriesPosts = getPostsBySeries(allPosts, id as string, seriesDefs);
+
 const seriesMeta = seriesEntries.find((s) => s.id === id);
 ---
 

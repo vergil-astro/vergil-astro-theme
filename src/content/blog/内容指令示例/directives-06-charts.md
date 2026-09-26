@@ -5,7 +5,6 @@ publishDate: 'Aug 23 2026'
 tags:
   - 使用指南
 categories: ["博客相关"]
-series: 内容指令示例
 ---
 
 两种图表引擎。Mermaid 适合流程和关系，ECharts 适合数据。都是写文本，构建时出图。

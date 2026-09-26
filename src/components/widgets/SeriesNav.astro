@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { getPostsBySeries } from '../../utils/data-utils';
+import { getPostSlug, getPostsBySeries } from '../../utils/data-utils';
 import { slugify } from '../../utils/common-utils';
 import { ChevronDown } from '@lucide/astro';
 import { t } from '../../i18n';
@@ -13,7 +13,8 @@ interface Props {
 const { currentPostId, series } = Astro.props;
 const seriesId = slugify(series);
 const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const seriesPosts = getPostsBySeries(allPosts, seriesId);
+const seriesDefs = (await getCollection('series')).map((s) => ({ id: s.id, name: s.data.name, dir: s.data.dir }));
+const seriesPosts = getPostsBySeries(allPosts, seriesId, seriesDefs);
 const currentIndex = seriesPosts.findIndex((p) => p.id === currentPostId);
 const total = seriesPosts.length;
 const needsCollapse = total > 5;
@@ -50,7 +51,7 @@ for (let i = visibleStart; i <= visibleEnd; i++) {
                     {isCurrent ? (
                         <span class="text-xs font-medium text-main line-clamp-1">{post.data.title}</span>
                     ) : (
-                        <a href={`/blog/${post.id}/`} class="text-xs text-muted hover:text-accent transition-colors line-clamp-1 series-link">
+                        <a href={`/blog/${getPostSlug(post)}/`} class="text-xs text-muted hover:text-accent transition-colors line-clamp-1 series-link">
                             {post.data.title}
                         </a>
                     )}

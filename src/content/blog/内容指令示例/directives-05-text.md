@@ -5,7 +5,6 @@ publishDate: 'Aug 21 2026'
 tags:
   - 使用指南
 categories: ["博客相关"]
-series: 内容指令示例
 ---
 
 这一类大多是行内指令，用单个冒号写在句子中间，不打断段落。
@@ -72,14 +71,14 @@ tab: 示例代码
 ::::tabs
 tab: 演示效果
 
-- 自动轮询颜色：:hashtag[Astro]{href="/tags/前端"} :hashtag[博客]{href="/tags/博客搭建"} :hashtag[教程]{href="/tags/使用指南"} :hashtag[前端]{href="/tags/前端"} :hashtag[CSS]{href="/tags/设计"}
-- 自定义颜色：:hashtag[指定蓝色]{href="/tags/后端" color="blue"} :hashtag[指定红色]{href="/tags/架构" color="red"}
+- 自动轮询颜色：:hashtag[Astro]{href="/tags/"} :hashtag[博客]{href="/tags/"} :hashtag[教程]{href="/tags/"} :hashtag[前端]{href="/tags/"} :hashtag[CSS]{href="/tags/"}
+- 自定义颜色：:hashtag[指定蓝色]{href="/tags/" color="blue"} :hashtag[指定红色]{href="/tags/" color="red"}
 
  tab: 示例代码
 
  ````
- - 自动轮询颜色：:hashtag[Astro]{href="/tags/前端"} :hashtag[博客]{href="/tags/博客搭建"} :hashtag[教程]{href="/tags/使用指南"} :hashtag[前端]{href="/tags/前端"} :hashtag[CSS]{href="/tags/设计"}
- - 自定义颜色：:hashtag[指定蓝色]{href="/tags/后端" color="blue"} :hashtag[指定红色]{href="/tags/架构" color="red"}
+ - 自动轮询颜色：:hashtag[Astro]{href="/tags/"} :hashtag[博客]{href="/tags/"} :hashtag[教程]{href="/tags/"} :hashtag[前端]{href="/tags/"} :hashtag[CSS]{href="/tags/"}
+ - 自定义颜色：:hashtag[指定蓝色]{href="/tags/" color="blue"} :hashtag[指定红色]{href="/tags/" color="red"}
  ````
 
  - `:hashtag` 默认自动轮询 7 种颜色（红、橙、黄、绿、青、蓝、紫），无需指定 `color`

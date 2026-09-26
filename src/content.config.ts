@@ -176,7 +176,16 @@ const series = defineCollection({
             name: z.string(),
             description: z.string().optional(),
             cover: z.string().optional(),
-            icon: z.string().optional()
+            icon: z.string().optional(),
+            /**
+             * 这个专栏的文章目录，相对于 src/content/blog/，只能是一级目录。
+             * 填了之后该目录下的文章自动属于本专栏，不必每篇再写 series。
+             * 目录名不参与 URL，文章地址仍然是 /blog/<文件名>/。
+             */
+            dir: z
+                .string()
+                .optional()
+                .refine((v) => !v || !v.includes('/'), { message: 'dir 只能填一级目录，不要带斜杠' })
         })
 });
 

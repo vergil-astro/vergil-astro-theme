@@ -106,9 +106,9 @@ prose 内的 h1~h4 上外边距和底边距都收了一点：
 
 这次字体系统重构本身也可以被标签系统所描述和组织。在写这篇文章时，我可以直接在 Markdown 中用内容指令标签来关联相关主题：
 
-- :hashtag[设计]{href="/tags/设计" color="purple"}
-- :hashtag[博客搭建]{href="/tags/博客搭建" color="blue"}
-- :hashtag[使用指南]{href="/tags/使用指南" color="green"}
+- :hashtag[设计]{href="/tags/" color="purple"}
+- :hashtag[博客搭建]{href="/tags/" color="blue"}
+- :hashtag[使用指南]{href="/tags/" color="green"}
 
 这些标签不仅是装饰，它们会真实地链接到对应的标签聚合页。这意味着：
 

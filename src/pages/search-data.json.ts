@@ -62,6 +62,8 @@ export const GET: APIRoute = async () => {
         ...posts.map((post) =>
             entry({
                 id: post.id,
+                // 文章可能放在专栏目录里，目录不进 URL，所以地址要算出来给前端
+                url: `/blog/${post.id.split('/').pop()}/`,
                 title: post.data.title,
                 description: post.data.excerpt || '',
                 content: toPlainText(post.body || '').slice(0, MAX_CONTENT),

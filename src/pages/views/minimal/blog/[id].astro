@@ -4,7 +4,7 @@ import DirectiveStyles from '../../../../components/base/DirectiveStyles.astro';
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import MinimalLayout from '../../../../views/minimal/layouts/MinimalLayout.astro';
 import Breadcrumb from '../../../../components/ui/Breadcrumb.astro';
-import { sortItemsByDateDesc } from '../../../../utils/data-utils';
+import { getPostSlug, sortItemsByDateDesc } from '../../../../utils/data-utils';
 import { slugify } from '../../../../utils/common-utils';
 import siteConfig from '../../../../data/site-config';
 
@@ -12,7 +12,7 @@ export async function getStaticPaths() {
     if (siteConfig.views?.minimal?.enabled !== true) return [];
     const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
     return posts.map((post) => ({
-        params: { id: post.id },
+        params: { id: getPostSlug(post) },
         props: { post }
     }));
 }

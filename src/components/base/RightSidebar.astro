@@ -1,7 +1,7 @@
 ---
 import { locale, t } from '../../i18n';
 import { type CollectionEntry, getCollection } from 'astro:content';
-import { getAllTags, getPostsByTag, sortItemsByDateDesc } from '../../utils/data-utils';
+import { getAllTags, getPostSlug, getPostsByTag, sortItemsByDateDesc } from '../../utils/data-utils';
 import siteConfig from '../../data/site-config';
 import MemoCard from '../widgets/MemoCard.astro';
 import SidebarRecentPosts from '../widgets/SidebarRecentPosts.astro';
@@ -106,7 +106,7 @@ function isMemoItemConfig(config: unknown): boolean {
                                                 data-words={day.totalWords}
                                                 data-stats={t.sidebar.heatmapDay(day.count, day.totalWords.toLocaleString(locale))}
                                                 data-titles={day.posts.map(p => p.data.title).join('|')}
-                                                data-links={day.posts.map(p => `/blog/${p.id}/`).join('|')}
+                                                data-links={day.posts.map(p => `/blog/${getPostSlug(p)}/`).join('|')}
                                             />
                                         ))}
                                     </div>
