@@ -492,9 +492,9 @@ export function processBlockDirective(node, options = {}) {
 
             const html = `<div class="md-directive md-directive-deadline" id="${uid}" data-date="${escapeHtml(date)}" data-expired="${escapeHtml(expiredText)}">` +
                 `${title ? `<div class="md-deadline-title"><span>${escapeHtml(title)}</span></div>` : ''}` +
+                `${description ? `<div class="md-deadline-desc">${escapeHtml(description)}</div>` : ''}` +
                 `<div class="md-deadline-display">${unitHtml}</div>` +
                 `<div class="md-deadline-meta">${escapeHtml(i18n.target)} ${dateStr}</div>` +
-                `${description ? `<div class="md-deadline-desc">${escapeHtml(description)}</div>` : ''}` +
                 `</div>${js}`;
 
             node.data = { hName: 'div', hProperties: {} };

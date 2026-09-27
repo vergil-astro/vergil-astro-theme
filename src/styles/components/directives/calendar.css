@@ -140,7 +140,7 @@
 /* Today: red filled circle */
 .md-calendar-cell--today .md-calendar-day-num {
   background: var(--cal-today);
-  color: #fff;
+  color: var(--cal-bg);
   font-weight: 600;
 }
 
@@ -244,6 +244,10 @@
   text-overflow: ellipsis;
   cursor: default;
   letter-spacing: 0.005em;
+  /* 事件色相由插件写进 --evt-hue，底色和文字色按当前配色混出来：
+     亮色下是浅底深字，暗色下自动变成深底浅字，不用再单独写暗色 */
+  --evt-bg: color-mix(in srgb, var(--evt-hue, #5f6368) 14%, var(--cal-bg));
+  --evt-text: color-mix(in srgb, var(--evt-hue, #5f6368) 78%, var(--cal-text));
   background: var(--evt-bg);
   color: var(--evt-text);
 }
@@ -329,100 +333,7 @@
   flex-shrink: 0;
 }
 
-/* ─── Dark Mode (class-based + media query) ─── */
-html.dark .md-directive-calendar,
-[data-theme="dark"] .md-directive-calendar {
-  --cal-bg: var(--bg-card, #1c1c1e);
-  --cal-border: var(--border-light, #2c2c2e);
-  --cal-text: var(--text-main, #f5f5f7);
-  --cal-text-muted: var(--text-muted, #8e8e93);
-  --cal-text-ghost: color-mix(in srgb, var(--text-secondary, #a0a0a0) 50%, transparent);
-  --cal-today: var(--accent-color, #ff453a);
-  --cal-hover: var(--bg-hover, rgba(255,255,255,0.04));
-}
-
-html.dark .md-calendar-tooltip,
-[data-theme="dark"] .md-calendar-tooltip {
-  background: var(--text-main, rgba(60,60,64,0.96));
-  color: var(--bg-card, #fff);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-}
-
-html.dark .md-calendar-tooltip::before,
-[data-theme="dark"] .md-calendar-tooltip::before {
-  border-bottom-color: var(--text-main, rgba(60,60,64,0.96));
-}
-
-html.dark .md-calendar-btn--today:hover,
-[data-theme="dark"] .md-calendar-btn--today:hover {
-  background: var(--bg-hover, #3a3a3c);
-  color: var(--cal-text);
-}
-
-/* dark mode event colors */
-html.dark .md-event-purple,
-[data-theme="dark"] .md-event-purple { --evt-bg: rgba(147,52,230,0.22); --evt-text: #c084fc; }
-
-html.dark .md-event-blue,
-[data-theme="dark"] .md-event-blue   { --evt-bg: rgba(25,103,210,0.22);  --evt-text: #7eb8ff; }
-
-html.dark .md-event-green,
-[data-theme="dark"] .md-event-green  { --evt-bg: rgba(19,115,51,0.22);   --evt-text: #6ee7b7; }
-
-html.dark .md-event-red,
-[data-theme="dark"] .md-event-red    { --evt-bg: rgba(197,34,31,0.22);   --evt-text: #fca5a5; }
-
-html.dark .md-event-yellow,
-[data-theme="dark"] .md-event-yellow { --evt-bg: rgba(176,96,0,0.22);    --evt-text: #fdba74; }
-
-html.dark .md-event-cyan,
-[data-theme="dark"] .md-event-cyan   { --evt-bg: rgba(0,121,107,0.22);   --evt-text: #4dd0e1; }
-
-html.dark .md-event-orange,
-[data-theme="dark"] .md-event-orange { --evt-bg: rgba(230,81,0,0.22);    --evt-text: #ffab91; }
-
-html.dark .md-event-pink,
-[data-theme="dark"] .md-event-pink   { --evt-bg: rgba(194,24,89,0.22);   --evt-text: #f48fb1; }
-
-html.dark .md-event-gray,
-[data-theme="dark"] .md-event-gray   { --evt-bg: rgba(95,99,104,0.22);   --evt-text: #a1a1aa; }
-
-@media (prefers-color-scheme: dark) {
-  .md-directive-calendar {
-    --cal-bg: var(--bg-card, #1c1c1e);
-    --cal-border: var(--border-light, #2c2c2e);
-    --cal-text: var(--text-main, #f5f5f7);
-    --cal-text-muted: var(--text-muted, #8e8e93);
-    --cal-text-ghost: color-mix(in srgb, var(--text-secondary, #a0a0a0) 50%, transparent);
-    --cal-today: var(--accent-color, #ff453a);
-    --cal-hover: var(--bg-hover, rgba(255,255,255,0.04));
-  }
-
-  .md-calendar-tooltip {
-    background: var(--text-main, rgba(60,60,64,0.96));
-    color: var(--bg-card, #fff);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  }
-
-  .md-calendar-tooltip::before {
-    border-bottom-color: var(--text-main, rgba(60,60,64,0.96));
-  }
-
-  .md-calendar-btn--today:hover {
-    background: var(--bg-hover, #3a3a3c);
-    color: var(--cal-text);
-  }
-
-  .md-event-purple { --evt-bg: rgba(147,52,230,0.22); --evt-text: #c084fc; }
-  .md-event-blue   { --evt-bg: rgba(25,103,210,0.22);  --evt-text: #7eb8ff; }
-  .md-event-green  { --evt-bg: rgba(19,115,51,0.22);   --evt-text: #6ee7b7; }
-  .md-event-red    { --evt-bg: rgba(197,34,31,0.22);   --evt-text: #fca5a5; }
-  .md-event-yellow { --evt-bg: rgba(176,96,0,0.22);    --evt-text: #fdba74; }
-  .md-event-cyan   { --evt-bg: rgba(0,121,107,0.22);   --evt-text: #4dd0e1; }
-  .md-event-orange { --evt-bg: rgba(230,81,0,0.22);    --evt-text: #ffab91; }
-  .md-event-pink   { --evt-bg: rgba(194,24,89,0.22);   --evt-text: #f48fb1; }
-  .md-event-gray   { --evt-bg: rgba(95,99,104,0.22);   --evt-text: #a1a1aa; }
-}
+/* 暗色模式不用单独写：上面的颜色全部取自配色变量，事件色也是按配色混出来的 */
 
 /* ─── Responsive ─── */
 @media (max-width: 640px) {

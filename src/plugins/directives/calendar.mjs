@@ -16,7 +16,8 @@
 import { Solar, HolidayUtil } from 'lunar-javascript';
 import { getIconSvg } from './shared.mjs';
 
-/* Color palette — auto-assigned to unknown tag types */
+/* Color palette — auto-assigned to unknown tag types.
+   只有 text 作为色相输出到 --evt-hue，底色和文字色由 CSS 按当前配色和亮暗模式混出来；bg 留作备查 */
 const TAG_PALETTE = [
     { cls: 'md-event-blue',   bg: '#e8f0fe', text: '#1967d2' },
     { cls: 'md-event-green',  bg: '#e6f4ea', text: '#137333' },
@@ -342,7 +343,7 @@ function renderCell(c, barPos) {
         const linkAttr = hasLink ? ` href="${escapeHtml(e.link)}" target="_blank" rel="noopener noreferrer"` : '';
         const linkCls = hasLink ? ' md-calendar-event--link' : '';
         const arrowSvg = hasLink ? getIconSvg('lucide:external-link', 10).replace(/<svg/, '<svg class="md-calendar-event-arrow"') : '';
-        return `<${tag} class="md-calendar-event ${cfg.cls}${linkCls}" style="--evt-bg:${cfg.bg};--evt-text:${cfg.text}"${linkAttr}>${escapeHtml(e.content)}${arrowSvg}</${tag}>`;
+        return `<${tag} class="md-calendar-event ${cfg.cls}${linkCls}" style="--evt-hue:${cfg.text}"${linkAttr}>${escapeHtml(e.content)}${arrowSvg}</${tag}>`;
     }).join('');
 
     const more = regular.length > maxEvt ? regular.length - maxEvt : 0;
@@ -376,7 +377,7 @@ function renderCell(c, barPos) {
 function renderBar(evt, pos) {
     const cls  = ` md-calendar-event--holiday-${pos}`;
     const text = (pos === 'start' || pos === 'single') ? escapeHtml(evt.content) : '';
-    return `<div class="md-calendar-event md-calendar-event--holiday ${BAR_STYLE.cls}${cls}" style="--evt-bg:${BAR_STYLE.bg};--evt-text:${BAR_STYLE.text}">${text}</div>`;
+    return `<div class="md-calendar-event md-calendar-event--holiday ${BAR_STYLE.cls}${cls}" style="--evt-hue:${BAR_STYLE.text}">${text}</div>`;
 }
 
 function parseEvents(node) {

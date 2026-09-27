@@ -125,7 +125,7 @@ Start by creating a new Vite project if you don't have one set up already.
 
 ---
 
-```bash terminal
+```bash
 npm create vite@latest my-project
 cd my-project
 ```
@@ -138,7 +138,7 @@ cd my-project
 
 ---
 
-```bash terminal
+```bash
 npm install tailwindcss @tailwindcss/vite
 ```
 :::
@@ -150,7 +150,7 @@ npm install tailwindcss @tailwindcss/vite
 
 ---
 
-```bash terminal title="vite.config.ts" highlight="2,6-7"
+```ts title="vite.config.ts" highlight="2,6-7"
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 
@@ -163,13 +163,13 @@ export default defineConfig({
 :::
 
 :::grid{cols="2" bg="none" gap="16"}
-:step-brackets[04]{title="显示行号的 Terminal"}
+:step-brackets[04]{title="显示行号的代码块"}
 
-通过 `linenos` 属性让 terminal 显示行号。
+通过 `linenos` 属性让代码块显示行号。
 
 ---
 
-```bash terminal title="安装依赖" linenos highlight="2"
+```bash title="安装依赖" linenos highlight="2"
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init
 ```

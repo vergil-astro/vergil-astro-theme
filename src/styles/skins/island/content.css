@@ -1,12 +1,12 @@
 /* ── 正文：代码块、分隔线、表格、标签、提示浮层 ── */
 
-/* 代码块固定用暖深棕底，这是整套皮肤里唯一写死的颜色。
+/* 代码块用暖深棕底，混入一点当前配色的强调色，切换配色时带上对应色调。
    Shiki 输出的是双主题：亮色值写在 style 的 color 里，暗色值写在 --shiki-dark 变量里。
    亮色主题的字是按浅底调的，放到深底上看不清，所以这里不论亮暗模式都改用暗色那一套。
    这些值都在 style 属性里，只能用 !important 盖掉 */
 html[data-skin="island"] {
-    --island-code-bg: #2b2118;
-    --island-code-border: #3d3028;
+    --island-code-bg: color-mix(in srgb, var(--accent-color) 8%, #2b2118);
+    --island-code-border: color-mix(in srgb, var(--accent-color) 8%, #3d3028);
 }
 
 html[data-skin="island"] .prose pre.astro-code,

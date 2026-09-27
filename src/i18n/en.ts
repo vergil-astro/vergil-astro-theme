@@ -428,6 +428,18 @@ const en: typeof zhCN = {
             target: 'Target date',
             expired: 'Expired',
         },
+        private: {
+            title: 'Private Content',
+            desc: 'This content is encrypted, please enter the password to view',
+            hint: (hint: string) => `Hint: ${hint}`,
+            placeholder: 'Enter password',
+            showPassword: 'Show password',
+            view: 'View',
+            error: 'Incorrect password, please try again',
+            unlocked: 'Unlocked',
+            lockAgain: 'Lock again',
+            missingPassword: 'Please provide a password attribute, e.g. :::private{password="xxx"}',
+        },
         calendar: {
             prev: 'Previous month',
             next: 'Next month',

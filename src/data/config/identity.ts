@@ -5,7 +5,7 @@ export const siteInfo = {
     /** 界面皮肤，决定圆角、按钮、投影、底纹这些形状质感，和配色互不影响。
      * 当前支持 'default' | 'island'
      * island 是模仿动森项目 github ID: animal-island-ui 风格 */
-    skin: 'island',
+    skin: 'default',
     subtitle: 'Astro Framework for Content Creators',
     description: 'A content-driven Astro framework for building personal websites with Markdown',
     image: {
