@@ -9,7 +9,7 @@ const featured = allPosts.filter((p) => p.data.isFeatured).slice(0, 3);
 
 {featured.length > 0 && (
     <div class="px-4 py-4">
-        <h3 class="text-xs font-medium text-muted uppercase tracking-wider mb-3">{t.sidebar.featured}</h3>
+        <h3 class="ui-label text-xs font-medium text-muted uppercase tracking-wider mb-3">{t.sidebar.featured}</h3>
         <ul class="space-y-2">
             {featured.map((post) => (
                 <li>

@@ -1,0 +1,20 @@
+/**
+ * 皮肤：海岛（island）。
+ *
+ * 皮肤和配色是两回事。配色（data-theme）只管颜色变量，皮肤（data-skin）只管形状和质感。
+ * 这里的颜色几乎都从当前配色的变量里调出来，所以海岛皮肤可以配 A–L 任意一套配色，也跟着暗色模式走。
+ * 唯一的例外是代码块，它固定用暖深棕底，见 content.css。
+ *
+ * 每一条规则都挂在 html[data-skin="island"] 下，默认皮肤不受任何影响。
+ * 组件上的 ui-* 类是给皮肤用的挂钩，本身不带样式；内容指令的 .md-* 类名本身就是公开的，直接匹配即可。
+ *
+ * 视觉语言参考 animal-island-ui 的设计规范，按它的硬规则取舍：
+ * 实色台阶只给主按钮，卡片不要投影，交互元素圆角不小于 12px，动效统一 cubic-bezier(0.4, 0, 0.2, 1)。
+ * 没有拷贝它的代码、字体和插画。
+ */
+
+@import './base.css';
+@import './navigation.css';
+@import './content.css';
+@import './directives.css';
+@import './overlays.css';

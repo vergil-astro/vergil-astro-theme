@@ -42,7 +42,7 @@ function hasActiveChild(children?: { href: string }[]): boolean {
 ---
 
 <header class={`${sticky ? 'sticky top-0' : 'fixed top-0 left-0 right-0'} z-50`} id="top-nav-header" data-is-article={isArticlePage ? 'true' : 'false'} data-article-title={articleTitle} data-comments-enabled={commentsEnabled ? 'true' : 'false'} data-splash-mode={sticky ? 'true' : 'false'}>
-    <div class="h-14 nav-glass backdrop-blur-lg relative">
+    <div class="ui-topbar h-14 nav-glass backdrop-blur-lg relative">
         <nav class="nav-normal flex items-center justify-between h-full max-w-7xl mx-auto px-4 lg:px-6 absolute inset-0 transition-all duration-300 ease-out">
             <a href="/" class="flex items-center gap-2 text-main hover:text-accent transition-colors">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

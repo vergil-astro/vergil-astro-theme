@@ -6,7 +6,7 @@ export const splash = {
         '/demo/splash-02.webp',
         '/demo/splash-03.webp'
     ],
-    overlay: 'rgba(0,0,0,0.1)',
+    overlay: 'rgba(0,0,0,0.15)',
     textShadow: true,
     fallbackBg: 'bg-black',
     gradientColor: '#2d2d2d',

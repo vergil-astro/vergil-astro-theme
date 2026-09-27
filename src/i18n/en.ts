@@ -136,8 +136,9 @@ const en: typeof zhCN = {
             G: 'Iris Wisteria',
             H: 'Midnight Navy',
             I: 'Charcoal',
-            J: 'Moss Forest',
+            J: 'Cream Coral',
             K: 'Sandstone',
+            L: 'Warm Cream',
         } as Record<string, string>,
     },
 

@@ -20,7 +20,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
 
 {posts.length > 0 && (
     <div class="px-4 py-4">
-        <h3 class="text-xs font-medium text-muted uppercase tracking-wider mb-3">{t.sidebar.recent}</h3>
+        <h3 class="ui-label text-xs font-medium text-muted uppercase tracking-wider mb-3">{t.sidebar.recent}</h3>
         <ul class="space-y-2.5">
             {posts.map((post) => (
                 <li>

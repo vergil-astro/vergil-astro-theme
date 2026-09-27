@@ -15,7 +15,7 @@ const searchDataUrl = '/search-data.json';
 
     <dialog
         id="search-dialog"
-        class="max-h-[80vh] w-[92vw] max-w-2xl rounded-xl bg-main p-0 shadow-2xl backdrop:bg-black/50 border border-light/30"
+        class="ui-modal max-h-[80vh] w-[92vw] max-w-2xl rounded-xl bg-main p-0 shadow-2xl backdrop:bg-black/50 border border-light/30"
     >
         <div class="flex flex-col">
             <!-- Search Input -->
@@ -38,7 +38,7 @@ const searchDataUrl = '/search-data.json';
                         type="text"
                         id="search-input"
                         placeholder={t.search.placeholder}
-                        class="w-full rounded-lg bg-card py-3 pl-11 pr-4 text-main outline-none placeholder:text-muted/60 transition-colors focus:bg-card/80"
+                        class="ui-input w-full rounded-lg bg-card py-3 pl-11 pr-4 text-main outline-none placeholder:text-muted/60 transition-colors focus:bg-card/80"
                         autocomplete="off"
                     />
                 </div>

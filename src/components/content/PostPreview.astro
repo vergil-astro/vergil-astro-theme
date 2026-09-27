@@ -80,7 +80,7 @@ const hasBanner = !!banner;
                     <span class="flex items-center gap-1">
                         <a
                             href={`/categories/${slugify(categories[categories.length - 1])}`}
-                            class="text-accent hover:underline"
+                            class="ui-tag text-accent hover:underline"
                             onclick="event.stopPropagation();"
                         >
                             {categories.join('/')}
@@ -90,10 +90,10 @@ const hasBanner = !!banner;
                     <span class="flex items-center gap-1">
                         {tags.map((tag, index) => (
                             <span>
-                                {index > 0 && <span class="text-secondary">, </span>}
+                                {index > 0 && <span class="ui-tag-sep text-secondary">, </span>}
                                 <a
                                     href={`/tags/${slugify(tag)}`}
-                                    class="text-accent hover:underline"
+                                    class="ui-tag text-accent hover:underline"
                                     onclick="event.stopPropagation();"
                                 >
                                     #{tag}

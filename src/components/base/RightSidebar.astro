@@ -93,7 +93,7 @@ function isMemoItemConfig(config: unknown): boolean {
             if (componentId === 'heatmap') {
                 return (
                     <div class="mb-6 px-4">
-                        <h3 class="text-xs font-medium text-muted uppercase tracking-wider mb-3">{t.sidebar.heatmap}</h3>
+                        <h3 class="ui-label text-xs font-medium text-muted uppercase tracking-wider mb-3">{t.sidebar.heatmap}</h3>
                         <div class="flex items-start gap-1">
                             <div class="flex gap-0.5">
                                 {weeks.map((week) => (
@@ -101,6 +101,7 @@ function isMemoItemConfig(config: unknown): boolean {
                                         {week.map((day) => (
                                             <div
                                                 class={`heatmap-cell w-4 h-4 rounded-sm ${getLevelColor(day.count)} relative cursor-pointer hover:ring-2 hover:ring-accent/50 transition-all`}
+                                                data-level={Math.min(day.count, 4)}
                                                 data-date={formatDate(day.date)}
                                                 data-count={day.count}
                                                 data-words={day.totalWords}
@@ -136,7 +137,7 @@ function isMemoItemConfig(config: unknown): boolean {
             }
             return null;
         })}
-    <div id="heatmap-tooltip" class="fixed hidden z-50 bg-card border border-light rounded-lg shadow-lg px-4 py-3 max-w-xs" data-i18n-no-posts={t.sidebar.noPosts}>
+    <div id="heatmap-tooltip" class="ui-tooltip fixed hidden z-50 bg-card border border-light rounded-lg shadow-lg px-4 py-3 max-w-xs" data-i18n-no-posts={t.sidebar.noPosts}>
         <div class="text-sm">
             <p id="tooltip-date" class="text-muted mb-1 text-xs"></p>
             <p id="tooltip-stats" class="font-medium text-main"></p>

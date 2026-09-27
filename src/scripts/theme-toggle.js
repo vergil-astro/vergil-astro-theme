@@ -1,10 +1,10 @@
 (function () {
     var root = document.documentElement;
-    var SCHEMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+    var SCHEMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
     var SCHEME_COLORS = {
         A: '#4a7c59', B: '#4a6fa5', C: '#c0622a', D: '#c06070',
         E: '#c07818', F: '#2a8c62', G: '#7848cc', H: '#1848cc',
-        I: '#141414', J: '#507838', K: '#b86030'
+        I: '#141414', J: '#b54531', K: '#b86030', L: '#a9521f'
     };
 
     function getStoredScheme() {

@@ -118,7 +118,7 @@ const hasActions = !!buttonText || navItems.length > 0;
             <button
                 id="splash-action-btn"
                 type="button"
-                class="inline-flex items-center justify-center px-8 py-3 sm:px-10 sm:py-3.5 rounded-full text-sm font-medium
+                class="ui-btn-primary inline-flex items-center justify-center px-8 py-3 sm:px-10 sm:py-3.5 rounded-full text-sm font-medium
                        bg-white/90 dark:bg-gray-900/90 text-main dark:text-white
                        hover:bg-white dark:hover:bg-gray-800
                        backdrop-blur-md shadow-lg hover:shadow-xl
@@ -291,10 +291,13 @@ const hasActions = !!buttonText || navItems.length > 0;
 
         if (!splash || !arrow) return;
 
-        const splashHeight = splash.offsetHeight;
+        // 开屏图高度是 100dvh，会随视口变化（开关书签栏、开发者工具、调整窗口）。
+        // 只在初始化时量一次的话，吸附目标会过期，页面停在开屏图末尾之前，顶栏上方露出一截图片。
+        // 所以每次用到时都现量。
+        const splashHeight = () => splash.offsetHeight;
 
         function scrollToContent() {
-            window.scrollTo({ top: splashHeight, behavior: 'smooth' });
+            window.scrollTo({ top: splashHeight(), behavior: 'smooth' });
         }
 
         window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
@@ -329,8 +332,9 @@ const hasActions = !!buttonText || navItems.length > 0;
             if (scrollTimeout) clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
                 const y = window.scrollY;
-                if (y > 0 && y < splashHeight) {
-                    if (y > splashHeight * 0.25) {
+                const h = splashHeight();
+                if (y > 0 && y < h) {
+                    if (y > h * 0.25) {
                         scrollToContent();
                     } else {
                         window.scrollTo({ top: 0, behavior: 'smooth' });

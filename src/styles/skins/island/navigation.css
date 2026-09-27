@@ -1,0 +1,306 @@
+/* ── 导航与页面骨架：顶栏、侧栏小标题、页面标题飘带、分页、悬浮按钮 ── */
+
+/* 顶栏外壳：铺上和页面一样的波点底，内容滚上去像是滑进了页面底下。
+   条带下沿正好是正文栏吸顶工具条的位置，工具条会挡住截断线，所以不需要再加渐隐 */
+html[data-skin="island"] .ui-topbar {
+    background-color: var(--bg-main);
+    background-image: radial-gradient(var(--island-dot) 1.5px, transparent 2px);
+    background-size: 22px 22px;
+    background-attachment: fixed;
+    border-bottom: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* 顶栏内容条：悬浮的奶油色胶囊。它不是按钮，所以只用柔和投影，不用台阶 */
+html[data-skin="island"] .ui-topbar > nav {
+    /* 胶囊保持原来 h-14 的高度，离顶 6px */
+    inset: 6px 1rem auto;
+    height: 3.5rem;
+    background: var(--bg-card);
+    border: 2px solid var(--border-light);
+    border-radius: 9999px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ── 面板：配色提供了 --bg-panel 时，把正文栏放进一块圆角面板，作为阅读区的视觉中心。
+   两条侧栏不加面板，保持原设计直接放在页面底色上：左栏自带卡片，右栏是一组小组件。
+   原设计里左栏卡片到正文、右栏文字到正文的距离几乎相等，给侧栏加底色会打破这层对称。
+   没有 --bg-panel 的配色退回透明，看起来和原来一样。
+   正文栏没有自己的类名，用 :has() 从 main#main-content 往上找；不支持 :has() 的旧浏览器只是没有面板 ── */
+html[data-skin="island"] div:has(> #main-content) {
+    /* 两种布局给正文栏的左右内边距不一样（BaseLayout 窄、DocsLayout 宽），
+       而吸顶工具条只按一种负边距铺满，结果不是比面板宽就是比面板窄。
+       海岛皮肤下统一成这一个变量，工具条正好贴齐面板两边 */
+    --island-gutter: 1rem;
+    padding-inline: var(--island-gutter);
+    background-color: var(--bg-panel, transparent);
+    border-radius: var(--radius-2xl);
+    /* 兜底：万一还有东西伸出面板，按面板的圆角裁掉。clip 不会生成滚动容器，吸顶照常生效 */
+    overflow: clip;
+}
+
+@media (min-width: 1024px) {
+    html[data-skin="island"] div:has(> #main-content) {
+        --island-gutter: 1.5rem;
+    }
+
+    /* 顶栏是 fixed 的页面（没有开屏图），正文区原本只留 pt-12，比顶栏矮，
+       面板顶部会压在实色顶栏底下，连圆角一起被切掉。改成从胶囊底边往下留一个间距。胶囊底边 = 条带高度 - 6px */
+    html[data-skin="island"] #main-stage:has(> #top-nav-header[data-splash-mode="false"]) > div:has(#main-content) {
+        padding-top: calc(var(--island-bar) - 6px + var(--island-space));
+    }
+
+    /* 有开屏图的页面顶栏在文档流里，正文区原本留 pt-4，这里同样对齐到胶囊底边往下一个间距 */
+    html[data-skin="island"] #main-stage:has(> #top-nav-header[data-splash-mode="true"]) > div:has(#main-content) {
+        padding-top: calc(var(--island-space) - 6px);
+    }
+
+    /* 正文面板两侧的留白 = 栏距 + 侧栏内容自带的内边距。原来两侧都接近 40px，面板显得孤立。
+       只收栏距，让两侧留白落到约 21.6px（原本的栏距）；省下来的宽度全部交给正文栏，
+       三栏总宽度不变，所以两条侧栏的宽度（包括原本被 flex 压缩的那一点）完全不变，外沿也不动。
+       首页类布局：栏距 lg 1rem / xl 1.5rem → 0.25rem；文档页：lg 以上 2rem → 0.5rem。
+       右侧栏只在 xl 以上出现，所以 lg 只省一个栏距，xl 省两个 */
+    html[data-skin="island"] #main-stage > div:has(#main-content) {
+        column-gap: 0.25rem;
+    }
+
+    html[data-skin="island"] #main-stage > div:has(#main-content) > div:has(#main-content) {
+        max-width: calc(48rem + 0.75rem);
+    }
+
+    html[data-skin="island"] #main-stage > div:has(#docs-sidebar) {
+        column-gap: 0.5rem;
+    }
+
+    html[data-skin="island"] #main-stage > div:has(#docs-sidebar) > div:has(#main-content) {
+        max-width: calc(48rem + 1.5rem);
+    }
+
+    /* 左栏容器带着上内边距，第一张卡片会比正文面板低一截。只去掉上内边距让顶边对齐，宽度和卡片间距都不动 */
+    html[data-skin="island"] #main-sidebar > :first-child {
+        padding-top: 0;
+    }
+
+    /* 右栏同理：外层容器和第一个组件各带一层上内边距，第一个小标签比左栏卡片低了约 21px。
+       只去掉最顶上这两层，组件之间的间距不动。文档页的右栏是目录，结构不同，不受影响
+       （那里左右两栏的文字本来就都比面板低 14.4px，和面板里的工具条一行对齐） */
+    html[data-skin="island"] .right-sidebar-container > :first-child,
+    html[data-skin="island"] .right-sidebar-container > :first-child > :first-child {
+        padding-top: 0;
+    }
+}
+
+@media (min-width: 1280px) {
+    html[data-skin="island"] #main-stage > div:has(#main-content) > div:has(#main-content) {
+        max-width: calc(48rem + 2.5rem);
+    }
+
+    html[data-skin="island"] #main-stage > div:has(#docs-sidebar) > div:has(#main-content) {
+        max-width: calc(48rem + 3rem);
+    }
+}
+
+/* 正文栏顶上吸顶的工具条原本是半透明的页面底色，在面板里会和正文断开，改成和面板一样的实色 */
+html[data-skin="island"] #floating-toolbar {
+    margin-inline: calc(-1 * var(--island-gutter, 1rem));
+    padding-inline: var(--island-gutter, 1rem);
+    background-color: var(--bg-panel, color-mix(in srgb, var(--bg-main) 80%, transparent));
+}
+
+/* 面板往上滚时会被顶栏的实色条带横着切出一条直边，而两条吸顶侧栏停在同一高度时露着圆角，
+   看起来就像正文被顶栏挡住了一截。工具条正好吸在这条切线上，所以在它的两个上角补一对反向圆角：
+   用和页面一模一样的底色加波点把角挖圆，面板露出来的顶部就始终是圆的。
+   面板没滚动时工具条就在面板顶上，这对角和面板自己的圆角重合，看不出来 */
+html[data-skin="island"] #floating-toolbar::before,
+html[data-skin="island"] #floating-toolbar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: var(--radius-2xl);
+    height: var(--radius-2xl);
+    pointer-events: none;
+    background-color: var(--bg-main);
+    background-image: radial-gradient(var(--island-dot) 1.5px, transparent 2px);
+    background-size: 22px 22px;
+    background-attachment: fixed;
+}
+
+html[data-skin="island"] #floating-toolbar::before {
+    left: 0;
+    -webkit-mask: radial-gradient(circle at 100% 100%, transparent calc(var(--radius-2xl) - 0.5px), #000 var(--radius-2xl));
+    mask: radial-gradient(circle at 100% 100%, transparent calc(var(--radius-2xl) - 0.5px), #000 var(--radius-2xl));
+}
+
+html[data-skin="island"] #floating-toolbar::after {
+    right: 0;
+    -webkit-mask: radial-gradient(circle at 0% 100%, transparent calc(var(--radius-2xl) - 0.5px), #000 var(--radius-2xl));
+    mask: radial-gradient(circle at 0% 100%, transparent calc(var(--radius-2xl) - 0.5px), #000 var(--radius-2xl));
+}
+
+/* ── 开屏图：底部那段模糊渐隐原本只渐到 55% 的页面底色，默认皮肤靠毛玻璃顶栏盖住接缝。
+   海岛皮肤的顶栏条带是实色，接缝会露成一道硬边，所以让渐隐一直走到 100% ── */
+html[data-skin="island"] .splash-gradient {
+    background: linear-gradient(to top, var(--bg-main) 0%, transparent 100%);
+}
+
+/* ── 首页 Hero 的行动按钮：Hero 自己有一条规则把区域里所有链接改成正文色加虚线下划线，
+   连按钮也被带上了。海岛皮肤下把它们还原成主按钮：浅色字、胶囊、底部台阶 ── */
+html[data-skin="island"] .hero a.bg-accent {
+    color: var(--bg-card);
+    text-decoration: none;
+    border-radius: 9999px;
+    font-weight: 600;
+    box-shadow: 0 4px 0 0 var(--island-ledge-accent);
+    transition:
+        transform var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out),
+        background-color var(--duration-fast);
+}
+
+html[data-skin="island"] .hero a.bg-accent:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 0 var(--island-ledge-accent);
+}
+
+html[data-skin="island"] .hero a.bg-accent:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 var(--island-ledge-accent);
+}
+
+/* 条带加高到胶囊上下各留 6px，胶囊不再压到条带外面；
+   所有原本按 top-14 吸顶、按 100vh-3.5rem 定高的元素，跟着停到条带下沿 */
+html[data-skin="island"] .ui-topbar {
+    height: var(--island-bar);
+}
+
+html[data-skin="island"] #floating-toolbar,
+html[data-skin="island"] #main-sidebar,
+html[data-skin="island"] #docs-sidebar,
+html[data-skin="island"] .right-sidebar-container,
+html[data-skin="island"] .mobile-menu-glass {
+    top: var(--island-bar);
+}
+
+html[data-skin="island"] #main-sidebar,
+html[data-skin="island"] #docs-sidebar,
+html[data-skin="island"] .right-sidebar-container {
+    height: calc(100vh - var(--island-bar));
+}
+
+/* ── 侧栏小标题：圆角小签 ── */
+html[data-skin="island"] .ui-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    width: fit-content;
+    padding: 0.2em 0.75em;
+    border-radius: 9999px;
+    background: var(--bg-muted);
+    color: var(--text-secondary);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+/* ── 页面标题：燕尾飘带。
+   正面是强调色，两端的燕尾比正面压暗一档、垂得更低，燕尾靠近正面的角上再压一个更暗的折角。
+   燕尾往外伸出 0.9em，所以标题本身往里让出同样的距离 ── */
+html[data-skin="island"] .ui-title {
+    --ribbon-front: var(--accent-color);
+    --ribbon-back: color-mix(in srgb, var(--accent-color) 72%, #000);
+    --ribbon-fold: color-mix(in srgb, var(--accent-color) 42%, #000);
+
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    height: 2em;
+    margin-left: 0.9em;
+    margin-right: 0.9em;
+    padding: 0 1.4em;
+    border-radius: 0.2em;
+    background: var(--ribbon-front);
+    color: var(--bg-card);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: nowrap;
+    filter: drop-shadow(0 0.08em 0.12em rgb(0 0 0 / 0.08));
+}
+
+html[data-skin="island"] .ui-title::before,
+html[data-skin="island"] .ui-title::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    bottom: -0.4em;
+    width: 1.7em;
+    height: 1.7em;
+    background-repeat: no-repeat;
+    background-size: 0.9em 0.4em, auto;
+}
+
+/* 折角是正面底边下方的一个小三角，靠正面那一侧 */
+html[data-skin="island"] .ui-title::before {
+    left: -0.9em;
+    background-image:
+        linear-gradient(to bottom left, var(--ribbon-fold) 50%, transparent 50%),
+        linear-gradient(var(--ribbon-back), var(--ribbon-back));
+    background-position: right bottom, 0 0;
+    clip-path: polygon(100% 0%, 100% 100%, 0% 100%, 30% 50%, 0% 0%);
+}
+
+html[data-skin="island"] .ui-title::after {
+    right: -0.9em;
+    background-image:
+        linear-gradient(to bottom right, var(--ribbon-fold) 50%, transparent 50%),
+        linear-gradient(var(--ribbon-back), var(--ribbon-back));
+    background-position: left bottom, 0 0;
+    clip-path: polygon(0% 0%, 100% 0%, 70% 50%, 100% 100%, 0% 100%);
+}
+
+/* 燕尾往下垂了 0.4em，给紧跟着的内容让出位置 */
+html[data-skin="island"] .ui-title + * {
+    margin-top: 0.6em;
+}
+
+/* ── 分页：前后翻页是透明圆钮，当前页是实心的强调色小胶囊 ── */
+html[data-skin="island"] .ui-pagination [aria-current="page"] {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35em 1em;
+    border-radius: 9999px;
+    background: var(--accent-color);
+    color: var(--bg-card);
+    font-weight: 700;
+}
+
+html[data-skin="island"] .ui-icon-btn {
+    border-color: transparent;
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast);
+}
+
+html[data-skin="island"] .ui-icon-btn:hover {
+    background: var(--island-tint);
+    color: var(--accent-color);
+}
+
+/* ── 悬浮圆钮（回到顶部、目录）：强调色的圆贴纸，外圈一道卡片色描边 ── */
+html[data-skin="island"] .ui-fab {
+    background: var(--accent-color);
+    color: var(--bg-card);
+    border: 3px solid var(--bg-card);
+    box-shadow: 0 4px 10px rgb(91 78 30 / 0.22);
+    backdrop-filter: none;
+}
+
+html[data-skin="island"] .ui-fab:hover {
+    color: var(--bg-card);
+    border-color: var(--bg-card);
+    box-shadow: 0 4px 14px rgb(91 78 30 / 0.32);
+    transform: scale(1.08);
+}
+
+html[data-skin="island"] .ui-fab:active {
+    transform: translateY(2px) scale(0.96);
+}

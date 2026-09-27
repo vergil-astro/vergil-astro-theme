@@ -1,0 +1,121 @@
+/* ── 基础：token、底纹、焦点、卡片、按钮 ── */
+
+html[data-skin="island"] {
+    /* 圆角整体放大。卡片 20px，浮层 16px，交互元素不小于 12px */
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 28px;
+
+    /* 投影改成更软的暖色 */
+    --shadow-xs: 0 1px 2px 0 rgb(61 52 40 / 0.05);
+    --shadow-sm: 0 2px 4px 0 rgb(61 52 40 / 0.06);
+    --shadow-md: 0 3px 10px 0 rgb(61 52 40 / 0.10);
+    --shadow-lg: 0 8px 24px 0 rgb(61 52 40 / 0.14);
+    --shadow-xl: 0 16px 40px -8px rgb(61 52 40 / 0.18);
+
+    --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* 页面骨架的统一间距：栏与栏之间、卡片与卡片之间、顶栏到内容、侧栏到视口底边都用它 */
+    --island-space: 1rem;
+    /* 顶栏条带的高度：原来的 h-14 再加上胶囊上下各 6px 的留白，胶囊整个装在条带里 */
+    --island-bar: calc(3.5rem + 12px);
+
+    /* 皮肤自己的派生色 */
+    /* 配色可以用 --bg-dot 指定波点颜色，不指定就从文字色混一个 */
+    --island-dot: var(--bg-dot, color-mix(in srgb, var(--text-main) 9%, var(--bg-main)));
+    --island-ledge: color-mix(in srgb, var(--text-main) 25%, var(--bg-card));
+    --island-ledge-accent: color-mix(in srgb, var(--accent-color) 65%, #000);
+    --island-edge: color-mix(in srgb, var(--text-main) 22%, var(--bg-card));
+    --island-dash: color-mix(in srgb, var(--text-main) 30%, transparent);
+    --island-tint: color-mix(in srgb, var(--accent-color) 12%, var(--bg-card));
+    /* 输入类控件的焦点色，参考站用黄色 */
+    --island-focus-input: #ffcc00;
+}
+
+/* ── 波点底。body 和吸顶侧栏、顶栏都铺同一张 fixed 背景，接缝对得上 ── */
+html[data-skin="island"] body,
+html[data-skin="island"] .bg-main {
+    background-image: radial-gradient(var(--island-dot) 1.5px, transparent 2px);
+    background-size: 22px 22px;
+    background-attachment: fixed;
+}
+
+/* ── 焦点：按钮和链接用强调色，输入类用黄色 ── */
+html[data-skin="island"] :where(a, button, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+    border-radius: var(--radius-md);
+}
+
+html[data-skin="island"] :where(input, textarea, select):focus-visible {
+    outline: 2px solid var(--island-focus-input);
+    outline-offset: 1px;
+}
+
+/* ── 卡片：不要投影，靠卡片色和底色的反差立起来。
+   参考站连描边都不要，但在 C 这类近白配色上卡片会和底色糊成一片，所以留一道很淡的边 ── */
+html[data-skin="island"] .card,
+html[data-skin="island"] .card-interactive {
+    border: 1.5px solid color-mix(in srgb, var(--border-light) 80%, transparent);
+    box-shadow: none;
+}
+
+html[data-skin="island"] .card:hover,
+html[data-skin="island"] .card-interactive:hover {
+    border-color: color-mix(in srgb, var(--accent-color) 40%, var(--border-light));
+    box-shadow: none;
+}
+
+/* ── 普通按钮：胶囊 + 柔和投影，悬停时边框和文字染上强调色 ── */
+html[data-skin="island"] .ui-btn {
+    border-radius: 9999px;
+    border-width: 2px;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    transition:
+        transform var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out),
+        color var(--duration-fast),
+        border-color var(--duration-fast);
+}
+
+html[data-skin="island"] .ui-btn:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+html[data-skin="island"] .ui-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ── 主按钮：奶油色胶囊 + 底部实色台阶，整套皮肤里只有它能用台阶 ── */
+html[data-skin="island"] .ui-btn-primary {
+    color: var(--text-main);
+    background: var(--bg-card);
+    border: 2px solid var(--bg-card);
+    border-radius: 9999px;
+    font-weight: 600;
+    box-shadow: 0 5px 0 0 var(--island-ledge);
+    backdrop-filter: none;
+    transition:
+        transform var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+}
+
+html[data-skin="island"] .ui-btn-primary:hover {
+    background: var(--bg-card);
+    border-color: var(--bg-card);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 0 0 var(--island-ledge);
+}
+
+html[data-skin="island"] .ui-btn-primary:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 var(--island-ledge);
+}
