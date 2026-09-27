@@ -112,7 +112,7 @@ Vergil 提供 50 个指令，按用途分为八类：
 - **[引用卡片（quot）](/docs/vergil-guide/03-基本创作/内容指令/内容展示/#引用卡片quot)** — 引用展示
 - **[标题装饰 / 强调引用（title）](/docs/vergil-guide/03-基本创作/内容指令/内容展示/#标题装饰--强调引用title)** — 引号或徽章样式的装饰标题
 - **[段落引号（blockquote）](/docs/vergil-guide/03-基本创作/内容指令/内容展示/#段落引号blockquote)** — 带引号的段落
-- **[终端块（terminal）](/docs/vergil-guide/03-基本创作/内容指令/内容展示/#终端块terminal)** — 终端样式代码块
+- **[代码块](/docs/vergil-guide/03-基本创作/内容指令/内容展示/#代码块)** — mac 窗口样式的代码块，shell 代码支持命令提示符
 - **[代码面板（panel）](/docs/vergil-guide/03-基本创作/内容指令/内容展示/#代码面板panel)** — 多段并列展示
 - **[复制块（copy）](/docs/vergil-guide/03-基本创作/内容指令/内容展示/#复制块copy)** — 一键复制代码
 - **[私密内容（private）](/docs/vergil-guide/03-基本创作/内容指令/内容展示/#私密内容private)** — 加密容器
@@ -169,8 +169,8 @@ Vergil 提供 50 个指令，按用途分为八类：
 
 - **[倒计时（deadline）](/docs/vergil-guide/03-基本创作/内容指令/时间规划/#倒计时deadline)** — 翻牌式倒计时器
 - **[日历（calendar）](/docs/vergil-guide/03-基本创作/内容指令/时间规划/#日历calendar)** — macOS 风格日历，支持农历和节假日
-- **[任务规划（plan）](/docs/vergil-guide/03-基本创作/内容指令/时间规划/#任务规划plan)** — 多视图任务看板（7种视图）
 - **[OKR 目标管理（okr）](/docs/vergil-guide/03-基本创作/内容指令/时间规划/#okr-目标管理okr)** — 目标与关键结果追踪
+- **[任务规划（plan）](/docs/vergil-guide/03-基本创作/内容指令/时间规划/#任务规划plan)** — 多视图任务看板（7种视图）
 
 ### [可视化叙事（2个指令）](/docs/vergil-guide/03-基本创作/内容指令/可视化叙事/)
 

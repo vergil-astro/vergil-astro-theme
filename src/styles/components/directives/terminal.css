@@ -1,8 +1,17 @@
+/* 窗口结构按 mac 终端：标题栏比内容区亮一档，下面接一整块铺满的内容区，中间一条细分隔线。
+   外框的底色就是标题栏的颜色，内容区自己铺满到窗口边缘，底部圆角由外框的 overflow 裁出来 */
 .md-terminal {
     margin: 1.25rem 0;
     border-radius: var(--md-radius-sm);
     overflow: hidden;
-    background: #0b0d12;
+    /* 窗口始终是深色，但往深色里混一点当前配色的强调色，切换配色时代码窗口也带上对应的色调 */
+    --code-bar: color-mix(in srgb, var(--accent-color, #64748b) 10%, #1d1f25);
+    --code-bg: color-mix(in srgb, var(--accent-color, #64748b) 8%, #121318);
+    --code-chrome: color-mix(in srgb, var(--accent-color, #64748b) 18%, #94a3b8);
+    --code-output: color-mix(in srgb, var(--accent-color, #64748b) 12%, #9aa4b2);
+    --code-prompt: color-mix(in srgb, var(--accent-color, #64748b) 55%, #ffffff);
+    --code-prompt-symbol: color-mix(in srgb, var(--accent-color, #64748b) 35%, #ffffff);
+    background: var(--code-bar);
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
@@ -16,7 +25,8 @@
     gap: 8px;
     padding: 5px 12px;
     background: transparent;
-    color: #94a3b8;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--code-chrome);
     font-size: 0.7rem;
     font-family: var(--font-mono);
 }
@@ -54,7 +64,7 @@
     border: none;
     border-radius: 5px;
     background: transparent;
-    color: #94a3b8;
+    color: var(--code-chrome);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -70,17 +80,17 @@
 
 .md-terminal-body {
     position: relative;
-    padding: 0 10px 10px;
+    padding: 0;
     background: transparent;
 }
 
 .md-terminal-body pre {
     margin: 0 !important;
     border: none !important;
-    border-radius: 6px !important;
-    background: #14161d !important;
+    border-radius: 0 !important;
+    background: var(--code-bg) !important;
     color: #e2e8f0;
-    padding: 10px 0 !important;
+    padding: 12px 0 !important;
     white-space: pre !important;
     word-wrap: normal !important;
     overflow-x: auto !important;
@@ -117,8 +127,8 @@
 }
 
 .md-terminal-body pre .line-highlight {
-    background: rgba(56, 189, 248, 0.1);
-    box-shadow: inset 3px 0 0 0 rgba(51, 164, 239, 0.85);
+    background: color-mix(in srgb, var(--accent-color, #38bdf8) 14%, transparent);
+    box-shadow: inset 3px 0 0 0 color-mix(in srgb, var(--accent-color, #38bdf8) 70%, #ffffff);
 }
 
 .md-terminal-body pre .line::before {
@@ -136,11 +146,37 @@
     top: 1px;
     width: 2.0em;
     text-align: right;
-    color: #64748b;
+    color: color-mix(in srgb, var(--code-chrome) 70%, transparent);
     font-size: 0.75em;
     content: attr(data-line);
 }
 
+/* 命令行前的提示符：写了 path 时由插件插入。不可选中，手动框选复制时也不会带上它 */
+.md-terminal-prompt {
+    user-select: none;
+    margin-right: 0.6em;
+    font-weight: 600;
+}
+
+.md-terminal-prompt-path {
+    color: var(--code-prompt);
+}
+
+.md-terminal-prompt-symbol {
+    margin-left: 0.5em;
+    color: var(--code-prompt-symbol);
+}
+
 .md-terminal .line span[style*="--shiki-dark"] {
     color: var(--shiki-dark) !important;
+}
+
+/* 有命令行时，其余行是命令输出，不按语法上色，统一用淡一些的纯色；
+   输出行也不可选中，手动框选复制时只会拿到命令，和复制按钮的行为一致 */
+.md-terminal:has(.line-command) .line:not(.line-command) {
+    user-select: none;
+}
+
+.md-terminal:has(.line-command) .line:not(.line-command) span[style] {
+    color: var(--code-output) !important;
 }

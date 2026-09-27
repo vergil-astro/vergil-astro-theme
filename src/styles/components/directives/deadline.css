@@ -8,6 +8,8 @@
     border-radius: var(--md-radius-lg);
     text-align: center;
     position: relative;
+    /* 数字块高度放在外层，冒号也读得到，才能按数字块的高度居中 */
+    --panel-h: 58px;
     box-shadow:
         0 1px 3px rgba(0,0,0,0.06),
         0 4px 12px rgba(0,0,0,0.05);
@@ -46,7 +48,7 @@
     display: flex;
     gap: 8px;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 0.7rem;
     flex-wrap: nowrap;
     min-height: 96px;
@@ -64,7 +66,6 @@
 .md-deadline-panel {
     position: relative;
     width: 48px;
-    --panel-h: 58px;
     height: var(--panel-h);
     perspective: 200px;
     border-radius: 10px;
@@ -250,6 +251,7 @@
 /* Colon separator */
 .md-deadline-sep {
     display: flex;
+    align-self: flex-start;
     align-items: center;
     height: var(--panel-h);
     font-size: 1.1rem;
@@ -274,21 +276,24 @@
     letter-spacing: 0.08em;
 }
 
-/* Meta line */
-.md-deadline-meta {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    font-weight: 500;
+/* 说明文字紧跟在标题下面当副标题，先交代在倒数什么再看数字 */
+.md-deadline-title:has(+ .md-deadline-desc) {
+    margin-bottom: 0.25rem;
 }
 
-/* Description */
 .md-deadline-desc {
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     line-height: 1.6;
     max-width: 280px;
-    margin: 0 auto;
+    margin: 0 auto 0.9rem;
+}
+
+/* 目标日期是补充信息，放在最底下当脚注 */
+.md-deadline-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
 }
 
 /* Expired state */
@@ -314,7 +319,6 @@
 
     .md-deadline-panel {
         width: 48px;
-        --panel-h: 58px;
         font-size: 1.2rem;
         border-radius: 8px;
     }

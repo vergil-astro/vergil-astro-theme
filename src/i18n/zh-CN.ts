@@ -439,6 +439,18 @@ export default {
             target: '目标日期',
             expired: '已截止',
         },
+        private: {
+            title: '私密内容',
+            desc: '这部分内容已加密，输入密码后查看',
+            hint: (hint: string) => `提示：${hint}`,
+            placeholder: '输入密码',
+            showPassword: '显示密码',
+            view: '查看',
+            error: '密码不对，再试一次',
+            unlocked: '已解锁',
+            lockAgain: '重新锁定',
+            missingPassword: '请提供 password 属性，例如 :::private{password="xxx"}',
+        },
         calendar: {
             prev: '上月',
             next: '下月',

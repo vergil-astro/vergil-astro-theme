@@ -241,15 +241,19 @@ html[data-skin="island"] .md-directive-panel:has(pre) .md-panel-segment > :is(p,
 /* ── 终端块：外框原本是写死的冷黑色，里面的代码区在海岛皮肤下是暖深棕，冷黑框套暖棕块不协调。
    外框和标题栏换成比代码区亮一档的暖深棕，圆点饱和度略压，和暖色调放在一起不刺眼 ── */
 html[data-skin="island"] .md-terminal {
-    background: #3a2d22;
-    border-color: #4a3a2c;
+    /* 海岛皮肤下窗口的基准色换成暖棕，同样混入当前配色的强调色 */
+    --code-bar: color-mix(in srgb, var(--accent-color) 8%, #3a2d22);
+    --code-bg: var(--island-code-bg);
+    --code-chrome: color-mix(in srgb, var(--accent-color) 12%, #c9b89e);
+    --code-output: color-mix(in srgb, var(--accent-color) 10%, #bfae96);
+    border-color: color-mix(in srgb, var(--accent-color) 8%, #4a3a2c);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
 }
 
 html[data-skin="island"] .md-terminal-header,
 html[data-skin="island"] .md-terminal-copy {
-    color: #c9b89e;
+    color: var(--code-chrome);
 }
 
 html[data-skin="island"] .md-terminal-copy:hover {
@@ -264,7 +268,215 @@ html[data-skin="island"] .md-terminal-header::before {
         radial-gradient(circle at 44px 6px, #5fc05a 5.5px, transparent 6px);
 }
 
+html[data-skin="island"] .md-terminal-header {
+    border-bottom-color: rgb(255 255 255 / 0.07);
+}
+
+/* 内容区铺满窗口，不再单独带圆角 */
 html[data-skin="island"] .prose .md-terminal-body pre {
-    border-radius: var(--radius-md) !important;
+    border-radius: 0 !important;
     padding: 12px 0 !important;
+}
+
+/* content.css 里有一条规则强制代码块里所有 span 用 Shiki 的暗色字色，提示符也是 span，这里要压过它，
+   颜色还是用窗口上按配色混出来的那一组 */
+html[data-skin="island"] .prose pre.astro-code .md-terminal-prompt-path {
+    color: var(--code-prompt) !important;
+}
+
+html[data-skin="island"] .prose pre.astro-code .md-terminal-prompt-symbol {
+    color: var(--code-prompt-symbol) !important;
+}
+
+html[data-skin="island"] .md-terminal:has(.line-command) .line:not(.line-command) span[style] {
+    color: var(--code-output) !important;
+}
+
+/* ── 私密内容：外框放大圆角，输入框和解锁按钮换成胶囊，解锁按钮是主按钮，带实色台阶 ── */
+html[data-skin="island"] .md-directive-private {
+    --private-radius: var(--radius-xl);
+    border-width: 1.5px;
+}
+
+html[data-skin="island"] .md-private-hint {
+    border-radius: 9999px;
+    padding: 3px 12px;
+}
+
+html[data-skin="island"] .md-private-input {
+    border-width: 2px;
+    border-radius: 9999px;
+    padding-left: 16px;
+}
+
+html[data-skin="island"] .md-private-input:focus {
+    border-color: var(--island-focus-input);
+}
+
+html[data-skin="island"] .md-private-btn {
+    padding: 8px 18px;
+    border-radius: 9999px;
+    font-weight: 600;
+    box-shadow: 0 4px 0 0 var(--island-ledge-accent);
+    transition:
+        transform var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+}
+
+html[data-skin="island"] .md-private-btn:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 0 var(--island-ledge-accent);
+}
+
+html[data-skin="island"] .md-private-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 var(--island-ledge-accent);
+}
+
+html[data-skin="island"] .md-private-lock-btn {
+    border-radius: 9999px;
+    padding: 4px 12px;
+}
+
+/* 倒计时：参考 animal-island-ui 的 Countdown。羊皮纸底色的虚线卡片，数字放进圆角奶油色数字块，
+   数字和冒号都用 900 字重的土棕色，不再用等宽字体和翻页的折痕、投影。
+   数字块用纯色：卡片本身已经是奶油底，块上再做上浅下深的渐变，下沿会融进卡片里，边缘发虚。
+   结构不动，翻页的四个半块里只留两块铺满整格：flip-top 放旧值，static-top 放新值，
+   换数时旧值往下滚出去，新值从上面滚进来 */
+html[data-skin="island"] .md-directive-deadline {
+    --deadline-card: color-mix(in srgb, var(--text-main) 3%, var(--bg-card));
+    --deadline-tile: color-mix(in srgb, var(--bg-card) 60%, #fff);
+    --deadline-digit: var(--text-secondary);
+    /* 数字块高度放在外层，冒号也读得到，才能按数字块的高度居中 */
+    --panel-h: 48px;
+    background: var(--deadline-card);
+    border: 2px dashed var(--island-edge);
+    border-radius: 20px;
+    box-shadow: none;
+}
+
+html[data-skin="island"].dark .md-directive-deadline {
+    --deadline-card: var(--bg-card);
+    --deadline-tile: color-mix(in srgb, var(--text-main) 10%, var(--bg-card));
+}
+
+html[data-skin="island"] .md-deadline-title::before {
+    display: none;
+}
+
+html[data-skin="island"] .md-deadline-display {
+    gap: 6px;
+    min-height: 0;
+}
+
+html[data-skin="island"] .md-deadline-unit-box {
+    gap: 6px;
+}
+
+html[data-skin="island"] .md-deadline-panel {
+    width: 54px;
+    perspective: none;
+    overflow: hidden;
+    border: 0;
+    border-radius: 12px;
+    box-shadow: none;
+    background: var(--deadline-tile);
+    color: var(--deadline-digit);
+    font-family: var(--font-display, inherit);
+    font-weight: 900;
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+}
+
+html[data-skin="island"] .md-deadline-static-top,
+html[data-skin="island"] .md-deadline-flip-top {
+    height: 100%;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+}
+
+html[data-skin="island"] .md-deadline-static-bottom,
+html[data-skin="island"] .md-deadline-flip-bottom,
+html[data-skin="island"] .md-deadline-static-top::after,
+html[data-skin="island"] .md-deadline-flip-top::after {
+    display: none;
+}
+
+html[data-skin="island"] .md-deadline-panel.flipping .md-deadline-flip-top {
+    animation: none;
+}
+
+html[data-skin="island"] .md-deadline-panel.flipping .md-deadline-static-top span {
+    animation: island-roll-in 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+html[data-skin="island"] .md-deadline-panel.flipping .md-deadline-flip-top span {
+    animation: island-roll-out 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes island-roll-in {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes island-roll-out {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-skin="island"] .md-deadline-panel.flipping .md-deadline-static-top span {
+        animation: none;
+    }
+
+    html[data-skin="island"] .md-deadline-panel.flipping .md-deadline-flip-top span {
+        animation: none;
+        visibility: hidden;
+    }
+}
+
+/* 冒号画成两个圆点，不用字符。字符 ":" 在字形里的高低每款字体都不一样，
+   字体又跟着站点配置走，用字符没法保证和数字块居中对齐 */
+html[data-skin="island"] .md-deadline-sep {
+    justify-content: center;
+    width: 6px;
+    font-size: 0;
+    opacity: 1;
+    animation: none;
+}
+
+html[data-skin="island"] .md-deadline-sep::before {
+    content: '';
+    width: 5px;
+    height: 17px;
+    background:
+        radial-gradient(circle, var(--deadline-digit) 2.5px, transparent 3px) top / 5px 5px no-repeat,
+        radial-gradient(circle, var(--deadline-digit) 2.5px, transparent 3px) bottom / 5px 5px no-repeat;
+}
+
+html[data-skin="island"] .md-deadline-label {
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+html[data-skin="island"] .md-deadline-expired {
+    min-height: 48px;
+    color: var(--deadline-digit);
+    font-family: var(--font-display, inherit);
+    font-weight: 900;
+}
+
+@media (max-width: 400px) {
+    html[data-skin="island"] .md-directive-deadline {
+        --panel-h: 44px;
+    }
+
+    html[data-skin="island"] .md-deadline-panel {
+        width: 46px;
+        font-size: 1.3rem;
+    }
 }
