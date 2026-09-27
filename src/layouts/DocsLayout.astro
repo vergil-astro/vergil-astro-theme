@@ -1,5 +1,6 @@
 ---
 import { locale, t } from '../i18n';
+import { skin } from '../utils/skin';
 import { ViewTransitions } from 'astro:transitions';
 import BaseHead, { type Props as HeadProps } from '../components/base/BaseHead.astro';
 import Footer from '../components/base/Footer.astro';
@@ -24,7 +25,7 @@ const isArticle = head.pageType === 'article';
 ---
 
 <!doctype html>
-<html lang={locale} class="wrap-break-words antialiased">
+<html lang={locale} data-skin={skin} class="wrap-break-words antialiased">
     <head>
         <BaseHead {...head} />
         <script is:inline>

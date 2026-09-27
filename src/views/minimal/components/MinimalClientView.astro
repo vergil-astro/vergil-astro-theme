@@ -220,7 +220,7 @@ const docSetsMeta = sets.map((s) => ({ id: s.id, title: s.meta.data.title }));
                     var node = nodes[i];
                     var indent = depth * 16;
                     if (node.type === 'group') {
-                        html += '<div class="text-xs font-medium text-muted uppercase tracking-wider mt-3 mb-1" style="padding-left: ' + indent + 'px">' + node.title + '</div>';
+                        html += '<div class="ui-label text-xs font-medium text-muted uppercase tracking-wider mt-3 mb-1" style="padding-left: ' + indent + 'px">' + node.title + '</div>';
                         html += this.renderDocTree(node.children, depth + 1);
                     } else {
                         html += '<a href="' + node.href + '" class="group flex items-center py-2 px-4 rounded-lg transition-all hover:bg-hover" style="padding-left: ' + (indent + 16) + 'px">' +

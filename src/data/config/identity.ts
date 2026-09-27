@@ -2,6 +2,10 @@ export const siteInfo = {
     title: 'Vergil',
     /** 主题界面文案的语言，也决定 <html lang> 和日期格式。可选 'zh-CN' | 'en' */
     locale: 'zh-CN',
+    /** 界面皮肤，决定圆角、按钮、投影、底纹这些形状质感，和配色互不影响。
+     * 当前支持 'default' | 'island'
+     * island 是模仿动森项目 github ID: animal-island-ui 风格 */
+    skin: 'island',
     subtitle: 'Astro Framework for Content Creators',
     description: 'A content-driven Astro framework for building personal websites with Markdown',
     image: {
@@ -22,10 +26,10 @@ export const siteInfo = {
      * 左侧栏底部的社交图标。改成你自己的地址；留空这个图标就不显示。
      */
     socials: {
-        github: 'https://github.com/wsjz/vergil-astro-theme',
+        github: 'https://github.com/wsjz/vergil-astro-theme'
     },
 
-    icp: [] as Array<{ text: string; href?: string }>,
+    icp: [] as Array<{ text: string; href?: string }>
 };
 
 /**

@@ -6,7 +6,7 @@ import { t } from '../../i18n';
 const { page, class: className } = Astro.props;
 ---
 
-<nav aria-label={t.pagination.label} class:list={['relative px-12 py-2 text-center', className]}>
+<nav aria-label={t.pagination.label} class:list={['ui-pagination relative px-12 py-2 text-center', className]}>
     {
         page.url.prev && (
             <IconButton

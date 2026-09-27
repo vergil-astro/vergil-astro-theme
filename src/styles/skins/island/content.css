@@ -1,0 +1,128 @@
+/* ── 正文：代码块、分隔线、表格、标签、提示浮层 ── */
+
+/* 代码块固定用暖深棕底，这是整套皮肤里唯一写死的颜色。
+   Shiki 输出的是双主题：亮色值写在 style 的 color 里，暗色值写在 --shiki-dark 变量里。
+   亮色主题的字是按浅底调的，放到深底上看不清，所以这里不论亮暗模式都改用暗色那一套。
+   这些值都在 style 属性里，只能用 !important 盖掉 */
+html[data-skin="island"] {
+    --island-code-bg: #2b2118;
+    --island-code-border: #3d3028;
+}
+
+html[data-skin="island"] .prose pre.astro-code,
+html[data-skin="island"] .prose pre.astro-code span {
+    color: var(--shiki-dark) !important;
+}
+
+html[data-skin="island"] .prose pre {
+    background-color: var(--island-code-bg) !important;
+    border: 1px solid var(--island-code-border);
+    border-radius: var(--radius-xl);
+    padding: 1.1rem 1.4rem;
+}
+
+html[data-skin="island"] .prose :where(code):not(pre code) {
+    border-radius: var(--radius-sm);
+    background: var(--island-tint);
+}
+
+/* 分隔线：棕色虚线 */
+html[data-skin="island"] .prose hr {
+    height: 2px;
+    border: 0;
+    background: repeating-linear-gradient(90deg, var(--island-dash) 0 6px, transparent 6px 12px);
+}
+
+/* 表格：没有外框，是一块卡片色的底板，四周留 6px。
+   表头和行之间用 6px 一段的虚线，偶数行压一层很浅的条纹，悬停的整行变成一条浅色胶囊。
+   虚线用背景渐变画，border 的 dashed 没法控制段长 */
+html[data-skin="island"] .prose :where(table) {
+    --island-table-rule: linear-gradient(90deg, var(--island-edge) 50%, transparent 50%);
+    padding: 6px;
+    border: 0;
+    border-radius: var(--radius-xl);
+    background: var(--bg-card);
+}
+
+html[data-skin="island"] .prose :where(thead) {
+    background-color: transparent;
+}
+
+html[data-skin="island"] .prose :where(thead th) {
+    padding: 1rem 1.25rem;
+    border-bottom: 0;
+    background: var(--island-table-rule) left bottom / 12px 1px repeat-x;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: none;
+}
+
+html[data-skin="island"] .prose :where(td) {
+    padding: 0.875rem 1.25rem;
+    border-top: 0;
+    background-image: var(--island-table-rule);
+    background-position: left top;
+    background-size: 12px 1px;
+    background-repeat: repeat-x;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+html[data-skin="island"] .prose :where(tbody tr:first-child td) {
+    background-image: none;
+}
+
+/* 条纹和悬停都画在单元格上，这样两端能跟着单元格的圆角走 */
+html[data-skin="island"] .prose :where(tbody tr:nth-child(even)),
+html[data-skin="island"] .prose :where(tbody tr:hover) {
+    background-color: transparent;
+}
+
+html[data-skin="island"] .prose :where(tbody tr:nth-child(even) td) {
+    background-color: color-mix(in srgb, var(--text-main) 3%, var(--bg-card));
+}
+
+html[data-skin="island"] .prose :where(tbody tr:hover td) {
+    background-color: color-mix(in srgb, var(--accent-color) 16%, var(--bg-card));
+    color: var(--text-main);
+}
+
+html[data-skin="island"] .prose :where(tbody tr td:first-child) {
+    border-radius: 30px 0 0 30px;
+}
+
+html[data-skin="island"] .prose :where(tbody tr td:last-child) {
+    border-radius: 0 30px 30px 0;
+}
+
+/* 标签：浅色胶囊，去掉原来的逗号分隔 */
+html[data-skin="island"] .ui-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15em 0.7em;
+    border-radius: 9999px;
+    background: var(--island-tint);
+    color: var(--accent-color);
+    font-weight: 600;
+    line-height: 1.5;
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+html[data-skin="island"] .ui-tag:hover {
+    background: color-mix(in srgb, var(--accent-color) 22%, var(--bg-card));
+    text-decoration: none;
+}
+
+html[data-skin="island"] .ui-tag-sep {
+    display: none;
+}
+
+/* 提示浮层：奶油色气泡，2px 暖色边 */
+html[data-skin="island"] .ui-tooltip {
+    border: 2px solid var(--island-edge);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}

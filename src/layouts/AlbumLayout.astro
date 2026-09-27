@@ -1,5 +1,6 @@
 ---
 import { locale, t } from '../i18n';
+import { skin } from '../utils/skin';
 import type { CollectionEntry } from 'astro:content';
 import { ChevronLeft } from '@lucide/astro';
 import BaseHead from '../components/base/BaseHead.astro';
@@ -54,7 +55,7 @@ const seoDesc = description || '';
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-skin={skin}>
     <head>
         <BaseHead title={seoTitle} description={seoDesc} />
         {fontsUrl ? <link rel="stylesheet" href={fontsUrl} /> : null}

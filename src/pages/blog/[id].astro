@@ -197,7 +197,7 @@ const postBreadcrumbs = [
             {tags.length > 0 && (
                 <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
                     {tags.map((tag) => (
-                        <a class="text-accent hover:underline" href={`/tags/${slugify(tag)}`}>
+                        <a class="ui-tag text-accent hover:underline" href={`/tags/${slugify(tag)}`}>
                             #{tag}
                         </a>
                     ))}

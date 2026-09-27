@@ -20,7 +20,7 @@ const currentPage = page.currentPage;
 ---
 
 <BaseLayout title={currentPage > 1 ? t.pagination.pageN(currentPage) : undefined} showHeader={false}>
-    <h1 class="mb-12 font-display text-xl leading-tight sm:mb-16 sm:text-2xl">{t.nav.posts}</h1>
+    <h1 class="ui-title mb-12 font-display text-xl leading-tight sm:mb-16 sm:text-2xl">{t.nav.posts}</h1>
     {
         blog.map((post) => {
             const hasBanner = !!post.data.banner;

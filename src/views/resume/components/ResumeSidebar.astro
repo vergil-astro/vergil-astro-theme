@@ -75,7 +75,7 @@ const h2Headings = headings.filter((h) => h.depth === 2);
         <!-- 目录 -->
         {h2Headings.length > 0 && (
             <div class="mb-6">
-                <h3 class="text-xs font-medium text-muted uppercase tracking-wider mb-3">{t.page.resume.toc}</h3>
+                <h3 class="ui-label text-xs font-medium text-muted uppercase tracking-wider mb-3">{t.page.resume.toc}</h3>
                 <nav class="space-y-1">
                     {h2Headings.map((h) => (
                         <a

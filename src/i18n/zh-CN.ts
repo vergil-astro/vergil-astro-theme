@@ -146,8 +146,9 @@ export default {
             G: '鸢尾紫藤',
             H: '午夜海军',
             I: '炭黑极简',
-            J: '苔藓森林',
+            J: '奶油珊瑚',
             K: '沙岩暖棕',
+            L: '暖奶油',
         } as Record<string, string>,
     },
 

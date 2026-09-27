@@ -1,0 +1,270 @@
+/* ── 内容指令：选项卡、折叠、复选框、进度条、提示框、指令按钮 ── */
+
+/* 大部分指令的圆角和描边都读这组变量，改这里一次就能统一 */
+html[data-skin="island"] {
+    --md-radius: 20px;
+    --md-radius-sm: 12px;
+    --md-radius-lg: 16px;
+    --md-border: 2px solid var(--border-light);
+}
+
+/* ── 选项卡：下划线换成胶囊轨道，当前项是实心强调色 ── */
+html[data-skin="island"] .md-tabs-nav {
+    gap: 4px;
+    width: fit-content;
+    max-width: 100%;
+    padding: 5px;
+    border: 2px solid var(--border-light);
+    border-radius: 9999px;
+    background: var(--bg-card);
+}
+
+html[data-skin="island"] .md-tab-btn {
+    padding: 0.4em 1.1em;
+    margin: 0;
+    border: 0;
+    border-radius: 9999px;
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast);
+}
+
+html[data-skin="island"] .md-tab-btn:hover {
+    background: var(--island-tint);
+    color: var(--text-main);
+}
+
+html[data-skin="island"] .md-tab-btn.md-tab-active {
+    background: var(--tab-active-color, var(--accent-color));
+    color: var(--bg-card);
+}
+
+/* Plan 指令内部的视图切换，同样换成胶囊 */
+html[data-skin="island"] .md-plan-tabs {
+    gap: 4px;
+    padding: 6px 0.75rem;
+}
+
+html[data-skin="island"] .md-plan-tab {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast);
+}
+
+html[data-skin="island"] .md-plan-tab:hover {
+    background: var(--island-tint);
+}
+
+html[data-skin="island"] .md-plan-tab::after {
+    display: none;
+}
+
+html[data-skin="island"] .md-plan-state--0:checked ~ .md-plan-tabs .md-plan-tab--0,
+html[data-skin="island"] .md-plan-state--1:checked ~ .md-plan-tabs .md-plan-tab--1,
+html[data-skin="island"] .md-plan-state--2:checked ~ .md-plan-tabs .md-plan-tab--2,
+html[data-skin="island"] .md-plan-state--3:checked ~ .md-plan-tabs .md-plan-tab--3,
+html[data-skin="island"] .md-plan-state--4:checked ~ .md-plan-tabs .md-plan-tab--4,
+html[data-skin="island"] .md-plan-state--5:checked ~ .md-plan-tabs .md-plan-tab--5 {
+    background: var(--accent-color);
+    color: var(--bg-card);
+}
+
+/* 进度条：加粗，轨道换成波点 */
+html[data-skin="island"] .md-plan-progress__track {
+    height: 8px;
+    border-radius: 9999px;
+    background:
+        radial-gradient(color-mix(in srgb, var(--text-muted) 30%, transparent) 1px, transparent 1.5px) 0 50% / 6px 6px,
+        color-mix(in srgb, var(--text-muted) 12%, transparent);
+}
+
+html[data-skin="island"] .md-plan-progress__fill {
+    border-radius: 9999px;
+}
+
+/* ── 折叠：2px 描边，展开箭头放进强调色的小圆里 ── */
+html[data-skin="island"] .md-directive-folding,
+html[data-skin="island"] .md-folder {
+    --details-radius: 18px;
+    border: 2px solid var(--border-light);
+}
+
+html[data-skin="island"] .md-folding-arrow,
+html[data-skin="island"] .md-folder-arrow {
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: var(--bg-card);
+    box-shadow: 0 2px 4px color-mix(in srgb, var(--accent-color) 30%, transparent);
+    transition: transform var(--duration-slow) var(--ease-out);
+}
+
+html[data-skin="island"] .md-directive-folding[open] .md-folding-arrow,
+html[data-skin="island"] .md-folder[open] .md-folder-arrow {
+    color: var(--bg-card);
+}
+
+html[data-skin="island"] .md-folding-body {
+    border-top: 1.5px dashed var(--island-edge);
+}
+
+/* ── 复选框：大圆角方块 ── */
+html[data-skin="island"] .md-tag-checkbox:not(.md-tag-radio) .md-checkbox-box {
+    border-radius: 5px;
+}
+
+/* ── 提示框：左边那道竖条换成整圈的浅色描边 ── */
+html[data-skin="island"] .md-directive-callout > div {
+    border: 2px solid color-mix(in srgb, var(--callout-bar) 30%, transparent);
+}
+
+html[data-skin="island"] .md-callout-inner {
+    padding-left: 18px;
+}
+
+html[data-skin="island"] .md-callout-inner::before {
+    display: none;
+}
+
+/* ── 指令按钮：它自带颜色，属于主按钮，可以用台阶；台阶用它自己的颜色压暗 ── */
+html[data-skin="island"] .md-tag-button:not(.md-btn-xs) {
+    --md-btn-ledge: color-mix(in srgb, var(--tag-btn-bg) 60%, #000);
+    border-radius: 9999px;
+    font-weight: 600;
+    box-shadow: 0 4px 0 var(--md-btn-ledge);
+    transition:
+        transform var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out),
+        filter var(--duration-fast);
+}
+
+html[data-skin="island"] .md-tag-button:not(.md-btn-xs):hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 5px 0 var(--md-btn-ledge);
+}
+
+html[data-skin="island"] .md-tag-button:not(.md-btn-xs):active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--md-btn-ledge);
+}
+
+/* ── 代码面板（panel）：原设计是代码直接铺在面板底色上，代码块自身透明。
+   海岛皮肤给所有代码块铺了暖深棕底，面板里就成了浅灰标签栏和深棕代码条一条条交替；
+   面板自己的浅灰色又是写死的，不跟配色走，放在奶油底上发冷。
+   含代码的面板整块做成深色代码窗口，和页面上其他代码块同一种质感；
+   纯文字的面板保持浅色，但改用当前配色的颜色 ── */
+html[data-skin="island"] .md-directive-panel {
+    --panel-bg: var(--bg-card);
+    --panel-border: var(--border-light);
+    --panel-divider: var(--island-edge);
+    --panel-radius: var(--radius-xl);
+    border-width: 1.5px;
+}
+
+html[data-skin="island"] .md-segment-label-left {
+    padding: 2px 12px;
+    border-radius: 9999px;
+    background: var(--bg-muted);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+html[data-skin="island"] .md-segment-label-left:hover {
+    background: var(--bg-hover);
+    color: var(--text-main);
+}
+
+html[data-skin="island"] .md-segment-right {
+    color: var(--text-muted);
+}
+
+html[data-skin="island"] .md-panel-segment:hover .md-segment-right {
+    color: color-mix(in srgb, var(--text-muted) 50%, transparent);
+}
+
+html[data-skin="island"] .md-segment-copy {
+    border-radius: 9999px;
+    border-color: var(--border-light);
+    color: var(--text-secondary);
+}
+
+html[data-skin="island"] .md-segment-copy:hover {
+    background: var(--bg-hover);
+    border-color: var(--island-edge);
+    color: var(--text-main);
+}
+
+/* 含代码的面板：整块暖深棕，代码回到透明，其余元素换成深底上的浅色调 */
+html[data-skin="island"] .md-directive-panel:has(pre) {
+    --panel-bg: var(--island-code-bg);
+    --panel-border: var(--island-code-border);
+    --panel-divider: rgb(255 255 255 / 0.12);
+}
+
+html[data-skin="island"] .prose .md-directive-panel .md-panel-segment > pre {
+    background-color: transparent !important;
+}
+
+html[data-skin="island"] .md-directive-panel:has(pre) .md-segment-label-left {
+    background: rgb(255 255 255 / 0.08);
+    color: #e2d2bb;
+}
+
+html[data-skin="island"] .md-directive-panel:has(pre) .md-segment-label-left:hover {
+    background: rgb(255 255 255 / 0.14);
+    color: #f3e7d4;
+}
+
+html[data-skin="island"] .md-directive-panel:has(pre) .md-segment-right {
+    color: #a8957c;
+}
+
+html[data-skin="island"] .md-directive-panel:has(pre) .md-panel-segment:hover .md-segment-right {
+    color: #6f6150;
+}
+
+html[data-skin="island"] .md-directive-panel:has(pre) .md-segment-copy {
+    border-color: rgb(255 255 255 / 0.16);
+    color: #cdbca4;
+}
+
+html[data-skin="island"] .md-directive-panel:has(pre) .md-segment-copy:hover {
+    background: rgb(255 255 255 / 0.08);
+    border-color: rgb(255 255 255 / 0.28);
+    color: #f3e7d4;
+}
+
+html[data-skin="island"] .md-directive-panel:has(pre) .md-panel-segment > :is(p, ul, ol) {
+    color: #e8dcc8;
+}
+
+/* ── 终端块：外框原本是写死的冷黑色，里面的代码区在海岛皮肤下是暖深棕，冷黑框套暖棕块不协调。
+   外框和标题栏换成比代码区亮一档的暖深棕，圆点饱和度略压，和暖色调放在一起不刺眼 ── */
+html[data-skin="island"] .md-terminal {
+    background: #3a2d22;
+    border-color: #4a3a2c;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+html[data-skin="island"] .md-terminal-header,
+html[data-skin="island"] .md-terminal-copy {
+    color: #c9b89e;
+}
+
+html[data-skin="island"] .md-terminal-copy:hover {
+    color: #f3e7d4;
+    background: rgb(255 255 255 / 0.08);
+}
+
+html[data-skin="island"] .md-terminal-header::before {
+    background:
+        radial-gradient(circle at 6px 6px, #ec6a5e 5.5px, transparent 6px),
+        radial-gradient(circle at 25px 6px, #f0bb4d 5.5px, transparent 6px),
+        radial-gradient(circle at 44px 6px, #5fc05a 5.5px, transparent 6px);
+}
+
+html[data-skin="island"] .prose .md-terminal-body pre {
+    border-radius: var(--radius-md) !important;
+    padding: 12px 0 !important;
+}

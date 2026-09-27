@@ -1,0 +1,35 @@
+/* ── 浮层：搜索弹窗、下拉菜单 ── */
+
+/* 搜索弹窗：用一张有机形状的 SVG 蒙版代替圆角矩形，边缘带一点手工感的起伏。
+   蒙版按 100% 100% 拉伸，所以弹窗多宽多高都贴合。
+   形状是自己画的，四边只往里收 1% 左右，不会切到输入框和结果列表。
+   蒙版会把投影一起裁掉，所以投影交给背后的遮罩层来衬托 */
+html[data-skin="island"] .ui-modal {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: var(--bg-card);
+    background-image: none;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M50 0.6C74 0.4 90 1.2 95.6 4.4C99.2 7 99.6 15 99.4 30C99.2 42 98.6 50 99 62C99.6 80 99.8 90 96.4 95C92.8 99.4 80 99.6 52 99.4C26 99.8 10 99.4 4.6 95.6C0.6 92.6 0.2 84 0.6 68C0.8 56 1.4 48 0.8 36C0.2 18 0.4 8.6 3.8 4.8C7.6 1 22 0.8 50 0.6Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M50 0.6C74 0.4 90 1.2 95.6 4.4C99.2 7 99.6 15 99.4 30C99.2 42 98.6 50 99 62C99.6 80 99.8 90 96.4 95C92.8 99.4 80 99.6 52 99.4C26 99.8 10 99.4 4.6 95.6C0.6 92.6 0.2 84 0.6 68C0.8 56 1.4 48 0.8 36C0.2 18 0.4 8.6 3.8 4.8C7.6 1 22 0.8 50 0.6Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+
+html[data-skin="island"] .ui-modal::backdrop {
+    background: color-mix(in srgb, var(--text-main) 35%, transparent);
+}
+
+/* 弹窗里的内容往里让一点，离起伏的边远一些 */
+html[data-skin="island"] .ui-modal > div {
+    padding: 0.5rem 0.75rem;
+}
+
+/* 搜索框：胶囊，聚焦时边框变黄 */
+html[data-skin="island"] .ui-input {
+    border: 2px solid var(--border-light);
+    border-radius: 9999px;
+    transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+html[data-skin="island"] .ui-input:focus {
+    border-color: var(--island-focus-input);
+}

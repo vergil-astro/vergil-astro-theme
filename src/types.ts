@@ -100,6 +100,8 @@ export type SiteConfig = {
     icp?: IcpRecord[];
     /** 主题界面文案语言，见 src/i18n */
     locale?: string;
+    /** 界面皮肤，见 src/utils/skin.ts */
+    skin?: string;
     fonts: FontConfig;
     avatar?: ImageInput;
     title: string;
