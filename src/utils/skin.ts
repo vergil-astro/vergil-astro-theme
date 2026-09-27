@@ -14,3 +14,15 @@ function isSkin(value: string | undefined): value is Skin {
 
 /** 配置里填了不认识的皮肤就退回默认，不让站点挂掉 */
 export const skin: Skin = isSkin(siteInfo.skin) ? siteInfo.skin : 'default';
+
+/**
+ * 访客还没选过配色时用哪一套。每个皮肤推荐一套和它最搭的配色：
+ * 默认皮肤用 C 暖墨橙红，海岛皮肤用 L 暖奶油。访客自己切过配色后以他的选择为准。
+ * 布局把它写在 <html data-default-scheme> 上，页面脚本从那里读
+ */
+const defaultSchemes: Record<Skin, string> = {
+    default: 'C',
+    island: 'L',
+};
+
+export const defaultScheme = defaultSchemes[skin];

@@ -1,6 +1,6 @@
 ---
 import { locale, t } from '../i18n';
-import { skin } from '../utils/skin';
+import { skin, defaultScheme } from '../utils/skin';
 import { ViewTransitions } from 'astro:transitions';
 import BaseHead, { type Props as HeadProps } from '../components/base/BaseHead.astro';
 import Footer from '../components/base/Footer.astro';
@@ -20,7 +20,7 @@ const isArticle = head.pageType === 'article';
 ---
 
 <!doctype html>
-<html lang={locale} data-skin={skin} class="wrap-break-words antialiased">
+<html lang={locale} data-skin={skin} data-default-scheme={defaultScheme} class="wrap-break-words antialiased">
     <head>
         <BaseHead {...head} />
         <script is:inline>
@@ -35,7 +35,7 @@ const isArticle = head.pageType === 'article';
         <script is:inline>
             (function() {
                 try {
-                    const scheme = localStorage.getItem('colorScheme') || 'C';
+                    const scheme = localStorage.getItem('colorScheme') || document.documentElement.getAttribute('data-default-scheme') || 'C';
                     const isDark = localStorage.getItem('darkMode');
                     document.documentElement.setAttribute('data-theme', scheme);
                     if (isDark === 'true' || (isDark === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {

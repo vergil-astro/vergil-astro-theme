@@ -7,8 +7,13 @@
         I: '#141414', J: '#b54531', K: '#b86030', L: '#a9521f'
     };
 
+    // 访客没选过配色时用当前皮肤推荐的那套，见 src/utils/skin.ts
+    function getDefaultScheme() {
+        return root.getAttribute('data-default-scheme') || 'C';
+    }
+
     function getStoredScheme() {
-        try { return localStorage.getItem('colorScheme') || 'C'; } catch { return 'C'; }
+        try { return localStorage.getItem('colorScheme') || getDefaultScheme(); } catch { return getDefaultScheme(); }
     }
 
     function storeScheme(scheme) {
@@ -116,7 +121,7 @@
             btn.removeEventListener('click', _darkModeHandler);
         }
         _darkModeHandler = function () {
-            var curScheme = root.getAttribute('data-theme') || 'C';
+            var curScheme = root.getAttribute('data-theme') || getDefaultScheme();
             var curDark = root.classList.contains('dark');
             var newDark = !curDark;
             storeDark(newDark);
