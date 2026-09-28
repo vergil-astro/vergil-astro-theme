@@ -8,7 +8,8 @@
         "build": "astro build",
         "reset": "node scripts/reset-content.mjs",
         "preview": "astro preview",
-        "astro": "astro"
+        "astro": "astro",
+        "images:check": "node scripts/check-images.mjs"
     },
     "dependencies": {
         "@astrojs/markdown-remark": "^6.3.11",
