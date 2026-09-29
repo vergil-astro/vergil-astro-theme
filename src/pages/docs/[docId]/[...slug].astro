@@ -59,6 +59,10 @@ const bannerUrl = await resolveImageUrl(entry.data.banner, 1600);
 // Astro glob loader 中 index.md 的 entry.id 格式为 docId/slug（不带 /index 后缀）
 // 判断方法：slug 是否对应一个已注册的目录
 const group = await getDocGroup(docId, slug);
+// 被 _meta.md 的 homepage 指定的那篇渲染在知识库根路径，原路径不生成，链接要指向根路径
+const homepageSlug = (await getDocHomepageSlug(docId))?.replace(/\/index$/, '').toLowerCase();
+const childHref = (path: string) =>
+    homepageSlug && path.replace(/\/index$/, '').toLowerCase() === homepageSlug ? `/docs/${docId}/` : `/docs/${docId}/${path}/`;
 const isIndexPage = !!group;
 const autoRender = entry.data.autoRender === true;
 let groupChildren: DocTreeNode[] = [];
@@ -137,9 +141,7 @@ const showAutoRender = autoRender && groupChildren.length > 0;
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {groupChildren.map((child) => {
                     const isGroup = child.type === 'group';
-                    const href = isGroup
-                        ? `/docs/${docId}/${child.dirPath}/`
-                        : `/docs/${docId}/${child.slug}/`;
+                    const href = childHref(isGroup ? child.dirPath : child.slug);
                     const childCount = isGroup ? child.children.length : 0;
                     return (
                         <a

@@ -4,6 +4,7 @@ import { marked } from 'marked';
 import { getCollection } from 'astro:content';
 import { getAllTags } from '../../utils/data-utils';
 import { slugify } from '../../utils/common-utils';
+import { resolveImageUrl, resolveImgAliasInMarkdown } from '../../utils/image-utils';
 
 interface LinkCard {
     title: string;
@@ -61,8 +62,15 @@ const tagHref = (tag: string): string | undefined => {
 };
 
 const renderMarkdown = async (text: string) => {
-    return marked.parse(text, { async: false }) as string;
+    return marked.parse(await resolveImgAliasInMarkdown(text), { async: false }) as string;
 };
+
+// 图片支持 @img/ 别名，其他写法原样使用
+const resolveImg = async (src: string | undefined) => (await resolveImageUrl(src, 800)) ?? src;
+const imageSrcs = await Promise.all(images.map(resolveImg));
+const forwardImageSrcs = await Promise.all((forward?.images ?? []).map(resolveImg));
+const forwardLinkCardImage = await resolveImg(forward?.linkCard?.image);
+const linkCardImage = await resolveImg(linkCard?.image);
 
 const processedContent = content ? await renderMarkdown(content) : '';
 const processedForwardContent = forward?.content ? await renderMarkdown(forward.content) : '';
@@ -138,7 +146,7 @@ const isLongContent = plainTextLength > 300;
             {images.length > 0 && (
                 <div class={`mt-2 ${imageGridMaxW}`}>
                     <div class={`grid gap-1 ${imageGridCols}`}>
-                        {images.map((img) => (
+                        {imageSrcs.map((img) => (
                             <div
                                 class={`relative overflow-hidden rounded-lg bg-[var(--bg-muted)] ${
                                     imageCount === 1 ? 'aspect-[4/3]' : 'aspect-square'
@@ -189,7 +197,7 @@ const isLongContent = plainTextLength > 300;
                                 forward.images.length === 2 || forward.images.length === 4 ? 'grid-cols-2' :
                                 'grid-cols-3'
                             }`}>
-                                {forward.images.map((img) => (
+                                {forwardImageSrcs.map((img) => (
                                     <div class="relative overflow-hidden rounded-lg bg-[var(--bg-muted)] aspect-square">
                                         <img src={img} alt="" class="w-full h-full object-cover" loading="lazy" data-zoomable="1" />
                                     </div>
@@ -206,7 +214,7 @@ const isLongContent = plainTextLength > 300;
                         >
                             {forward.linkCard!.image && (
                                 <div class="flex-shrink-0 w-14 h-14 rounded-md overflow-hidden bg-[var(--bg-muted)]">
-                                    <img src={forward.linkCard!.image} alt="" class="w-full h-full object-cover" loading="lazy" />
+                                    <img src={forwardLinkCardImage} alt="" class="w-full h-full object-cover" loading="lazy" />
                                 </div>
                             )}
                             <div class="flex-1 min-w-0">
@@ -232,7 +240,7 @@ const isLongContent = plainTextLength > 300;
                 >
                     {linkCard.image && (
                         <div class="flex-shrink-0 w-14 h-14 rounded-md overflow-hidden bg-[var(--bg-muted)]">
-                            <img src={linkCard.image} alt="" class="w-full h-full object-cover" loading="lazy" />
+                            <img src={linkCardImage} alt="" class="w-full h-full object-cover" loading="lazy" />
                         </div>
                     )}
                     <div class="flex-1 min-w-0">

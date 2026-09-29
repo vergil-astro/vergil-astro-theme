@@ -192,13 +192,14 @@ export default defineConfig({
 | 命令 | 作用 |
 | --- | --- |
 | `pnpm dev` | 启动开发服务器，改文件后浏览器自动刷新。`pnpm start` 等同 |
-| `pnpm build` | 构建站点，产物在 `dist/` |
+| `pnpm build` | 先运行 `images:organize` 整理图片，再构建站点，产物在 `dist/` |
 | `pnpm preview` | 本地预览构建产物 |
 | `pnpm reset` | 清空演示内容，保留 Vergil 使用文档 |
 | `pnpm reset:all` | 清空演示内容，连 Vergil 使用文档一起删 |
 | `pnpm reset:dry` | 只列出 `reset` 会删除和重写哪些文件，不实际执行 |
 | `pnpm images:organize` | 把内容引用的图片挪到 `src/assets/img/` 并改成 `@img/` 引用，见 [图片与静态资源](/docs/vergil-guide/03-基本创作/图片与静态资源/) |
-| `pnpm images:check` | 检查图片引用，报告失效引用、重复文件、大图，只读不写 |
+| `pnpm images:expand` | 把 `@img/` 展开成相对路径，方便在 Typora、VS Code 里预览，`build` 时会自动改回 |
+| `pnpm images:check` | 检查图片引用，报告失效引用、重复文件、大图，只读不写；有失效引用时返回失败，适合放进 CI |
 | `pnpm fonts:subset` | 重新生成中文字体子集，见 [字体与主题](/docs/vergil-guide/02-站点配置/字体与主题/) |
 | `pnpm samples:dates` | 把主题示例文章的日期挪到最近八周内，让热力图有内容。只改示例文章，`reset` 之后不再有作用 |
 | `pnpm samples:dates:dry` | 只列出 `samples:dates` 会改哪些日期，不实际执行 |

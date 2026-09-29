@@ -4,7 +4,7 @@
  *
  * 报告五类问题：
  *   1. 引用失效  内容里写了本地图片路径，但文件不存在（唯一会让命令失败的一类）
- *   2. 可以迁移  正文图片或 banner、cover、seo.image 引用了 public/ 下的图，挪到 src/assets/img/ 用 @img/ 引用能被优化
+ *   2. 可以迁移  正文图片、banner、cover、seo.image 或图文动态的图片引用了 public/ 下的图，挪到 src/assets/img/ 用 @img/ 引用能被优化
  *   3. 内容重复  几个文件的内容完全相同
  *   4. 体积过大  单张超过 MAX_KB（改下面的常量调整）
  *   5. 暂未引用  文件名没有出现在任何源码或内容里（只提示，可能是留着以后用的）
@@ -104,7 +104,7 @@ for (const file of contentFiles) {
         refs.set(ref, refs.get(ref) || fromMarkdown);
     };
     if (ext(file) === '.json') {
-        for (const m of text.matchAll(JSON_STRING)) add(m[1], false);
+        for (const m of text.matchAll(JSON_STRING)) add(m[1], true);
     } else {
         for (const m of text.matchAll(MD_IMAGE)) add(m[1], true);
         for (const m of text.matchAll(ATTR_SRC)) add(m[1], false);

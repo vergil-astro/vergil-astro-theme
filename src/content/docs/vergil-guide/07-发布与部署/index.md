@@ -50,6 +50,8 @@ pnpm build
 
 构建完成后，静态文件会输出到 `dist/` 目录。
 
+`pnpm build` 会先运行 `pnpm images:organize`，把内容里的图片整理到规则目录，再开始构建，所以在本地构建后，`git diff` 里可能会看到图片路径被改成了 `@img/`。说明见 [图片与静态资源](/docs/vergil-guide/03-基本创作/图片与静态资源/)。
+
 ### 选择部署平台
 
 ::::tabs

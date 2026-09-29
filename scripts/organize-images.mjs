@@ -4,12 +4,13 @@
  * 引用改成 @img/ 别名。规则见文档「图片与静态资源」。
  *
  * 处理范围：
- *   - 载体：src/content/ 下的 blog、projects、pages、docs、albums、series
+ *   - 载体：src/content/ 下的 blog、projects、pages、docs、albums、series、moments
  *   - 正文里的 Markdown 图片 ![](...)，代码块里的示例不动
+ *   - 图文动态 JSON 里的图片路径（images、linkCard.image 等）
  *   - frontmatter 里的 src、cover、banner（seo.image.src、文章和文档的 banner、知识库、相册和专栏的 cover、相册的 images[].src）
  *
  * 不处理：
- *   - 指令、图文动态、想法这些只接受字符串路径的地方
+ *   - 想法正文里的图、内容指令里的 src（只接受字符串路径）
  *   - 外链、已经是 @img/ 的引用
  *
  * 安全措施：
@@ -19,7 +20,8 @@
  *   - 目标位置已有同名但内容不同的文件：自动改名为 xxx-1.png
  *   - 引用的文件不存在：跳过，在最后列出来
  *
- * 执行完会自动跑一次 images:check。
+ * 执行完会自动跑一次 images:check，只报告结果，不会因为失效引用而失败：
+ * pnpm build 会先运行这个脚本，一处失效引用不应该挡住整个部署。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -31,7 +33,7 @@ const CONTENT_DIR = path.join(ROOT, 'src/content');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const IMG_DIR = path.join(ROOT, 'src/assets/img');
 const IMG_ALIAS = '@img/';
-const CARRIERS = ['blog', 'projects', 'pages', 'docs', 'albums', 'series'];
+const CARRIERS = ['blog', 'projects', 'pages', 'docs', 'albums', 'series', 'moments'];
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.avif']);
 const TEXT_EXT = new Set(['.md', '.mdx', '.astro', '.ts', '.js', '.mjs', '.json', '.css', '.html', '.webmanifest']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.astro', '.git']);
@@ -56,7 +58,7 @@ function targetDirOf(file) {
     const parts = path.relative(CONTENT_DIR, file).split(path.sep);
     const carrier = parts[0];
     if (carrier === 'docs') return path.join(IMG_DIR, 'docs', parts[1]);
-    const base = path.basename(file).replace(/\.(md|mdx)$/, '');
+    const base = path.basename(file).replace(/\.(md|mdx|json)$/, '');
     const name = base === 'index' && parts.length > 2 ? parts[parts.length - 2] : base;
     return path.join(IMG_DIR, carrier, name);
 }
@@ -77,10 +79,20 @@ function resolveRef(ref, fromFile) {
 const MD_IMAGE = /(!\[[^\]]*\]\(\s*<?)([^)\s>]+)(>?(?:\s+"[^"]*")?\s*\))/g;
 const FM_FIELD = /^(\s*-?\s*(?:src|cover|banner):\s*)(['"]?)([^'"\s#]+)\2(\s*)$/;
 
-const contentFiles = CARRIERS.flatMap((c) => walk(path.join(CONTENT_DIR, c))).filter((f) => /\.(md|mdx)$/.test(f));
+const contentFiles = CARRIERS.flatMap((c) => walk(path.join(CONTENT_DIR, c))).filter((f) => /\.(md|mdx)$/.test(f) || (f.endsWith('.json') && f.startsWith(path.join(CONTENT_DIR, 'moments'))));
 
-/** 按行扫描一个内容文件，回调每个可处理的引用，回调返回新值则替换 */
-function mapRefs(text, onRef) {
+const JSON_STRING = /"([^"]+\.(?:png|jpe?g|webp|gif|svg|avif))"/gi;
+
+/** 扫描一个内容文件，回调每个可处理的引用，回调返回新值则替换 */
+function mapRefs(text, onRef, file) {
+    // 图文动态 JSON：只替换对应的字符串，不重新序列化，保留原来的格式
+    if (file && file.endsWith('.json')) {
+        return text.replace(JSON_STRING, (all, ref) => {
+            if (!isCandidate(ref)) return all;
+            const next = onRef(ref);
+            return next ? `"${next}"` : all;
+        });
+    }
     const lines = text.split('\n');
     let inFrontmatter = lines[0] === '---';
     let fence = null;
@@ -137,7 +149,7 @@ for (const file of contentFiles) {
         const list = refsBySource.get(source);
         if (!list.some((r) => r.file === file)) list.push({ file, targetDir: targetDirOf(file) });
         return null;
-    });
+    }, file);
 }
 
 // ── 2. 决定每张图挪到哪 ──
@@ -188,7 +200,7 @@ for (const file of contentFiles) {
     const next = mapRefs(text, (ref) => {
         const source = resolveRef(ref, file);
         return newRef.get(`${file}\0${source}`) || null;
-    });
+    }, file);
     if (next !== text) rewritten.set(file, next);
 }
 
@@ -272,4 +284,4 @@ if (operations.length === 0 && rewritten.size === 0) console.log('  所有内容
 
 console.log('\n检查整理结果：');
 const check = spawnSync(process.execPath, [path.join(ROOT, 'scripts/check-images.mjs')], { stdio: 'inherit' });
-process.exit(check.status ?? 0);
+if (check.status) console.log('（有失效引用，不影响继续执行。需要让它变成失败时用 pnpm images:check）');
