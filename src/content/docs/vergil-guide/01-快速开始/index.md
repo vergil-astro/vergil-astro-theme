@@ -120,6 +120,7 @@ export const footerNavLinks = [
 my-blog/
 ├── src/
 │   ├── assets/img/       ← 内容里的图片，用 @img/ 引用
+│   ├── assets/videos/    ← 相册主题的背景视频
 │   ├── content/          ← 所有内容文件放在这里
 │   │   ├── blog/         ← 博客文章
 │   │   ├── moments/      ← 瞬间（图文动态）
@@ -138,7 +139,7 @@ my-blog/
 │   │       ├── links.ts       ← 网站卡片链接分组
 │   │       └── fonts.ts       ← 字体注册表
 │   └── pages/            ← 页面路由
-├── public/               ← 需要固定地址的静态资源（封面图、字体等）
+├── public/               ← 站点文件：favicon、头像、分享图、默认背景、字体
 └── package.json
 ```
 

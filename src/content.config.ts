@@ -7,6 +7,15 @@ const imageSchema = (image: ImageFunction) =>
         alt: z.string().optional()
     });
 
+/**
+ * 内容里的封面图：推荐写 @img/ 别名指向 src/assets/img/ 下的文件，会被优化；
+ * 也兼容 / 开头的 public 路径和外链，那两种原样输出。
+ *
+ * 字符串分支必须排在前面：image() 遇到 / 开头的路径会直接报「图片不存在」，
+ * 不会让给后面的分支。
+ */
+const imageOrPath = (image: ImageFunction) => z.union([z.string().regex(/^(\/|https?:\/\/)/), image()]);
+
 const seoSchema = (image: ImageFunction) =>
     z.object({
         title: z.string().min(5).max(120).optional(),
@@ -33,7 +42,7 @@ const blog = defineCollection({
             categories: z.array(z.string()).optional(),
             series: z.string().optional(),
             draft: z.boolean().default(false),
-            banner: z.string().optional(),
+            banner: imageOrPath(image).optional(),
             seo: seoSchema(image).optional(),
             fonts: fontsSchema
         })
@@ -129,7 +138,7 @@ const docs = defineCollection({
             homepage: z.string().optional(),
             tags: z.array(z.string()).default([]),
             cover: image().optional(),
-            banner: z.string().optional(),
+            banner: imageOrPath(image).optional(),
             splash: z.object({
                 enabled: z.boolean().default(false),
                 backgroundImage: z.string().optional(),
@@ -171,11 +180,11 @@ const thoughts = defineCollection({
 
 const series = defineCollection({
     loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/series' }),
-    schema: () =>
+    schema: ({ image }) =>
         z.object({
             name: z.string(),
             description: z.string().optional(),
-            cover: z.string().optional(),
+            cover: imageOrPath(image).optional(),
             icon: z.string().optional(),
             /**
              * 这个专栏的文章目录，相对于 src/content/blog/，只能是一级目录。

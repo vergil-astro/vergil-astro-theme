@@ -1,4 +1,5 @@
 ---
+import { resolveImageUrl } from '../../../utils/image-utils';
 import { t } from '../../../i18n';
 import DirectiveStyles from '../../../components/base/DirectiveStyles.astro';
 import { getCollection, render } from 'astro:content';
@@ -51,14 +52,8 @@ const sets = await getDocSets();
 const currentSet = sets.find((s) => s.id === docId);
 const metaTitle = (currentSet?.meta.data.title as string) ?? docId;
 
-function resolveBannerUrl(banner: string | undefined): string | null {
-    if (!banner) return null;
-    // 外链和站内路径都直接用；以前只认 http 开头，站内路径会被悄悄换成兜底图
-    if (banner.startsWith('http') || banner.startsWith('/')) return banner;
-    return '/assets/defaults/banner-01.webp';
-}
 
-const bannerUrl = resolveBannerUrl(entry.data.banner as string | undefined);
+const bannerUrl = await resolveImageUrl(entry.data.banner, 1600);
 
 // 判断是否开启自动渲染子目录
 // Astro glob loader 中 index.md 的 entry.id 格式为 docId/slug（不带 /index 后缀）

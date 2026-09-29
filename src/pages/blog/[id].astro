@@ -1,4 +1,5 @@
 ---
+import { resolveImageUrl } from '../../utils/image-utils';
 import { t } from '../../i18n';
 import DirectiveStyles from '../../components/base/DirectiveStyles.astro';
 import { type CollectionEntry, getCollection, render } from 'astro:content';
@@ -103,14 +104,8 @@ const navNext = series ? seriesNext : nextPost;
 const recommendNext = series ? seriesRecommend : null;
 const hasNav = !!(navPrev || navNext || recommendNext);
 
-function resolveBannerUrl(banner: string | undefined): string | null {
-    if (!banner) return null;
-    // 外链和站内路径都直接用；以前只认 http 开头，站内路径会被悄悄换成兜底图
-    if (banner.startsWith('http') || banner.startsWith('/')) return banner;
-    return '/assets/defaults/banner-01.webp';
-}
 
-const bannerUrl = resolveBannerUrl(banner);
+const bannerUrl = await resolveImageUrl(banner, 1600);
 const { Content, headings } = await render(post);
 
 // 生成微信分享二维码

@@ -5,6 +5,7 @@ import { Calendar, Clock } from '@lucide/astro';
 import FormattedDate from '../ui/FormattedDate.astro';
 import { slugify } from '../../utils/common-utils';
 import { t } from '../../i18n';
+import { resolveImageUrl } from '../../utils/image-utils';
 
 type Props = { post: CollectionEntry<'blog'>; class?: string; headingLevel?: 'h2' | 'h3' };
 
@@ -20,14 +21,15 @@ function calculateReadingTime(content: string): number {
 }
 
 const readingTime = calculateReadingTime(post.body || '');
-const hasBanner = !!banner;
+const bannerUrl = await resolveImageUrl(banner, 960);
+const hasBanner = !!bannerUrl;
 ---
 
 <div class:list={['', className]}>
     {hasBanner ? (
         <a href={`/blog/${getPostSlug(post)}/`} class="block relative -m-4 overflow-hidden rounded-[20px] group">
             <img
-                src={banner}
+                src={bannerUrl}
                 alt={title}
                 class="w-full aspect-[2.35/1] object-cover"
                 loading="lazy"

@@ -4,18 +4,18 @@
  * 引用改成 @img/ 别名。规则见文档「图片与静态资源」。
  *
  * 处理范围：
- *   - 载体：src/content/ 下的 blog、projects、pages、docs、albums
+ *   - 载体：src/content/ 下的 blog、projects、pages、docs、albums、series
  *   - 正文里的 Markdown 图片 ![](...)，代码块里的示例不动
- *   - frontmatter 里的 src、cover（seo.image.src、知识库和相册的 cover、相册的 images[].src）
+ *   - frontmatter 里的 src、cover、banner（seo.image.src、文章和文档的 banner、知识库、相册和专栏的 cover、相册的 images[].src）
  *
  * 不处理：
- *   - banner、指令、图文动态、想法这些只接受字符串路径的地方（它们本来就该用 public/assets/）
+ *   - 指令、图文动态、想法这些只接受字符串路径的地方
  *   - 外链、已经是 @img/ 的引用
  *
  * 安全措施：
  *   - 不删除任何图片。没被引用的图原地不动
  *   - 同一张图被多条内容引用：移给第一条，其余各复制一份
- *   - 图片还被代码、配置或字符串字段引用：只复制不移动
+ *   - 图片还被代码、配置或字符串字段引用，或者是 public/assets/site、defaults 下的站点文件：只复制不移动
  *   - 目标位置已有同名但内容不同的文件：自动改名为 xxx-1.png
  *   - 引用的文件不存在：跳过，在最后列出来
  *
@@ -31,7 +31,7 @@ const CONTENT_DIR = path.join(ROOT, 'src/content');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const IMG_DIR = path.join(ROOT, 'src/assets/img');
 const IMG_ALIAS = '@img/';
-const CARRIERS = ['blog', 'projects', 'pages', 'docs', 'albums'];
+const CARRIERS = ['blog', 'projects', 'pages', 'docs', 'albums', 'series'];
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.avif']);
 const TEXT_EXT = new Set(['.md', '.mdx', '.astro', '.ts', '.js', '.mjs', '.json', '.css', '.html', '.webmanifest']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.astro', '.git']);
@@ -75,7 +75,7 @@ function resolveRef(ref, fromFile) {
 
 // ── 1. 找出所有要处理的引用 ──
 const MD_IMAGE = /(!\[[^\]]*\]\(\s*<?)([^)\s>]+)(>?(?:\s+"[^"]*")?\s*\))/g;
-const FM_FIELD = /^(\s*-?\s*(?:src|cover):\s*)(['"]?)([^'"\s#]+)\2(\s*)$/;
+const FM_FIELD = /^(\s*-?\s*(?:src|cover|banner):\s*)(['"]?)([^'"\s#]+)\2(\s*)$/;
 
 const contentFiles = CARRIERS.flatMap((c) => walk(path.join(CONTENT_DIR, c))).filter((f) => /\.(md|mdx)$/.test(f));
 
@@ -196,8 +196,12 @@ for (const file of contentFiles) {
 const corpusFiles = [...walk(path.join(ROOT, 'src')), ...walk(PUBLIC_DIR), path.join(ROOT, 'astro.config.mjs')].filter(
     (f) => TEXT_EXT.has(path.extname(f).toLowerCase()) && fs.existsSync(f)
 );
+// public/assets/site/ 和 defaults/ 是站点本身的文件，被内容引用了也只复制，不能挪走
+const SITE_DIRS = ['site', 'defaults'].map((d) => path.join(PUBLIC_DIR, 'assets', d) + path.sep);
+const isSiteFile = (file) => SITE_DIRS.some((d) => file.startsWith(d));
+
 for (const source of refsBySource.keys()) {
-    if (stillReferencedElsewhere(source)) continue;
+    if (isSiteFile(source) || stillReferencedElsewhere(source)) continue;
     const first = operations.find((op) => op.from === source && op.kind === 'copy');
     if (first) first.kind = 'move';
 }

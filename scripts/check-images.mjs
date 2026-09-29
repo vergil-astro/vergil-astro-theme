@@ -4,7 +4,7 @@
  *
  * 报告五类问题：
  *   1. 引用失效  内容里写了本地图片路径，但文件不存在（唯一会让命令失败的一类）
- *   2. 可以迁移  正文用 Markdown 语法引用了 public/ 下的图，挪到 src/assets/img/ 用 @img/ 引用能被优化
+ *   2. 可以迁移  正文图片或 banner、cover、seo.image 引用了 public/ 下的图，挪到 src/assets/img/ 用 @img/ 引用能被优化
  *   3. 内容重复  几个文件的内容完全相同
  *   4. 体积过大  单张超过 MAX_KB（改下面的常量调整）
  *   5. 暂未引用  文件名没有出现在任何源码或内容里（只提示，可能是留着以后用的）
@@ -52,7 +52,9 @@ const textFiles = [...allFiles, path.join(ROOT, 'astro.config.mjs')].filter(
 // 覆盖：Markdown 图片语法、HTML/指令的 src="..."、frontmatter 里的图片路径字段
 const MD_IMAGE = /!\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+"[^"]*")?\s*\)/g;
 const ATTR_SRC = /\b(?:src|bg|cover|banner)\s*=\s*"([^"]+)"/g;
-const FM_FIELD = /^\s*-?\s*(?:src|cover|banner|image|avatar|backgroundImage):\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
+const FM_FIELD = /^\s*-?\s*(?:image|avatar|backgroundImage):\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
+// 这几个字段支持 @img/，指向 public/ 时提示可以迁移
+const FM_IMAGE_FIELD = /^\s*-?\s*(?:src|cover|banner):\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 const JSON_STRING = /"([^"]+\.(?:png|jpe?g|webp|gif|svg|avif))"/gi;
 
 // 代码块和行内代码里的路径只是示例，不算引用
@@ -107,6 +109,7 @@ for (const file of contentFiles) {
         for (const m of text.matchAll(MD_IMAGE)) add(m[1], true);
         for (const m of text.matchAll(ATTR_SRC)) add(m[1], false);
         for (const m of text.matchAll(FM_FIELD)) add(m[1], false);
+        for (const m of text.matchAll(FM_IMAGE_FIELD)) add(m[1], true);
     }
     for (const [ref, fromMarkdown] of refs) {
         let target;

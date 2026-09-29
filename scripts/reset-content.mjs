@@ -150,7 +150,7 @@ rm('src/assets/img/pages/about');
 rm('src/assets/img/docs/kubernetes');
 rm('src/assets/img/docs/react-guide');
 if (ALL) rm('src/assets/img/docs/vergil-guide');
-rm('public/videos');
+rm('src/assets/videos');
 
 // ── 配置 ──
 console.log('\n配置');

@@ -10,6 +10,7 @@ import { getCollection, render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import AlbumLayout from '../../layouts/AlbumLayout.astro';
 import AlbumRenderer from '../../components/album/AlbumRenderer.astro';
+import { themeVideo } from '../../utils/theme-videos';
 
 export const getStaticPaths = (async () => {
     const albums = await getCollection('albums');
@@ -55,13 +56,14 @@ const imageCount = images.length;
 const yearMonth = date ? new Date(date).toLocaleDateString(locale, { year: 'numeric', month: 'long' }) : '';
 
 const isSeasons = theme === 'seasons';
+const seasonVideos = { summer: themeVideo('season-summer.mp4'), autumn: themeVideo('season-autumn.mp4') };
 ---
 
 <AlbumLayout title={title} description={description} theme={theme} fonts={fonts} pageType="detail" background={background} accent={accent}>
     {isSeasons ? (
         <div class="adetail-bg-video" id="adetail-bg-video">
             <video autoplay muted loop playsinline class="adetail-bg-video-el" id="season-video" poster={coverSrc}>
-                <source src="/videos/season-summer.mp4" type="video/mp4" />
+                {seasonVideos.summer && <source src={seasonVideos.summer} type="video/mp4" />}
             </video>
             <div class="adetail-bg-video-overlay"></div>
             <div class="adetail-bg-video-vignette"></div>
@@ -96,7 +98,7 @@ const isSeasons = theme === 'seasons';
     </AlbumRenderer>
 </AlbumLayout>
 
-<script is:inline define:vars={{ imageData: allImages, isSeasonsTheme: isSeasons, defaultSeason: defaultSeason, i18nSeasons: t.album.seasonLabel, i18nTime: t.album.timeOfDay }}>
+<script is:inline define:vars={{ imageData: allImages, isSeasonsTheme: isSeasons, defaultSeason: defaultSeason, i18nSeasons: t.album.seasonLabel, i18nTime: t.album.timeOfDay, seasonVideos }}>
     (function() {
         const lightbox = document.getElementById('alb-lightbox');
         if (!lightbox) return;
@@ -287,13 +289,14 @@ const isSeasons = theme === 'seasons';
                 }
                 var bgVideo = document.getElementById('season-video');
                 if (bgVideo) {
-                    var videoMap = { spring: '/videos/season-summer.mp4', summer: '/videos/season-summer.mp4', autumn: '/videos/season-autumn.mp4', winter: '/videos/season-autumn.mp4' };
+                    var videoMap = { spring: seasonVideos.summer, summer: seasonVideos.summer, autumn: seasonVideos.autumn, winter: seasonVideos.autumn };
                     var newSrc = videoMap[season];
-                    if (newSrc && bgVideo.querySelector('source').src !== newSrc) {
+                    var videoSource = bgVideo.querySelector('source');
+                    if (newSrc && videoSource && videoSource.getAttribute('src') !== newSrc) {
                         bgVideo.style.transition = 'opacity 0.6s ease';
                         bgVideo.style.opacity = '0.3';
                         setTimeout(function() {
-                            bgVideo.querySelector('source').src = newSrc;
+                            videoSource.src = newSrc;
                             bgVideo.load();
                             bgVideo.play().catch(function(){});
                             bgVideo.style.opacity = '1';

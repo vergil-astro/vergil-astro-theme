@@ -3,6 +3,7 @@
  * GoldenHero — Full-screen video hero for the Golden theme.
  */
 import { t } from '../../../../i18n';
+import { themeVideo } from '../../../../utils/theme-videos';
 
 export interface Props {
     title: string;
@@ -11,12 +12,13 @@ export interface Props {
 }
 
 const { title, description, coverSrc } = Astro.props;
+const heroVideo = themeVideo('hero-golden.mp4');
 ---
 
 <section class="adetail-hero reveal">
     <div class="adetail-hero-bg">
         <video autoplay muted loop playsinline class="adetail-hero-video" poster={coverSrc}>
-            <source src="/videos/hero-golden.mp4" type="video/mp4" />
+            {heroVideo && <source src={heroVideo} type="video/mp4" />}
         </video>
         <div class="adetail-hero-overlay"></div>
         <div class="adetail-hero-vignette"></div>

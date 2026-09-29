@@ -5,13 +5,14 @@ import { t } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionNav from '../../components/ui/SectionNav.astro';
 import { getPostsBySeries, sortItemsByDateDesc } from '../../utils/data-utils';
+import { resolveImageUrl } from '../../utils/image-utils';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
 const allSeries = await getCollection('series');
 const seriesDefs = allSeries.map((s) => ({ id: s.id, name: s.data.name, dir: s.data.dir }));
 
-const seriesWithMeta = allSeries
-    .map((s) => {
+const seriesWithMeta = (await Promise.all(allSeries
+    .map(async (s) => {
         const seriesPosts = getPostsBySeries(posts, s.id, seriesDefs);
         // getPostsBySeries 现在是正序，取最新要算最大值，不能再取第一个
         const latestDate = seriesPosts.length > 0
@@ -19,10 +20,11 @@ const seriesWithMeta = allSeries
             : 0;
         return {
             ...s,
+            coverUrl: await resolveImageUrl(s.data.cover, 160),
             postCount: seriesPosts.length,
             latestDate,
         };
-    })
+    })))
     // 专栏详情页只为「有文章的专栏」生成，所以这里也必须过滤掉空专栏，
     // 否则列表上会出现一个点进去 404 的入口。
     .filter((s) => s.postCount > 0)
@@ -51,9 +53,9 @@ const seriesWithMeta = allSeries
                     style="background-color: color-mix(in srgb, var(--bg-card) 80%, transparent); backdrop-filter: blur(8px);"
                 >
                     <div class="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center relative">
-                        {s.data.cover ? (
+                        {s.coverUrl ? (
                             <img
-                                src={s.data.cover}
+                                src={s.coverUrl}
                                 alt={s.data.name}
                                 class="w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.03]"
                             />
