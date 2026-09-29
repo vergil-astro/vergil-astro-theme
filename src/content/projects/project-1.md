@@ -5,11 +5,11 @@ publishDate: 'Jun 18 2026'
 isFeatured: true
 seo:
   image:
-    src: '../../assets/images/project-1.jpg'
+    src: '@img/projects/project-1/cover.jpg'
     alt: Vergil 主题预览
 ---
 
-![Vergil 主题预览](../../assets/images/project-1.jpg)
+![Vergil 主题预览](@img/projects/project-1/cover.jpg)
 
 :::callout{type="tip" title="这是示例项目"}
 项目页面的内容就是普通 Markdown，支持全部指令。改 `src/content/projects/` 下的文件即可。

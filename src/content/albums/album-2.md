@@ -9,9 +9,9 @@ background: '#0d0d12'
 accent: '#C8A464'
 seasonFilter: true
 seasonDefault: 'summer'
-cover: ./hero-seasons.jpg
+cover: '@img/albums/album-2/hero-seasons.jpg'
 images:
-  - src: ./seasons/cherry-blossom.jpg
+  - src: '@img/albums/album-2/cherry-blossom.jpg'
     alt: '樱花盛开'
     caption: '春天的第一缕温暖'
     season: 'spring'
@@ -22,7 +22,7 @@ images:
       aperture: 'f/1.8'
       shutter: '1/500s'
       iso: '200'
-  - src: ./seasons/tulip.jpg
+  - src: '@img/albums/album-2/tulip.jpg'
     alt: '郁金香田野'
     caption: '色彩斑斓的春天'
     season: 'spring'
@@ -32,15 +32,15 @@ images:
       aperture: 'f/2.8'
       shutter: '1/1000s'
       iso: '100'
-  - src: ./seasons/rain.jpg
+  - src: '@img/albums/album-2/rain.jpg'
     alt: '春雨'
     caption: '润物细无声'
     season: 'spring'
-  - src: ./seasons/bamboo.jpg
+  - src: '@img/albums/album-2/bamboo.jpg'
     alt: '竹林深处'
     caption: '雨后春笋'
     season: 'spring'
-  - src: ./seasons/beach.jpg
+  - src: '@img/albums/album-2/beach.jpg'
     alt: '夏日海滩'
     caption: '阳光、沙滩与海浪'
     season: 'summer'
@@ -51,7 +51,7 @@ images:
       aperture: 'f/2.8'
       shutter: '1/2000s'
       iso: '100'
-  - src: ./seasons/sunset.jpg
+  - src: '@img/albums/album-2/sunset.jpg'
     alt: '日落'
     caption: '金色时刻'
     season: 'summer'
@@ -61,19 +61,19 @@ images:
       aperture: 'f/4'
       shutter: '1/125s'
       iso: '400'
-  - src: ./seasons/fireworks.jpg
+  - src: '@img/albums/album-2/fireworks.jpg'
     alt: '烟花'
     caption: '夏夜绽放'
     season: 'summer'
-  - src: ./seasons/mountain.jpg
+  - src: '@img/albums/album-2/mountain.jpg'
     alt: '山间溪流'
     caption: '清凉一夏'
     season: 'summer'
-  - src: ./seasons/camping.jpg
+  - src: '@img/albums/album-2/camping.jpg'
     alt: '露营'
     caption: '星空下的夜晚'
     season: 'summer'
-  - src: ./seasons/maple.jpg
+  - src: '@img/albums/album-2/maple.jpg'
     alt: '红枫'
     caption: '秋意浓'
     season: 'autumn'
@@ -84,19 +84,19 @@ images:
       aperture: 'f/1.4'
       shutter: '1/250s'
       iso: '320'
-  - src: ./seasons/ginkgo.jpg
+  - src: '@img/albums/album-2/ginkgo.jpg'
     alt: '银杏大道'
     caption: '满城尽带黄金甲'
     season: 'autumn'
-  - src: ./seasons/fog.jpg
+  - src: '@img/albums/album-2/fog.jpg'
     alt: '晨雾'
     caption: '薄雾轻纱'
     season: 'autumn'
-  - src: ./seasons/harvest.jpg
+  - src: '@img/albums/album-2/harvest.jpg'
     alt: '丰收'
     caption: '硕果累累'
     season: 'autumn'
-  - src: ./seasons/snow.jpg
+  - src: '@img/albums/album-2/snow.jpg'
     alt: '雪景'
     caption: '银装素裹'
     season: 'winter'
@@ -107,15 +107,15 @@ images:
       aperture: 'f/2.0'
       shutter: '1/500s'
       iso: '400'
-  - src: ./seasons/ice.jpg
+  - src: '@img/albums/album-2/ice.jpg'
     alt: '冰晶'
     caption: '冬日精灵'
     season: 'winter'
-  - src: ./seasons/hot-spring.jpg
+  - src: '@img/albums/album-2/hot-spring.jpg'
     alt: '温泉'
     caption: '冬日暖阳'
     season: 'winter'
-  - src: ./seasons/new-year.jpg
+  - src: '@img/albums/album-2/new-year.jpg'
     alt: '新年'
     caption: '瑞雪兆丰年'
     season: 'winter'

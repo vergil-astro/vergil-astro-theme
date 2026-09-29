@@ -142,12 +142,14 @@ sections: []
 
 // ── 素材 ──
 console.log('\n素材');
-rm('src/assets/images/albums-demo');
-for (const f of fs.existsSync(path.join(ROOT, 'src/assets/images'))
-    ? fs.readdirSync(path.join(ROOT, 'src/assets/images'))
-    : []) {
-    if (/^(post-\d+|project-\d+)\./.test(f)) rm(`src/assets/images/${f}`);
-}
+// 内容图片按 src/assets/img/<载体>/<内容名>/ 存放，跟着上面清掉的内容一起删。
+rm('src/assets/img/blog');
+rm('src/assets/img/projects');
+rm('src/assets/img/albums');
+rm('src/assets/img/pages/about');
+rm('src/assets/img/docs/kubernetes');
+rm('src/assets/img/docs/react-guide');
+if (ALL) rm('src/assets/img/docs/vergil-guide');
 rm('public/videos');
 
 // ── 配置 ──
@@ -159,7 +161,7 @@ const IDENTITY = `export const siteInfo = {
     subtitle: '一句话副标题',
     description: '用一两句话说明这个站点是关于什么的，会用在 SEO 和分享卡片上。',
     image: {
-        src: '/vergil-preview.jpg',
+        src: '/assets/site/vergil-preview.jpg',
         alt: '你的站点名'
     },
     /**

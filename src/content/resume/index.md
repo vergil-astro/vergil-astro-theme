@@ -1,7 +1,7 @@
 ---
 title: 个人简历
 name: 你的名字
-avatar: /avatar.jpg
+avatar: /assets/site/avatar.jpg
 contact:
   email: you@example.com
   phone: +86 138 0000 0000

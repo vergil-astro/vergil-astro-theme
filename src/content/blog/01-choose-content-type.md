@@ -6,7 +6,15 @@ tags:
   - 使用指南
 categories: ["博客相关"]
 series: 搭建你的第一个站点
+seo:
+  image:
+    src: '@img/blog/01-choose-content-type/laptop.jpg'
+    alt: 打开的笔记本电脑
 ---
+
+![通往远方的公路](@img/blog/01-choose-content-type/road.jpg)
+
+这篇文章的配图放在 `src/assets/img/blog/01-choose-content-type/`，正文里写 `@img/blog/01-choose-content-type/road.jpg`。你自己的文章照着这样放就行，完整规则见 [图片与静态资源](/docs/vergil-guide/03-基本创作/图片与静态资源/)。
 
 ## 四种内容形式
 

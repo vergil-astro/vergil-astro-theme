@@ -8,9 +8,9 @@ photoFit: 'cover'
 background: '#0a0a0a'
 accent: '#C8A464'
 seasonFilter: false
-cover: ./hero-golden.jpg
+cover: '@img/albums/album-1/hero-golden.jpg'
 images:
-  - src: ./private/seal.jpg
+  - src: '@img/albums/album-1/seal.jpg'
     alt: '阿尔卑斯山脊'
     caption: '晨光中的山脊线'
     featured: true
@@ -21,7 +21,7 @@ images:
       aperture: 'f/1.4'
       shutter: '1/125s'
       iso: '800'
-  - src: ./private/studio.jpg
+  - src: '@img/albums/album-1/studio.jpg'
     alt: '星空山脉'
     caption: '银河下的静谧'
     exif:
@@ -31,7 +31,7 @@ images:
       aperture: 'f/2.8'
       shutter: '1/60s'
       iso: '3200'
-  - src: ./private/corridor.jpg
+  - src: '@img/albums/album-1/corridor.jpg'
     alt: '层叠山峦'
     caption: '层次分明的地质之美'
     exif:
@@ -41,7 +41,7 @@ images:
       aperture: 'f/4'
       shutter: '1/500s'
       iso: '200'
-  - src: ./private/courtyard.jpg
+  - src: '@img/albums/album-1/courtyard.jpg'
     alt: '高山湖泊'
     caption: '倒影中的世界'
     exif:
@@ -51,7 +51,7 @@ images:
       aperture: 'f/1.8'
       shutter: '1/250s'
       iso: '400'
-  - src: ./private/staircase.jpg
+  - src: '@img/albums/album-1/staircase.jpg'
     alt: '海岸悬崖'
     caption: '海陆交界'
     exif:
@@ -60,7 +60,7 @@ images:
       aperture: 'f/2.8'
       shutter: '1/2000s'
       iso: '100'
-  - src: ./private/ceiling.jpg
+  - src: '@img/albums/album-1/ceiling.jpg'
     alt: '雾中森林'
     caption: '迷雾森林'
     exif:
@@ -70,7 +70,7 @@ images:
       aperture: 'f/2.0'
       shutter: '1/250s'
       iso: '400'
-  - src: ./private/window.jpg
+  - src: '@img/albums/album-1/window.jpg'
     alt: '林间阳光'
     caption: '丁达尔效应'
     exif:
@@ -80,7 +80,7 @@ images:
       aperture: 'f/1.8'
       shutter: '1/500s'
       iso: '200'
-  - src: ./private/facade.jpg
+  - src: '@img/albums/album-1/facade.jpg'
     alt: '草原黄昏'
     caption: '金色草原'
     exif:

@@ -7,7 +7,7 @@ homepage: 03-基本创作/内容形式
 tags:
   - 博客搭建
   - 主题
-cover: ../../../assets/images/hero.jpg
+cover: '@img/docs/vergil-guide/cover.jpg'
 splash:
   enabled: true
   backgroundImage: https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80

@@ -10,6 +10,23 @@ categories: ["博客相关"]
 图片、音频、视频和代码面板。所有嵌入都在构建期处理，不引第三方播放器脚本。
 
 ---
+### 本地图片
+
+放在仓库里的图片，用普通的 Markdown 语法加 `@img/` 别名引用，构建时会自动压缩、转成 WebP：
+
+![山峰](@img/blog/directives-03-media/mountains.jpg)
+
+```markdown
+![山峰](@img/blog/directives-03-media/mountains.jpg)
+```
+
+这篇文章放在专栏目录 `内容指令示例/` 下，图片目录只取文件名，所以是 `blog/directives-03-media/`，不带专栏目录。
+
+:::callout{type="warning" title="下面的指令不支持 @img/"}
+`::image`、`gallery`、`photo` 这些指令只接受字符串路径，要用 `/assets/` 开头的 `public/` 路径或者外链。详见 [图片与静态资源](/docs/vergil-guide/03-基本创作/图片与静态资源/)。
+:::
+
+---
 ### Image 图片
 
 ::::tabs
