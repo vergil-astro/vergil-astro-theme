@@ -104,7 +104,7 @@ export const footerNavLinks = [
 
 ### 5. 头像
 
-把你的头像图片替换掉 `src/assets/images/avatar.jpg`，同名覆盖即可。
+把你的头像图片替换掉 `public/assets/site/avatar.jpg`，同名覆盖即可。
 
 :::callout{type="tip"}
 **改完这 5 项，刷新浏览器，网站就是你的了。**
@@ -183,6 +183,25 @@ export default defineConfig({
 ```
 
 不加白名单的外部图片会被拦截，只显示 alt 文字。本地图片（`public/` 目录下）无需配置。
+
+## 常用命令
+
+所有命令都写在 `package.json` 的 `scripts` 里，没有别的隐藏命令。
+
+| 命令 | 作用 |
+| --- | --- |
+| `pnpm dev` | 启动开发服务器，改文件后浏览器自动刷新。`pnpm start` 等同 |
+| `pnpm build` | 构建站点，产物在 `dist/` |
+| `pnpm preview` | 本地预览构建产物 |
+| `pnpm reset` | 清空演示内容，保留 Vergil 使用文档 |
+| `pnpm reset:all` | 清空演示内容，连 Vergil 使用文档一起删 |
+| `pnpm reset:dry` | 只列出 `reset` 会删除和重写哪些文件，不实际执行 |
+| `pnpm images:organize` | 把内容引用的图片挪到 `src/assets/img/` 并改成 `@img/` 引用，见 [图片与静态资源](/docs/vergil-guide/03-基本创作/图片与静态资源/) |
+| `pnpm images:check` | 检查图片引用，报告失效引用、重复文件、大图，只读不写 |
+| `pnpm fonts:subset` | 重新生成中文字体子集，见 [字体与主题](/docs/vergil-guide/02-站点配置/字体与主题/) |
+| `pnpm samples:dates` | 把主题示例文章的日期挪到最近八周内，让热力图有内容。只改示例文章，`reset` 之后不再有作用 |
+| `pnpm samples:dates:dry` | 只列出 `samples:dates` 会改哪些日期，不实际执行 |
+| `pnpm astro` | 直接调用 Astro 命令行，比如 `pnpm astro --help` |
 
 ## 下一步
 

@@ -5,7 +5,7 @@ seo:
   description: Vergil 是一套基于 Astro 的内容站点主题，把排版、组件和交互都做进了 Markdown 指令里。
 ---
 
-![Vergil](../../assets/images/about.jpg)
+![Vergil](@img/pages/about/about.jpg)
 
 :::callout{type="tip" title="这是示例页面"}
 你看到的是 Vergil 演示站的关于页。换成你自己的内容，编辑 `src/content/pages/about.md` 即可，支持全部 Markdown 指令。

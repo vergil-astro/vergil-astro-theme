@@ -5,7 +5,7 @@ order: 1
 tags:
   - 运维
   - 后端
-cover: ../../../assets/images/project-2.jpg
+cover: '@img/docs/kubernetes/cover.jpg'
 dirs:
   - getting-started
   - env-setup

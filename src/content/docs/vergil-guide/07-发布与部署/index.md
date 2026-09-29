@@ -22,7 +22,7 @@ seo:
   title: 分享时显示的标题
   description: 分享时显示的描述
   image:
-    src: ../../assets/images/share-cover.jpg
+    src: '@img/blog/my-post/share-cover.jpg'
     alt: 分享卡片配图
 ---
 ```
@@ -33,7 +33,7 @@ seo:
 
 ```typescript
 image: {
-    src: '/vergil-preview.jpg',
+    src: '/assets/site/vergil-preview.jpg',
     alt: 'Vergil 主题预览图'
 }
 ```

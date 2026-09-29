@@ -6,13 +6,10 @@
  *   1. 引用失效  内容里写了本地图片路径，但文件不存在（唯一会让命令失败的一类）
  *   2. 可以迁移  正文用 Markdown 语法引用了 public/ 下的图，挪到 src/assets/img/ 用 @img/ 引用能被优化
  *   3. 内容重复  几个文件的内容完全相同
- *   4. 体积过大  单张超过阈值（默认 500KB）
+ *   4. 体积过大  单张超过 MAX_KB（改下面的常量调整）
  *   5. 暂未引用  文件名没有出现在任何源码或内容里（只提示，可能是留着以后用的）
  *
- * 用法：
- *   pnpm images:check
- *   pnpm images:check --max-kb 800
- *   pnpm images:check --verbose     # 列出每一类的全部文件，而不是只列前几个
+ * 用法：pnpm images:check
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,15 +25,8 @@ const PUBLIC_DIR = path.join(ROOT, 'public');
 const IMG_ALIAS = '@img/';
 const IMG_ALIAS_DIR = path.join(ROOT, 'src/assets/img');
 
-const args = process.argv.slice(2);
-const verbose = args.includes('--verbose');
-const maxKbIdx = args.indexOf('--max-kb');
-const maxKb = maxKbIdx !== -1 ? Number(args[maxKbIdx + 1]) : 500;
-if (!Number.isFinite(maxKb) || maxKb <= 0) {
-    console.error('--max-kb 需要一个正数，比如 --max-kb 800');
-    process.exit(2);
-}
-const LIST_LIMIT = verbose ? Infinity : 8;
+/** 单张图片超过这个体积（KB）会被提示 */
+const MAX_KB = 500;
 
 function walk(dir, out = []) {
     if (!fs.existsSync(dir)) return out;
@@ -143,7 +133,7 @@ const duplicates = [...byHash.values()].filter((group) => group.length > 1);
 // ── 体积过大 ──
 const large = images
     .map((img) => ({ img, kb: fs.statSync(img).size / 1024 }))
-    .filter((x) => x.kb > maxKb)
+    .filter((x) => x.kb > MAX_KB)
     .sort((a, b) => b.kb - a.kb);
 
 // ── 暂未引用（按文件名匹配） ──
@@ -160,8 +150,7 @@ function section(title, items, render) {
         console.log('  无');
         return;
     }
-    for (const item of items.slice(0, LIST_LIMIT)) console.log(`  ${render(item)}`);
-    if (items.length > LIST_LIMIT) console.log(`  …还有 ${items.length - LIST_LIMIT} 项，加 --verbose 查看全部`);
+    for (const item of items) console.log(`  ${render(item)}`);
 }
 
 console.log(`扫描了 ${images.length} 张图片、${contentFiles.length} 个内容文件`);
@@ -169,7 +158,7 @@ console.log(`扫描了 ${images.length} 张图片、${contentFiles.length} 个�
 section('✗ 引用失效', broken, ({ file, ref }) => `${rel(file)} → ${ref}`);
 section('→ 可以迁移到 src/assets/img/ 以获得优化', movable, ({ file, ref }) => `${rel(file)} → ${ref}`);
 section('≡ 内容重复', duplicates, (group) => group.map(rel).join('  ==  '));
-section(`▲ 体积超过 ${maxKb}KB`, large, ({ img, kb }) => `${rel(img)}  ${Math.round(kb)}KB`);
+section(`▲ 体积超过 ${MAX_KB}KB`, large, ({ img, kb }) => `${rel(img)}  ${Math.round(kb)}KB`);
 
 const unrefByDir = new Map();
 for (const img of unreferenced) {

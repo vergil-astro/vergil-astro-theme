@@ -12,7 +12,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/wsjz/vergil-astro-theme?style=social)](https://github.com/wsjz/vergil-astro-theme)
 
-![Vergil 深色文档页与浅色首页](public/vergil-preview.jpg)
+![Vergil 深色文档页与浅色首页](public/assets/site/vergil-preview.jpg)
 
 </div>
 
@@ -30,10 +30,11 @@ pnpm dev
 仓库自带的文章、相册、示例文档是演示内容。确认能跑起来之后，清掉它们：
 
 ```bash
-pnpm reset     # 加 --dry 先看会删什么
+pnpm reset:dry # 先看会删什么
+pnpm reset     # 确认后真正清理
 ```
 
-`pnpm reset` 会保留站内的 Vergil 使用文档，那是你之后要查的东西。想一起删掉加 `--all`。
+`pnpm reset` 会保留站内的 Vergil 使用文档，那是你之后要查的东西。想一起删掉用 `pnpm reset:all`。
 
 ## 它能做什么
 

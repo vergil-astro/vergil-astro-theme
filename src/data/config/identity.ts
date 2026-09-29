@@ -9,7 +9,7 @@ export const siteInfo = {
     subtitle: 'Astro Framework for Content Creators',
     description: 'A content-driven Astro framework for building personal websites with Markdown',
     image: {
-        src: '/vergil-preview.jpg',
+        src: '/assets/site/vergil-preview.jpg',
         alt: 'Vergil - Astro.js and Tailwind CSS theme'
     },
     /**

@@ -11,7 +11,6 @@ import siteConfig from '../data/site-config';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Pagination from '../components/widgets/Pagination.astro';
 import { sortItemsByDateDesc } from '../utils/data-utils';
-import avatar from '../assets/images/avatar.jpg';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
 const pageSize = 7;
@@ -40,7 +39,8 @@ interface MomentData {
 }
 
 const momentsDir = path.join(process.cwd(), 'src', 'content', 'moments');
-const avatarSrc = typeof avatar === 'string' ? avatar : avatar.src;
+// 头像可以写 public/ 下的路径字符串，也可以在 site-config.ts 里 import 成图片对象
+const avatarSrc = typeof siteConfig.avatar?.src === 'string' ? siteConfig.avatar.src : siteConfig.avatar?.src.src;
 let latestMoment: MomentData | null = null;
 if (fs.existsSync(momentsDir)) {
     const files = fs.readdirSync(momentsDir).filter(f => f.endsWith('.json'));

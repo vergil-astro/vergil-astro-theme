@@ -5,11 +5,11 @@ publishDate: 'Nov 12 2025'
 isFeatured: false
 seo:
   image:
-    src: '../../assets/images/project-3.jpg'
+    src: '@img/projects/project-3/cover.jpg'
     alt: 播客项目预览
 ---
 
-![播客项目预览](../../assets/images/project-3.jpg)
+![播客项目预览](@img/projects/project-3/cover.jpg)
 
 :::callout{type="note" title="示例项目"}
 这是一个虚构的项目，用来演示项目列表里不同类型的条目。

@@ -1,5 +1,3 @@
-import avatar from '../assets/images/avatar.jpg';
-import hero from '../assets/images/hero.jpg';
 import type { SiteConfig } from '../types';
 
 // ── 字体注册表 ──
@@ -29,7 +27,7 @@ const siteConfig: SiteConfig = {
     website: 'https://example.com',
     fonts,
     avatar: {
-        src: avatar,
+        src: '/assets/site/avatar.jpg',
         alt: '站点头像'
     },
 
@@ -50,13 +48,7 @@ const siteConfig: SiteConfig = {
     footerNavLinks,
 
     // ── Hero / 订阅 / 分页 ──
-    hero: {
-        ...heroData,
-        image: {
-            src: hero,
-            alt: 'A person sitting at a desk in front of a computer'
-        }
-    },
+    hero: heroData,
     subscribe,
     postsPerPage,
     projectsPerPage,

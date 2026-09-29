@@ -9,7 +9,8 @@
  * 这个脚本按下面的排期重新分配日期，让热力图始终有内容，
  * 并且刻意让某两天各有两篇，好把颜色深浅的分级也展示出来。
  *
- * 发版前跑一次即可。加 --dry 只看不改。
+ * 发版前跑一次即可：pnpm samples:dates。只看不改用 pnpm samples:dates:dry。
+ * 只改下面 SCHEDULE 里列出的示例文章，用户自己的文章不受影响。
  */
 import fs from 'node:fs';
 import path from 'node:path';

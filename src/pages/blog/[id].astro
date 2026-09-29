@@ -107,7 +107,7 @@ function resolveBannerUrl(banner: string | undefined): string | null {
     if (!banner) return null;
     // 外链和站内路径都直接用；以前只认 http 开头，站内路径会被悄悄换成兜底图
     if (banner.startsWith('http') || banner.startsWith('/')) return banner;
-    return '/demo/banner-01.webp';
+    return '/assets/defaults/banner-01.webp';
 }
 
 const bannerUrl = resolveBannerUrl(banner);

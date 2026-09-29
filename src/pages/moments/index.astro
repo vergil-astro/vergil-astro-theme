@@ -6,11 +6,11 @@ import { t } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Moment from '../../components/content/Moment.astro';
 import siteConfig from '../../data/site-config';
-import avatar from '../../assets/images/avatar.jpg';
 
-const avatarSrc = typeof avatar === 'string' ? avatar : avatar.src;
+// 头像可以写 public/ 下的路径字符串，也可以在 site-config.ts 里 import 成图片对象
+const avatarSrc = typeof siteConfig.avatar?.src === 'string' ? siteConfig.avatar.src : siteConfig.avatar?.src.src;
 const signature = t.page.moments.signature;
-const bannerUrl = '/demo/banner-moments.webp';
+const bannerUrl = '/assets/defaults/banner-moments.webp';
 
 interface MomentPost {
     date: string;

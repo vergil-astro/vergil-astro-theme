@@ -6,10 +6,16 @@
         "dev": "astro dev",
         "start": "astro dev",
         "build": "astro build",
-        "reset": "node scripts/reset-content.mjs",
         "preview": "astro preview",
         "astro": "astro",
-        "images:check": "node scripts/check-images.mjs"
+        "reset": "node scripts/reset-content.mjs",
+        "reset:all": "node scripts/reset-content.mjs --all",
+        "reset:dry": "node scripts/reset-content.mjs --dry",
+        "images:organize": "node scripts/organize-images.mjs",
+        "images:check": "node scripts/check-images.mjs",
+        "fonts:subset": "bash scripts/subset-fonts.sh",
+        "samples:dates": "node scripts/refresh-sample-dates.mjs",
+        "samples:dates:dry": "node scripts/refresh-sample-dates.mjs --dry"
     },
     "dependencies": {
         "@astrojs/markdown-remark": "^6.3.11",

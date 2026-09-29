@@ -5,7 +5,7 @@ order: 2
 tags:
   - 前端
   - 教程
-cover: ../../../assets/images/project-1.jpg
+cover: '@img/docs/react-guide/cover.jpg'
 dirs:
   - hooks
 ---
