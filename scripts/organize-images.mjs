@@ -4,13 +4,13 @@
  * 引用改成 @img/ 别名。规则见文档「图片与静态资源」。
  *
  * 处理范围：
- *   - 载体：src/content/ 下的 blog、projects、pages、docs、albums、series、moments
+ *   - 载体：src/content/ 下的 blog、projects、pages、docs、albums、series、thoughts、moments
  *   - 正文里的 Markdown 图片 ![](...)，代码块里的示例不动
  *   - 图文动态 JSON 里的图片路径（images、linkCard.image 等）
  *   - frontmatter 里的 src、cover、banner（seo.image.src、文章和文档的 banner、知识库、相册和专栏的 cover、相册的 images[].src）
  *
  * 不处理：
- *   - 想法正文里的图、内容指令里的 src（只接受字符串路径）
+ *   - 内容指令里的 src（指令只接受字符串路径）
  *   - 外链、已经是 @img/ 的引用
  *
  * 安全措施：
@@ -33,7 +33,7 @@ const CONTENT_DIR = path.join(ROOT, 'src/content');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const IMG_DIR = path.join(ROOT, 'src/assets/img');
 const IMG_ALIAS = '@img/';
-const CARRIERS = ['blog', 'projects', 'pages', 'docs', 'albums', 'series', 'moments'];
+const CARRIERS = ['blog', 'projects', 'pages', 'docs', 'albums', 'series', 'thoughts', 'moments'];
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.avif']);
 const TEXT_EXT = new Set(['.md', '.mdx', '.astro', '.ts', '.js', '.mjs', '.json', '.css', '.html', '.webmanifest']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.astro', '.git']);

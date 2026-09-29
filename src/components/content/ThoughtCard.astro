@@ -1,6 +1,5 @@
 ---
-import { type CollectionEntry } from 'astro:content';
-import { marked } from 'marked';
+import { type CollectionEntry, render } from 'astro:content';
 import { t } from '../../i18n';
 
 interface Props {
@@ -11,8 +10,8 @@ const { thought } = Astro.props;
 const { date, tags } = thought.data;
 const content = thought.body || '';
 
-// 渲染 Markdown 正文
-const processedContent = await marked.parse(content, { async: false }) as string;
+// 正文走 Astro 的 Markdown 编译：图片（@img/、相对路径）会被优化，内容指令也能用
+const { Content } = await render(thought);
 
 // 计算纯文本长度（用于判断是否超长）
 const plainText = content
@@ -71,10 +70,9 @@ const formattedDate = formatDate(date);
         )}
 
         <!-- 正文 -->
-        <div
-            class={`thought-content text-[15px] leading-relaxed text-[var(--text-main)] ${isLongContent ? 'thought-content-clamped' : ''}`}
-            set:html={processedContent}
-        />
+        <div class={`thought-content text-[15px] leading-relaxed text-[var(--text-main)] ${isLongContent ? 'thought-content-clamped' : ''}`}>
+            <Content />
+        </div>
 
         <!-- 展开/收起按钮 -->
         {isLongContent && (

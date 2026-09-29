@@ -6,10 +6,10 @@
  * 展开后的相对路径 Astro 同样能解析，pnpm dev、pnpm build 都正常；
  * pnpm build 会先运行 images:organize，把它们改回 @img/。
  *
- * 处理范围：blog、projects、pages、docs、albums、series 下的 .md/.mdx，
+ * 处理范围：blog、projects、pages、docs、albums、series、thoughts 下的 .md/.mdx，
  * 正文里的 ![](...) 和 frontmatter 里的 src、cover、banner。代码块里的写法示例不动。
  *
- * 不处理：图文动态（JSON，编辑器预览不了）、想法（正文还不支持相对路径）。
+ * 不处理：图文动态（JSON，编辑器预览不了，它的图片只支持 @img/）。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,7 +18,7 @@ const ROOT = process.cwd();
 const CONTENT_DIR = path.join(ROOT, 'src/content');
 const IMG_DIR = path.join(ROOT, 'src/assets/img');
 const IMG_ALIAS = '@img/';
-const CARRIERS = ['blog', 'projects', 'pages', 'docs', 'albums', 'series'];
+const CARRIERS = ['blog', 'projects', 'pages', 'docs', 'albums', 'series', 'thoughts'];
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.astro', '.git']);
 
 function walk(dir, out = []) {

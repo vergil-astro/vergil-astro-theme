@@ -2,6 +2,13 @@
 
 # Vergil
 
+</div>
+
+<details>
+<summary><a href="README_CN.md">简体中文</a>（点击展开 / 收起）</summary>
+
+<div align="center">
+
 **写 Markdown，剩下的交给主题。**
 
 一套基于 Astro 的内容站点框架。提示框、时间线、图表、相册、看板这些东西都做成了 Markdown 指令，不用写组件，不用碰 CSS。
@@ -99,3 +106,110 @@ Vergil 基于极简主题 [Dante](https://github.com/JustGoodUI/dante-astro-them
 ## License
 
 [MIT](LICENSE)
+
+</details>
+
+<details open>
+<summary>English (click to collapse / expand)</summary>
+
+<div align="center">
+
+**Write Markdown. Let the theme handle the rest.**
+
+A content site framework built on Astro. Callouts, timelines, charts, galleries, and kanban boards are all available as Markdown directives—no components to write or CSS to touch.
+
+[![Astro](https://img.shields.io/badge/Astro-5.x-BC52EE?logo=astro&logoColor=white)](https://astro.build)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/wsjz/vergil-astro-theme?style=social)](https://github.com/wsjz/vergil-astro-theme)
+
+![Vergil documentation in dark mode and homepage in light mode](public/assets/site/vergil-preview.jpg)
+
+</div>
+
+## Quick Start
+
+Requires Node.js 22 (the version used in CI) and pnpm.
+
+```bash
+git clone https://github.com/wsjz/vergil-astro-theme.git
+cd vergil-astro-theme
+pnpm install
+pnpm dev
+```
+
+The posts, galleries, and sample documents included in the repository are demo content. Once the site is running, you can remove them:
+
+```bash
+pnpm reset:dry # Preview what will be removed
+pnpm reset     # Remove it after reviewing the preview
+```
+
+`pnpm reset` keeps the built-in Vergil documentation for future reference. To remove it as well, use `pnpm reset:all`.
+
+## Features
+
+Write a `:::` directive to render a component:
+
+```markdown
+:::callout{type="tip"}
+Here's a quick tip your readers can spot at a glance.
+:::
+
+:::timeline
+- 2024-01 | Project kickoff
+- 2024-06 | First release
+:::
+
+:::video{bilibili="BV1xx411c7mD"}
+:::
+```
+
+There are 50 directives across eight categories: structure and layout, content display, media embeds, cards and links, text and interaction, charts and visualization, time planning, and visual storytelling. Write math formulas directly with `$...$`—no directive needed.
+
+Beyond directives, Vergil also includes:
+
+| | |
+|---|---|
+| **Multiple views** | Default, immersive reading, and resume modes, each with its own layout and navigation |
+| **Content organization** | Mix and match tags, categories, series, and hierarchical documentation |
+| **Galleries** | Golden and Seasons themes, with a lightbox, EXIF metadata, and seasonal filtering |
+| **Sidebars** | Pluggable components on both sides: heatmaps, tag clouds, table of contents, and related posts |
+| **Ready to use** | Dark mode, full-text search, comments, RSS, sitemap, and a site assistant |
+| **Interface language** | Switch theme text between English and Chinese without affecting your content |
+
+![Four page examples](.github/features.jpg)
+
+The four panels show collapsible blocks and timeline directives in a post, a Golden-themed gallery, a knowledge base with a sidebar document tree, and an immersive reading view filtered by category.
+
+For configuration and writing instructions, visit `/docs` after starting the site. The full documentation source is in [`src/content/docs/vergil-guide/`](src/content/docs/vergil-guide).
+
+## Ecosystem Tools
+
+- **[vergil-cli](https://github.com/vergil-astro/vergil-cli)** — The `vg` command-line tool for initializing projects, creating posts, galleries, and updates, and publishing drafts
+- **[vergil-writing-skills](https://github.com/vergil-astro/vergil-writing-skills)** — AI writing skills that help assistants format your content with Vergil directives. Supports Claude Code, Codex CLI, Cursor, and Gemini CLI
+
+## Contributing
+
+Vergil is maintained by one person in their spare time. Bug reports, ideas, documentation improvements, and interface translations are welcome.
+
+Before making code changes, consider opening an [issue](https://github.com/wsjz/vergil-astro-theme/issues) to discuss your approach and avoid wasted effort. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/).
+
+Planned and ongoing work is tracked in [issues](https://github.com/wsjz/vergil-astro-theme/issues).
+
+## About the Name
+
+Vergil extensively reworks the minimalist [Dante](https://github.com/JustGoodUI/dante-astro-theme) theme. The name pays homage to Dante's longtime rival and reflects the project's journey from minimalism toward a more comprehensive framework.
+
+## Acknowledgments
+
+- [Dante](https://github.com/JustGoodUI/dante-astro-theme) — Vergil's starting point
+- [Hexo Stellar](https://github.com/xaoxuu/hexo-theme-stellar) — Inspiration for the tag and documentation systems
+- [Astro](https://astro.build) — Making static site development fun again
+
+## License
+
+[MIT](LICENSE)
+
+</details>

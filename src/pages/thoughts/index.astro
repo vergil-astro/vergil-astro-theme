@@ -4,6 +4,7 @@ import { ChevronDown } from '@lucide/astro';
 import { t } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ThoughtCard from '../../components/content/ThoughtCard.astro';
+import DirectiveStyles from '../../components/base/DirectiveStyles.astro';
 
 // 获取所有想法，按日期降序排列
 const allThoughts = await getCollection('thoughts');
@@ -20,8 +21,8 @@ const allTags = Array.from(tagCounts.entries())
     .sort((a, b) => b[1] - a[1])
     .map(([tag]) => tag);
 
+// 所有想法都在构建时渲染好，前端只控制显示多少条
 const PAGE_SIZE = 10;
-const initialThoughts = allThoughts.slice(0, PAGE_SIZE);
 
 // 标签展示：默认显示前8个，超出可展开
 const VISIBLE_TAG_COUNT = 8;
@@ -29,17 +30,6 @@ const hasMoreTags = allTags.length > VISIBLE_TAG_COUNT;
 const visibleTags = hasMoreTags ? allTags.slice(0, VISIBLE_TAG_COUNT) : allTags;
 const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
 
-// 注入给下面的内联脚本：带参数的条目按可能取值预先算好，脚本里直接查表
-const thoughtsI18n = {
-    expand: t.common.expand,
-    today: t.time.today,
-    yesterday: t.time.yesterday,
-    dayBeforeYesterday: t.time.dayBeforeYesterday,
-    daysAgo: Array.from({ length: 7 }, (_, n) => t.time.daysAgo(n)),
-    weeksAgo: Array.from({ length: 5 }, (_, n) => t.time.weeksAgo(n)),
-    md: t.time.md('{m}', '{d}'),
-    ymd: t.time.ymd('{y}', '{m}', '{d}'),
-};
 ---
 
 <BaseLayout
@@ -103,14 +93,10 @@ const thoughtsI18n = {
     )}
 
     <!-- 想法卡片流 -->
-    <div id="thoughts-feed" class="space-y-4" data-all-thoughts={JSON.stringify(allThoughts.map(thought => ({
-        id: thought.id,
-        date: thought.data.date,
-        tags: thought.data.tags,
-        body: thought.body
-    })))} data-page-size={PAGE_SIZE}>
-        {initialThoughts.map((thought) => (
-            <div class="reveal">
+    <DirectiveStyles content={allThoughts.map((thought) => thought.body || '').join('\n')} />
+    <div id="thoughts-feed" class="space-y-4" data-page-size={PAGE_SIZE}>
+        {allThoughts.map((thought, index) => (
+            <div class="reveal thought-item" data-tags={JSON.stringify(thought.data.tags)} hidden={index >= PAGE_SIZE}>
                 <ThoughtCard thought={thought} />
             </div>
         ))}
@@ -154,7 +140,7 @@ const thoughtsI18n = {
     )}
 </BaseLayout>
 
-<script is:inline define:vars={{ i18n: thoughtsI18n }}>
+<script is:inline>
 (function() {
     if (window.__thoughtsPageScriptLoaded) return;
     window.__thoughtsPageScriptLoaded = true;
@@ -168,124 +154,49 @@ const thoughtsI18n = {
 
     if (!feed) return;
 
-    var allThoughts = JSON.parse(feed.dataset.allThoughts || '[]');
+    // 所有想法都已在构建时渲染，这里只负责显示多少条、显示哪些
+    var items = Array.prototype.slice.call(feed.querySelectorAll('.thought-item'));
     var pageSize = parseInt(feed.dataset.pageSize || '10', 10);
-    var loadedCount = feed.querySelectorAll('.thought-card').length;
-    var loadingLock = false;
+    var shownCount = Math.min(pageSize, items.length);
     var currentFilterTag = '';
+    var loadingLock = false;
 
-    // 获取当前过滤后的想法列表（标签筛选）
-    function getFilteredThoughts() {
-        if (!currentFilterTag) return allThoughts;
-        return allThoughts.filter(function(t) {
-            return t.tags && t.tags.indexOf(currentFilterTag) !== -1;
+    function getFilteredItems() {
+        if (!currentFilterTag) return items;
+        return items.filter(function(item) {
+            var tags = JSON.parse(item.dataset.tags || '[]');
+            return tags.indexOf(currentFilterTag) !== -1;
         });
     }
 
-    // 渲染单条想法为 HTML
-    function renderThoughtHTML(thought) {
-        var tagsHtml = '';
-        if (thought.tags && thought.tags.length > 0) {
-            tagsHtml = '<div class="flex flex-wrap gap-2 mb-3">' +
-                thought.tags.map(function(tag) {
-                    return '<button type="button" class="thought-tag text-sm text-[var(--accent-color)] hover:underline bg-transparent border-0 p-0 cursor-pointer" data-tag="' + escapeHtml(tag) + '">#' + escapeHtml(tag) + '</button>';
-                }).join('') +
-                '</div>';
-        }
-
-        var plainText = (thought.body || '')
-            .replace(/!?\[([^\]]+)\]\([^)]+\)/g, '$1')
-            .replace(/[#*`~\[\]()\-_\!]/g, '')
-            .replace(/\s+/g, ' ')
-            .trim();
-        var isLong = plainText.length > 140;
-
-        var contentClass = 'thought-content text-[15px] leading-relaxed text-[var(--text-main)]';
-        if (isLong) contentClass += ' thought-content-clamped';
-
-        var expandBtn = '';
-        if (isLong) {
-            expandBtn = '<button type="button" class="thought-expand-btn text-[var(--accent-color)] text-sm mt-2 hover:underline bg-transparent border-0 p-0 cursor-pointer">' + escapeHtml(i18n.expand) + '</button>';
-        }
-
-        var dateStr = formatDate(thought.date);
-
-        return '<article class="thought-card reveal visible" data-tags="' + escapeHtml(JSON.stringify(thought.tags || [])) + '">' +
-            '<div class="thought-card-inner rounded-xl bg-[var(--bg-card)] p-5">' +
-            '<div class="text-xs text-[var(--text-muted)] mb-2">' + escapeHtml(dateStr) + '</div>' +
-            tagsHtml +
-            '<div class="' + contentClass + '">' + escapeHtml(thought.body || '').replace(/\n/g, '<br>') + '</div>' +
-            expandBtn +
-            '</div></article>';
+    // 显示筛选结果里的前 shownCount 条，其余隐藏
+    function render() {
+        var filtered = getFilteredItems();
+        items.forEach(function(item) {
+            item.hidden = true;
+        });
+        filtered.slice(0, shownCount).forEach(function(item) {
+            item.hidden = false;
+            item.classList.add('visible');
+        });
+        var hasMore = shownCount < filtered.length;
+        if (loadBtn) loadBtn.classList.toggle('hidden', !hasMore);
+        if (noMore) noMore.classList.toggle('hidden', hasMore);
     }
 
-    function formatDate(dateStr) {
-        var now = new Date();
-        var target = new Date(dateStr);
-        var diffMs = now.getTime() - target.getTime();
-        var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        var month = target.getMonth() + 1;
-        var day = target.getDate();
-        var hours = String(target.getHours()).padStart(2, '0');
-        var minutes = String(target.getMinutes()).padStart(2, '0');
-        var timeStr = hours + ':' + minutes;
-
-        if (diffDays <= 0) return i18n.today + ' ' + timeStr;
-        if (diffDays === 1) return i18n.yesterday + ' ' + timeStr;
-        if (diffDays === 2) return i18n.dayBeforeYesterday + ' ' + timeStr;
-        if (diffDays < 7) return i18n.daysAgo[diffDays] + ' ' + timeStr;
-        if (diffDays < 30) return i18n.weeksAgo[Math.floor(diffDays / 7)] + ' ' + timeStr;
-        if (target.getFullYear() === now.getFullYear()) {
-            return i18n.md.replace('{m}', String(month)).replace('{d}', String(day)) + ' ' + timeStr;
-        }
-        return i18n.ymd.replace('{y}', String(target.getFullYear())).replace('{m}', String(month)).replace('{d}', String(day));
-    }
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    // 加载更多
+    // 加载更多：保留加载动画和骨架屏的过渡
     function loadMore() {
-        if (loadingLock) return;
+        if (loadingLock || shownCount >= getFilteredItems().length) return;
         loadingLock = true;
         if (loadBtn) loadBtn.classList.add('hidden');
         if (loading) loading.classList.remove('hidden');
         if (skeleton) skeleton.classList.remove('hidden');
 
         setTimeout(function() {
-            var filtered = getFilteredThoughts();
-            var nextThoughts = filtered.slice(loadedCount, loadedCount + pageSize);
-
-            if (nextThoughts.length === 0) {
-                if (loading) loading.classList.add('hidden');
-                if (skeleton) skeleton.classList.add('hidden');
-                if (noMore) noMore.classList.remove('hidden');
-                loadingLock = false;
-                return;
-            }
-
-            var html = nextThoughts.map(renderThoughtHTML).join('');
-            var temp = document.createElement('div');
-            temp.innerHTML = html;
-            while (temp.firstChild) {
-                feed.appendChild(temp.firstChild);
-            }
-
-            loadedCount += nextThoughts.length;
+            shownCount += pageSize;
             if (loading) loading.classList.add('hidden');
             if (skeleton) skeleton.classList.add('hidden');
-            if (loadedCount >= filtered.length) {
-                if (noMore) noMore.classList.remove('hidden');
-            } else {
-                if (loadBtn) loadBtn.classList.remove('hidden');
-            }
+            render();
             loadingLock = false;
         }, 300);
     }
@@ -296,8 +207,7 @@ const thoughtsI18n = {
 
     // 无限滚动
     var scrollHandler = function() {
-        var filtered = getFilteredThoughts();
-        if (loadedCount >= filtered.length) return;
+        if (shownCount >= getFilteredItems().length) return;
         var scrollTop = window.scrollY || document.documentElement.scrollTop;
         var docHeight = document.documentElement.scrollHeight;
         var winHeight = window.innerHeight;
@@ -324,25 +234,15 @@ const thoughtsI18n = {
             btn.style.color = 'var(--accent-color)';
 
             currentFilterTag = btn.dataset.tag || '';
-            applyFilter();
+            shownCount = pageSize;
+            render();
         });
     }
 
+    // 「更多」展开区里的标签在另一个容器里，也要绑上，否则使用次数少的标签点了没反应
     setupTagFilter(tagFilterContainer);
-
-    // 统一应用筛选并重新渲染
-    function applyFilter() {
-        var filtered = getFilteredThoughts();
-        feed.innerHTML = filtered.slice(0, pageSize).map(renderThoughtHTML).join('');
-        loadedCount = Math.min(pageSize, filtered.length);
-
-        if (noMore) noMore.classList.add('hidden');
-        if (loadBtn) loadBtn.classList.remove('hidden');
-        if (loadedCount >= filtered.length) {
-            if (loadBtn) loadBtn.classList.add('hidden');
-            if (noMore) noMore.classList.remove('hidden');
-        }
-    }
+    setupTagFilter(document.getElementById('thought-tags-hidden'));
+    render();
 
     // 标签更多/收起
     var tagsMoreBtn = document.getElementById('thought-tags-more-btn');
@@ -367,7 +267,7 @@ const thoughtsI18n = {
         var tag = e.detail && e.detail.tag;
         if (!tag || !tagFilterContainer) return;
 
-        var btn = tagFilterContainer.querySelector('[data-tag="' + tag + '"]');
+        var btn = document.querySelector('.thought-filter-btn[data-tag="' + CSS.escape(tag) + '"]');
         if (btn) {
             btn.click();
         }
