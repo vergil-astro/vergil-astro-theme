@@ -1,4 +1,5 @@
 import { visit } from 'unist-util-visit';
+import { createDirectiveImages } from './directive-images.mjs';
 
 function escapeHtml(text) {
     if (!text) return '';
@@ -98,7 +99,7 @@ function extractGalleryImages(children) {
     return images;
 }
 
-function renderPhotoDirective(attrs, aliasMap) {
+function renderPhotoDirective(attrs, aliasMap, images) {
     const src = attrs.src || '';
     const alt = attrs.alt || '';
     const type = attrs.type || 'blur';
@@ -112,7 +113,8 @@ function renderPhotoDirective(attrs, aliasMap) {
     const datetime = attrs.datetime || '';
     const fancybox = attrs.fancybox;
     const useZoom = fancybox !== 'false' && fancybox !== false;
-    const zoomAttr = useZoom ? ' data-zoomable="1"' : '';
+    const photoImg = () =>
+        images.img(src, { class: 'md-photo-img', alt, 'data-zoomable': useZoom ? '1' : undefined, loading: 'lazy', decoding: 'async' });
     const logoSvg = getBrandLogo(logo || brand, aliasMap);
 
     const exifParts = [];
@@ -125,9 +127,10 @@ function renderPhotoDirective(attrs, aliasMap) {
     if (type === 'blur') {
         // Blur: blurred background + clear centered image + bottom info bar
         let html = `<div class="md-directive md-directive-photo md-photo-blur">`;
-        html += `<div class="md-photo-bg" style="background-image:url('${escapeHtml(src)}');"></div>`;
+        // 模糊背景用铺满的 <img>（object-fit: cover），而不是 CSS 背景图，这样本地图片也能被 Astro 优化
+        html += images.img(src, { class: 'md-photo-bg', alt: '', 'aria-hidden': 'true', loading: 'lazy', decoding: 'async' });
         html += `<div class="md-photo-img-wrap">`;
-        html += `<img class="md-photo-img" src="${escapeHtml(src)}" alt="${escapeHtml(alt)}"${zoomAttr} loading="lazy" decoding="async" />`;
+        html += photoImg();
         html += `</div>`;
         html += `<div class="md-photo-bar">`;
         if (logoSvg) {
@@ -146,7 +149,7 @@ function renderPhotoDirective(attrs, aliasMap) {
     // Watermark: simple image + info bar (三栏：左品牌型号 / 中Logo / 右EXIF时间)
     let html = `<div class="md-directive md-directive-photo md-photo-watermark">`;
     html += `<div class="md-photo-img-wrap">`;
-    html += `<img class="md-photo-img" src="${escapeHtml(src)}" alt="${escapeHtml(alt)}"${zoomAttr} loading="lazy" decoding="async" />`;
+    html += photoImg();
     html += `</div>`;
     html += `<div class="md-photo-bar">`;
     html += `<div class="md-photo-left">`;
@@ -182,9 +185,10 @@ export function remarkPhotoDirectives(options = {}) {
         visit(tree, 'leafDirective', (node) => {
             if (node.name !== 'photo') return;
             const attrs = node.attributes || {};
-            const html = renderPhotoDirective(attrs, aliasMap);
+            const images = createDirectiveImages();
+            const html = renderPhotoDirective(attrs, aliasMap, images);
             node.data = { hName: 'div', hProperties: {} };
-            node.children = [{ type: 'html', value: html }];
+            node.children = images.toNodes(html);
         });
 
         // ── Container directive: photo ──
@@ -199,9 +203,10 @@ export function remarkPhotoDirectives(options = {}) {
                     attrs.src = first.src;
                 }
             }
-            const html = renderPhotoDirective(attrs, aliasMap);
+            const images = createDirectiveImages();
+            const html = renderPhotoDirective(attrs, aliasMap, images);
             node.data = { hName: 'div', hProperties: {} };
-            node.children = [{ type: 'html', value: html }];
+            node.children = images.toNodes(html);
         });
     };
 }

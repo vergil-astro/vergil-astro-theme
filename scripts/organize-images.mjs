@@ -6,6 +6,7 @@
  * 处理范围：
  *   - 载体：src/content/ 下的 blog、projects、pages、docs、albums、series、thoughts、moments
  *   - 正文里的 Markdown 图片 ![](...)，代码块里的示例不动
+ *   - 内容指令 image、photo 的 src，banner 的 bg、avatar
  *   - 图文动态 JSON 里的图片路径（images、linkCard.image 等）
  *   - frontmatter 里的 src、cover、banner（seo.image.src、文章和文档的 banner、知识库、相册和专栏的 cover、相册的 images[].src）
  *
@@ -79,6 +80,25 @@ function resolveRef(ref, fromFile) {
 // ── 1. 找出所有要处理的引用 ──
 // 正文图片：路径可以用 <...> 包起来，里面允许空格
 const MD_IMAGE = /(!\[[^\]]*\]\(\s*)(?:<([^>]+)>|([^)\s]+))((?:\s+"[^"]*")?\s*\))/g;
+// 支持 @img/ 的内容指令，以及它们放图片的属性。只列这几个：其他指令还不支持 @img/，改了会坏
+const IMG_DIRECTIVES = { image: ['src'], photo: ['src'], banner: ['bg', 'avatar'] };
+const DIRECTIVE = /(:{1,4})([a-z]+)\{([^}]*)\}/g;
+const DIRECTIVE_ATTR = /\b([a-z]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'}]+))/g;
+
+/** 找出指令属性里的图片路径，回调返回新值则替换（统一写成双引号） */
+function mapDirectiveImages(text, onRef) {
+    return text.replace(DIRECTIVE, (all, colons, name, body) => {
+        const keys = IMG_DIRECTIVES[name];
+        if (!keys) return all;
+        const next = body.replace(DIRECTIVE_ATTR, (attr, key, dq, sq, bare) => {
+            if (!keys.includes(key)) return attr;
+            const value = onRef(dq ?? sq ?? bare);
+            return value ? `${key}="${value}"` : attr;
+        });
+        return `${colons}${name}{${next}}`;
+    });
+}
+
 // frontmatter：值可以加引号（允许空格），后面可以跟 # 注释
 const FM_FIELD = /^(\s*-?\s*(?:src|cover|banner):\s*)(?:(['"])(.+?)\2|([^'"\s#][^\s#]*))(\s*(?:#.*)?)$/;
 
@@ -133,12 +153,15 @@ function mapRefs(text, onRef, file) {
             .map((part) =>
                 part.startsWith('`')
                     ? part
-                    : part.replace(MD_IMAGE, (all, head, angled, plain, tail) => {
-                          const ref = angled ?? plain;
-                          if (!isCandidate(ref)) return all;
-                          const next = onRef(ref);
-                          return next ? `${head}${mdPath(next)}${tail}` : all;
-                      })
+                    : mapDirectiveImages(
+                          part.replace(MD_IMAGE, (all, head, angled, plain, tail) => {
+                              const ref = angled ?? plain;
+                              if (!isCandidate(ref)) return all;
+                              const next = onRef(ref);
+                              return next ? `${head}${mdPath(next)}${tail}` : all;
+                          }),
+                          (ref) => (isCandidate(ref) ? onRef(ref) : null)
+                      )
             )
             .join('');
     }

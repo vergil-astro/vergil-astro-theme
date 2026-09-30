@@ -115,3 +115,20 @@ function formatCanonicalURL(url: string | URL) {
 {description && <meta name="twitter:description" content={description} />}
 {resolvedImage?.src && <meta name="twitter:image" content={resolvedImage.src} />}
 {resolvedImage?.alt && <meta name="twitter:image:alt" content={resolvedImage.alt} />}
+
+<!--
+    内容指令 image 的加载状态。<img> 上写 onload="vergilImgLoad(this)"，调用里不带引号：
+    交给 Astro 优化的本地图片，属性值里的引号会被转义两次，内联脚本一带引号就会失效。
+-->
+<script is:inline>
+    window.vergilImgLoad = function (img) {
+        img.classList.add('md-image-loaded');
+        var wrap = img.closest('.md-image-img-wrap');
+        if (wrap) wrap.classList.add('is-loaded');
+    };
+    window.vergilImgError = function (img) {
+        img.classList.add('md-image-error');
+        var wrap = img.closest('.md-image-img-wrap');
+        if (wrap) wrap.classList.add('has-error');
+    };
+</script>

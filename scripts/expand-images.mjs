@@ -7,7 +7,8 @@
  * pnpm build 会先运行 images:organize，把它们改回 @img/。
  *
  * 处理范围：blog、projects、pages、docs、albums、series、thoughts 下的 .md/.mdx，
- * 正文里的 ![](...) 和 frontmatter 里的 src、cover、banner。代码块里的写法示例不动。
+ * 正文里的 ![](...)、内容指令 image/photo 的 src 和 banner 的 bg/avatar、frontmatter 里的 src、cover、banner。
+ * 代码块里的写法示例不动。
  *
  * 不处理：图文动态（JSON，编辑器预览不了，它的图片只支持 @img/）。
  */
@@ -38,6 +39,25 @@ function toRelative(ref, file) {
     let rel = path.relative(path.dirname(file), target).split(path.sep).join('/');
     if (!rel.startsWith('.')) rel = `./${rel}`;
     return rel;
+}
+
+// 支持 @img/ 的内容指令，以及它们放图片的属性。只列这几个：其他指令还不支持 @img/，改了会坏
+const IMG_DIRECTIVES = { image: ['src'], photo: ['src'], banner: ['bg', 'avatar'] };
+const DIRECTIVE = /(:{1,4})([a-z]+)\{([^}]*)\}/g;
+const DIRECTIVE_ATTR = /\b([a-z]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'}]+))/g;
+
+/** 找出指令属性里的图片路径，回调返回新值则替换（统一写成双引号） */
+function mapDirectiveImages(text, onRef) {
+    return text.replace(DIRECTIVE, (all, colons, name, body) => {
+        const keys = IMG_DIRECTIVES[name];
+        if (!keys) return all;
+        const next = body.replace(DIRECTIVE_ATTR, (attr, key, dq, sq, bare) => {
+            if (!keys.includes(key)) return attr;
+            const value = onRef(dq ?? sq ?? bare);
+            return value ? `${key}="${value}"` : attr;
+        });
+        return `${colons}${name}{${next}}`;
+    });
 }
 
 // 正文图片：路径可以用 <...> 包起来，里面允许空格
@@ -81,11 +101,18 @@ function expand(text, file) {
             .map((part) =>
                 part.startsWith('`')
                     ? part
-                    : part.replace(MD_IMAGE, (all, head, angled, plain, tail) => {
-                          count++;
-                          const rel = toRelative(angled ?? plain, file);
-                          return `${head}${angled !== undefined || /\s/.test(rel) ? `<${rel}>` : rel}${tail}`;
-                      })
+                    : mapDirectiveImages(
+                          part.replace(MD_IMAGE, (all, head, angled, plain, tail) => {
+                              count++;
+                              const rel = toRelative(angled ?? plain, file);
+                              return `${head}${angled !== undefined || /\s/.test(rel) ? `<${rel}>` : rel}${tail}`;
+                          }),
+                          (ref) => {
+                              if (!ref.startsWith(IMG_ALIAS)) return null;
+                              count++;
+                              return toRelative(ref, file);
+                          }
+                      )
             )
             .join('');
     }

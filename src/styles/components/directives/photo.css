@@ -35,8 +35,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
+    object-fit: cover;
+    object-position: center;
     filter: blur(10px) brightness(0.85);
     z-index: 1;
 }

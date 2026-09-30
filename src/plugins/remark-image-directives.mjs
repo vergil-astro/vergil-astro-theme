@@ -1,4 +1,5 @@
 import { visit } from 'unist-util-visit';
+import { createDirectiveImages, isLocalImage } from './directive-images.mjs';
 
 const DOWNLOAD_ICON = `<svg class="icon" style="width:1em;height:1em;vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M561.00682908 685.55838913a111.03077546 111.03077546 0 0 1-106.8895062 0L256.23182837 487.72885783a55.96309219 55.96309219 0 0 1 79.13181253-79.18777574L450.70357448 523.88101491V181.55477937a55.96309219 55.96309219 0 0 1 111.92618438 0v344.06109173l117.07478902-117.07478901a55.96309219 55.96309219 0 0 1 79.13181252 79.18777574zM282.81429711 797.1487951h447.70473912a55.96309219 55.96309219 0 0 1 0 111.92618438H282.81429711a55.96309219 55.96309219 0 0 1 0-111.92618438z"></path></svg>`;
 
@@ -36,7 +37,7 @@ function extractGalleryImages(children) {
     return images;
 }
 
-function renderImageDirective(attrs) {
+function renderImageDirective(attrs, images) {
     const src = attrs.src || '';
     const alt = attrs.alt || '';
     const width = attrs.width || '';
@@ -52,17 +53,23 @@ function renderImageDirective(attrs) {
     if (height) imgStyle += `height:${height};`;
 
     const useZoom = fancybox !== 'false' && fancybox !== false;
-    const zoomAttr = useZoom ? ' data-zoomable="1"' : '';
 
     // Build image with loading placeholder wrapper
     let imgWrap = '<div class="md-image-img-wrap">';
     // Loading shimmer placeholder
     imgWrap += '<div class="md-image-loading"></div>';
     // Actual image with onerror fallback
-    let imgHtml = `<img class="md-image-img" src="${escapeHtml(src)}" alt="${escapeHtml(alt)}"${zoomAttr}`;
-    if (imgStyle && !ratio) imgHtml += ` style="${imgStyle}"`;
-    imgHtml += ' loading="lazy" decoding="async" onerror="this.classList.add(\'md-image-error\');this.closest(\'.md-image-img-wrap\').classList.add(\'has-error\');" onload="this.classList.add(\'md-image-loaded\');this.closest(\'.md-image-img-wrap\').classList.add(\'is-loaded\');" />';
-    imgWrap += imgHtml;
+    imgWrap += images.img(src, {
+        class: 'md-image-img',
+        alt,
+        'data-zoomable': useZoom ? '1' : undefined,
+        style: imgStyle && !ratio ? imgStyle : undefined,
+        loading: 'lazy',
+        decoding: 'async',
+        // 处理函数定义在 BaseHead 里；调用不带引号，本地图片交给 Astro 后属性才不会被转义坏
+        onerror: 'vergilImgError(this)',
+        onload: 'vergilImgLoad(this)'
+    });
     imgWrap += '</div>';
 
     let inner = imgWrap;
@@ -70,7 +77,12 @@ function renderImageDirective(attrs) {
     if (download && download.length > 0) {
         const href = download === 'true' ? src : download;
         const downloadAttr = alt ? ` download="${escapeHtml(alt)}"` : '';
-        inner += `<a class="md-image-download" target="_blank"${downloadAttr} href="${escapeHtml(href)}">${DOWNLOAD_ICON}</a>`;
+        if (isLocalImage(href)) {
+            // 本地图片构建后才有真实地址，点击时取页面上这张图实际加载的地址
+            inner += `<a class="md-image-download" target="_blank"${downloadAttr} href="#" onclick="this.href=this.closest('.md-image-bg').querySelector('img').currentSrc">${DOWNLOAD_ICON}</a>`;
+        } else {
+            inner += `<a class="md-image-download" target="_blank"${downloadAttr} href="${escapeHtml(href)}">${DOWNLOAD_ICON}</a>`;
+        }
     }
 
     let bgStyle = '';
@@ -103,20 +115,22 @@ export function remarkImageDirectives() {
         visit(tree, 'containerDirective', (node) => {
             if (node.name !== 'image') return;
             const attrs = node.attributes || {};
-            const html = renderImageDirective(attrs);
+            const images = createDirectiveImages();
+            const html = renderImageDirective(attrs, images);
             // Replace the entire container with just the rendered image,
             // discarding any accidentally-swallowed children
             node.data = { hName: 'div', hProperties: {} };
-            node.children = [{ type: 'html', value: html }];
+            node.children = images.toNodes(html);
         });
 
         // ── Leaf directive: image ──
         visit(tree, 'leafDirective', (node) => {
             if (node.name !== 'image') return;
             const attrs = node.attributes || {};
-            const html = renderImageDirective(attrs);
+            const images = createDirectiveImages();
+            const html = renderImageDirective(attrs, images);
             node.data = { hName: 'div', hProperties: {} };
-            node.children = [{ type: 'html', value: html }];
+            node.children = images.toNodes(html);
         });
 
         // ── Text directive: image ──
@@ -129,7 +143,21 @@ export function remarkImageDirectives() {
 
         for (const { node, index, parent } of imageTextDirectives) {
             const attrs = node.attributes || {};
-            const html = renderImageDirective(attrs);
+            const images = createDirectiveImages();
+            const html = renderImageDirective(attrs, images);
+            const nodes = images.toNodes(html);
+
+            if (nodes.length > 1) {
+                // 含本地图片：保留成带子节点的元素，让里面的图片节点交给 Astro 处理
+                if (parent && parent.type === 'paragraph') {
+                    parent.data = { hName: 'div', hProperties: {} };
+                    parent.children = nodes;
+                } else {
+                    node.data = { hName: 'span', hProperties: {} };
+                    node.children = nodes;
+                }
+                continue;
+            }
 
             if (parent && parent.type === 'paragraph') {
                 // Replace the entire paragraph with raw html block
@@ -155,6 +183,8 @@ export function remarkImageDirectives() {
             const name = node.name;
             const attrs = node.attributes || {};
 
+            const directiveImages = createDirectiveImages();
+
             if (name === 'gallery') {
                 const layout = attrs.layout || 'grid';
                 const size = attrs.size || 'm';
@@ -171,7 +201,7 @@ export function remarkImageDirectives() {
 
                 images.forEach((img) => {
                     html += `<div class="md-gallery-cell">`;
-                    html += `<img src="${escapeHtml(img.src)}" alt="${escapeHtml(img.alt)}" data-zoomable="1" loading="lazy" decoding="async" />`;
+                    html += directiveImages.img(img.src, { alt: img.alt, 'data-zoomable': '1', loading: 'lazy', decoding: 'async' });
                     if (img.alt) {
                         html += `<div class="md-gallery-meta"><span class="md-gallery-caption">${escapeHtml(img.alt)}</span></div>`;
                     }
@@ -181,7 +211,7 @@ export function remarkImageDirectives() {
                 html += '</div>';
 
                 node.data = { hName: 'div', hProperties: {} };
-                node.children = [{ type: 'html', value: html }];
+                node.children = directiveImages.toNodes(html);
 
             } else if (name === 'banner') {
                 const title = attrs.title || '';
@@ -192,7 +222,7 @@ export function remarkImageDirectives() {
 
                 let html = '<div class="md-directive md-directive-banner">';
                 if (bg) {
-                    html += `<img class="md-banner-bg" src="${escapeHtml(bg)}" alt="" loading="lazy" />`;
+                    html += directiveImages.img(bg, { class: 'md-banner-bg', alt: '', loading: 'lazy' });
                 }
                 html += '<div class="md-banner-content">';
                 html += '<div class="md-banner-top">';
@@ -205,7 +235,7 @@ export function remarkImageDirectives() {
 
                 html += '<div class="md-banner-bottom">';
                 if (avatar) {
-                    html += `<img class="md-banner-avatar" src="${escapeHtml(avatar)}" alt="" loading="lazy" />`;
+                    html += directiveImages.img(avatar, { class: 'md-banner-avatar', alt: '', loading: 'lazy' });
                 }
                 if (title || subtitle) {
                     html += '<div class="md-banner-text">';
@@ -222,7 +252,7 @@ export function remarkImageDirectives() {
                 html += '</div>';
 
                 node.data = { hName: 'div', hProperties: {} };
-                node.children = [{ type: 'html', value: html }];
+                node.children = directiveImages.toNodes(html);
             }
         });
     };
