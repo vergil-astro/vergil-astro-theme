@@ -16,7 +16,7 @@ order: 0
 | `site-config.ts` | 配置入口，组装所有字段，首次打开建议看这里 |
 | `config/nav.ts` | 顶部导航、底部导航、视图模式 |
 | `config/identity.ts` | 网站标题/描述、Hero、订阅、分页数 |
-| `config/features.ts` | 评论、虚拟角色、边栏、音频播放器 |
+| `config/features.ts` | 评论、站点助理、边栏、音频播放器 |
 | `config/splash.ts` | 开屏页（背景图、标题、导航按钮） |
 | `config/links.ts` | 网站卡片链接分组（设计/工具/音乐/电影） |
 | `config/fonts.ts` | 字体注册表和字体配置 |

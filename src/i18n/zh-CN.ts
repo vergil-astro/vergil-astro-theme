@@ -96,7 +96,7 @@ export default {
     toolbar: {
         collapseSidebar: '收起侧边栏',
         immersive: '沉浸',
-        enterImmersive: '进入沉浸模式',
+        enterImmersive: '极简模式',
     },
 
     sidebar: {
@@ -309,8 +309,8 @@ export default {
         },
         contact: { breadcrumb: '留言' },
         minimal: {
-            title: '沉浸阅读',
-            description: '极简沉浸式阅读体验',
+            title: '极简模式',
+            description: '只留正文的极简阅读体验',
             backToList: '返回列表',
             updatedAt: '更新于',
             all: '全部',

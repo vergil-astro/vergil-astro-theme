@@ -5,7 +5,7 @@ order: 0
 
 # 功能配置
 
-本章介绍 Vergil 内置功能的配置方法，涵盖搜索、评论、RSS、数据统计、边栏、开屏页、虚拟角色、音频播放器和词云星球。
+本章介绍 Vergil 内置功能的配置方法，涵盖搜索、评论、RSS、数据统计、边栏、开屏页、站点助理、音频播放器和词云星球。
 
 ## 本章内容
 
@@ -14,7 +14,7 @@ order: 0
 - [RSS 订阅](/docs/vergil-guide/06-功能配置/rss订阅/) — 生成 RSS feed，方便读者订阅
 - [数据统计](/docs/vergil-guide/06-功能配置/数据统计/) — 接入 Umami Analytics 查看站点访问数据
 - [开屏页](/docs/vergil-guide/06-功能配置/开屏页/) — 全屏轮播背景与自定义导航
-- [虚拟角色](/docs/vergil-guide/06-功能配置/虚拟角色/) — 配置 Rive 或 Live2D 站点助理
+- [站点助理](/docs/vergil-guide/06-功能配置/站点助理/) — 页面左下角的助理，可以配 Rive 或 Live2D 模型
 - [浮动音频播放器](/docs/vergil-guide/06-功能配置/浮动音频播放器/) — 全局背景音乐配置
 - [边栏配置](/docs/vergil-guide/06-功能配置/边栏配置/) — 自定义左右侧边栏组件
 - [Memo 便签卡片](/docs/vergil-guide/06-功能配置/memo便签卡片/) — 配置欢迎语、通知等富文本卡片

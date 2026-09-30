@@ -9,4 +9,4 @@ seo:
 
 - **发邮件：** [example@example.com](mailto:example@example.com)
 
-- **评论区留言：** 直接在下方评论区写下你想说的，我会尽快回复！
+- **评论区留言：** 直接在下方评论区写下你想说的，我会尽快回复！（评论默认关闭，在 `src/data/config/features.ts` 里开启后，这里才会出现评论框。）

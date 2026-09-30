@@ -26,22 +26,15 @@ const BLOG = path.join(process.cwd(), 'src/content/blog');
  * 它们的标题里写死了年份，挪日期会让标题和发布时间对不上。
  */
 const SCHEDULE = {
-    '01-choose-content-type': 53,
-    '02-writing-with-directives': 52,
-    '03-organize-with-series': 51,
-    // 「内容指令示例」专栏按阅读顺序排，日期必须递增，专栏页才会正着排
-    'directives-01-layout': 44,
-    'directives-02-content': 42,
-    'directives-03-media': 40,
-    'directives-04-cards': 38,
-    'directives-05-text': 36,
-    'directives-06-charts': 34,
-    'directives-07-math': 32,
-    'directives-08-planning': 30,
-    'directives-09-narrative': 28,
-    'designing-typography-system': 23,
-    'vergil-on-edgeone': 20,
-    'plan-directive-guide': 9,
+    // 普通文章最早，排在首页最后：读完总览和专栏，最后看到一篇真实的文章
+    'a-weekend-in-the-mountains': 23,
+    // 专栏按阅读顺序排，日期必须递增，专栏页才会正着排
+    '搭建你的第一个站点/01-run-in-ten-minutes': 20,
+    '搭建你的第一个站点/02-first-post': 18,
+    '搭建你的第一个站点/03-directives-in-writing': 16,
+    '搭建你的第一个站点/04-organize-and-style': 14,
+    // 总览最新，新用户打开首页第一篇就是它
+    'welcome-to-vergil': 2,
 };
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

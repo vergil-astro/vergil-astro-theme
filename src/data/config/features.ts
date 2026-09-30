@@ -3,7 +3,8 @@ import { welcome } from './welcome';
 import { notice } from './notice';
 
 export const comments = {
-    enabled: true,
+    // 默认关闭：没配好评论服务就打开，文章底部会显示报错。配好 giscus 或 artalk 后改成 true
+    enabled: false,
     provider: 'giscus' as const,
     giscus: {
         repo: 'your-name/your-repo',
@@ -26,7 +27,8 @@ export const comments = {
 } satisfies NonNullable<SiteConfig['comments']>;
 
 export const agent = {
-    enabled: true,
+    // 默认关闭：台词在 src/data/agent-dialogue.ts，写的是示例站的口吻，开启前先改成你自己的
+    enabled: false,
     provider: 'rive' as const,
     name: 'Miki',
     // rive: { src: '/model.riv' },

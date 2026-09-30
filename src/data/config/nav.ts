@@ -40,7 +40,7 @@ export const headerNavLinks = [
 export const views = {
     default: { name: '主页', path: '/' },
     resume: { name: '简历', path: '/views/resume/' },
-    minimal: { name: '沉浸阅读', path: '/views/minimal/', enabled: true }
+    minimal: { name: '极简模式', path: '/views/minimal/', enabled: true }
 };
 
 export const footerNavLinks = [

@@ -17,7 +17,7 @@ Vergil 提供多种页面视图模式，让读者可以选择不同的阅读体�
 
 适合日常浏览和导航。
 
-## 沉浸阅读视图
+## 极简模式
 
 专为长文章设计的无干扰阅读模式。
 
@@ -30,7 +30,7 @@ Vergil 提供多种页面视图模式，让读者可以选择不同的阅读体�
 
 ### 如何进入
 
-在阅读文章时，点击顶部导航栏的"沉浸阅读"按钮，即可切换到沉浸视图。
+在阅读文章时，点击文章上方工具栏的「沉浸」按钮，即可切换到极简模式。顶部导航菜单里也有「极简模式」入口。
 
 文章地址会自动从 `/blog/文章名` 变为 `/views/minimal/blog/文章名`。
 
@@ -40,23 +40,23 @@ Vergil 提供多种页面视图模式，让读者可以选择不同的阅读体�
 
 ### 启用与关闭
 
-沉浸阅读视图的开关在 `src/data/config/nav.ts` 中配置：
+极简模式的开关在 `src/data/config/nav.ts` 中配置：
 
 ```typescript
 export const views = {
     default: { name: '主页', path: '/' },
     resume: { name: '简历', path: '/views/resume/' },
-    minimal: { name: '沉浸阅读', path: '/views/minimal/', enabled: true }
+    minimal: { name: '极简模式', path: '/views/minimal/', enabled: true }
 };
 ```
 
-将 `enabled` 设为 `false` 即可关闭沉浸阅读入口：
+将 `enabled` 设为 `false` 即可关闭极简模式的入口：
 
 ```typescript
-minimal: { name: '沉浸阅读', path: '/views/minimal/', enabled: false }
+minimal: { name: '极简模式', path: '/views/minimal/', enabled: false }
 ```
 
-关闭后，导航菜单中将不再显示"沉浸阅读"选项。已发布的沉浸阅读页面 URL 仍可访问。
+关闭后，导航菜单和文章工具栏中将不再显示极简模式的入口。已发布的极简模式页面 URL 仍可访问。
 
 ## 简历视图
 
@@ -85,15 +85,15 @@ minimal: { name: '沉浸阅读', path: '/views/minimal/', enabled: false }
 
 读者可以在不同视图之间自由切换：
 
-- 默认视图 → 沉浸阅读：点击导航栏按钮
-- 沉浸阅读 → 默认视图：点击底部返回按钮
+- 默认视图 → 极简模式：点击文章工具栏的「沉浸」按钮
+- 极简模式 → 默认视图：点击页面底部的返回按钮
 - 简历视图通过独立路径访问
 
 ## 为内容选择合适的视图
 
 | 内容类型 | 推荐视图 |
 |---------|---------|
-| 博客文章阅读 | 默认视图 / 沉浸阅读 |
+| 博客文章阅读 | 默认视图 / 极简模式 |
 | 教程文档 | 默认视图 |
 | 简历展示 | 简历视图 |
-| 专注深度阅读 | 沉浸阅读 |
+| 专注深度阅读 | 极简模式 |
