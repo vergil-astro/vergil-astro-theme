@@ -40,8 +40,10 @@ function toRelative(ref, file) {
     return rel;
 }
 
-const MD_IMAGE = /(!\[[^\]]*\]\(\s*<?)(@img\/[^)\s>]+)(>?(?:\s+"[^"]*")?\s*\))/g;
-const FM_FIELD = /^(\s*-?\s*(?:src|cover|banner):\s*)(['"]?)(@img\/[^'"\s#]+)\2(\s*)$/;
+// 正文图片：路径可以用 <...> 包起来，里面允许空格
+const MD_IMAGE = /(!\[[^\]]*\]\(\s*)(?:<(@img\/[^>]+)>|(@img\/[^)\s]+))((?:\s+"[^"]*")?\s*\))/g;
+// frontmatter：值可以加引号（允许空格），后面可以跟 # 注释
+const FM_FIELD = /^(\s*-?\s*(?:src|cover|banner):\s*)(?:(['"])(@img\/.+?)\2|(@img\/[^\s#]*))(\s*(?:#.*)?)$/;
 
 function expand(text, file) {
     const lines = text.split('\n');
@@ -57,7 +59,9 @@ function expand(text, file) {
             }
             const m = line.match(FM_FIELD);
             if (m) {
-                lines[i] = `${m[1]}${m[2]}${toRelative(m[3], file)}${m[2]}${m[4]}`;
+                const rel = toRelative(m[3] ?? m[4], file);
+                const quote = m[2] || (/\s/.test(rel) ? "'" : '');
+                lines[i] = `${m[1]}${quote}${rel}${quote}${m[5]}`;
                 count++;
             }
             continue;
@@ -77,9 +81,10 @@ function expand(text, file) {
             .map((part) =>
                 part.startsWith('`')
                     ? part
-                    : part.replace(MD_IMAGE, (all, head, ref, tail) => {
+                    : part.replace(MD_IMAGE, (all, head, angled, plain, tail) => {
                           count++;
-                          return `${head}${toRelative(ref, file)}${tail}`;
+                          const rel = toRelative(angled ?? plain, file);
+                          return `${head}${angled !== undefined || /\s/.test(rel) ? `<${rel}>` : rel}${tail}`;
                       })
             )
             .join('');

@@ -15,7 +15,8 @@
  *
  * 安全措施：
  *   - 不删除任何图片。没被引用的图原地不动
- *   - 同一张图被多条内容引用：移给第一条，其余各复制一份
+ *   - 已经在 src/assets/img/ 里的图：只把写法统一成 @img/，不挪文件
+ *   - src/assets/img/ 之外的图被多条内容引用：移给第一条，其余各复制一份
  *   - 图片还被代码、配置或字符串字段引用，或者是 public/assets/site、defaults 下的站点文件：只复制不移动
  *   - 目标位置已有同名但内容不同的文件：自动改名为 xxx-1.png
  *   - 引用的文件不存在：跳过，在最后列出来
@@ -76,8 +77,14 @@ function resolveRef(ref, fromFile) {
 }
 
 // ── 1. 找出所有要处理的引用 ──
-const MD_IMAGE = /(!\[[^\]]*\]\(\s*<?)([^)\s>]+)(>?(?:\s+"[^"]*")?\s*\))/g;
-const FM_FIELD = /^(\s*-?\s*(?:src|cover|banner):\s*)(['"]?)([^'"\s#]+)\2(\s*)$/;
+// 正文图片：路径可以用 <...> 包起来，里面允许空格
+const MD_IMAGE = /(!\[[^\]]*\]\(\s*)(?:<([^>]+)>|([^)\s]+))((?:\s+"[^"]*")?\s*\))/g;
+// frontmatter：值可以加引号（允许空格），后面可以跟 # 注释
+const FM_FIELD = /^(\s*-?\s*(?:src|cover|banner):\s*)(?:(['"])(.+?)\2|([^'"\s#][^\s#]*))(\s*(?:#.*)?)$/;
+
+/** 改写后的值：YAML 里一律加引号，正文里有空格时用 <> 包起来 */
+const yamlQuote = (v) => (v.includes("'") ? `"${v}"` : `'${v}'`);
+const mdPath = (v) => (/\s/.test(v) ? `<${v}>` : v);
 
 const contentFiles = CARRIERS.flatMap((c) => walk(path.join(CONTENT_DIR, c))).filter((f) => /\.(md|mdx)$/.test(f) || (f.endsWith('.json') && f.startsWith(path.join(CONTENT_DIR, 'moments'))));
 
@@ -104,9 +111,10 @@ function mapRefs(text, onRef, file) {
                 continue;
             }
             const m = line.match(FM_FIELD);
-            if (m && isCandidate(m[3])) {
-                const next = onRef(m[3]);
-                if (next) lines[i] = `${m[1]}'${next}'${m[4]}`;
+            const value = m && (m[3] ?? m[4]);
+            if (value && isCandidate(value)) {
+                const next = onRef(value);
+                if (next) lines[i] = `${m[1]}${yamlQuote(next)}${m[5]}`;
             }
             continue;
         }
@@ -125,10 +133,11 @@ function mapRefs(text, onRef, file) {
             .map((part) =>
                 part.startsWith('`')
                     ? part
-                    : part.replace(MD_IMAGE, (all, head, ref, tail) => {
+                    : part.replace(MD_IMAGE, (all, head, angled, plain, tail) => {
+                          const ref = angled ?? plain;
                           if (!isCandidate(ref)) return all;
                           const next = onRef(ref);
-                          return next ? `${head}${next}${tail}` : all;
+                          return next ? `${head}${mdPath(next)}${tail}` : all;
                       })
             )
             .join('');
@@ -173,7 +182,9 @@ for (const [source, refs] of refsBySource) {
         let target = targetByDir.get(targetDir);
         if (target) {
             // 已经排好了，直接复用
-        } else if (path.dirname(source) === targetDir) {
+        } else if (source.startsWith(IMG_DIR + path.sep)) {
+            // 已经在 src/assets/img/ 里的图，放在哪由用户决定，只把写法统一成 @img/，不挪文件。
+            // 这样 images:expand 展开再改回，结果不变；公共素材目录也能被多处直接引用。
             target = source;
         } else {
             const picked = uniqueTarget(targetDir, path.basename(source), source);

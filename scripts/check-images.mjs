@@ -50,11 +50,11 @@ const textFiles = [...allFiles, path.join(ROOT, 'astro.config.mjs')].filter(
 
 // ── 从内容文件里提取本地图片引用 ──
 // 覆盖：Markdown 图片语法、HTML/指令的 src="..."、frontmatter 里的图片路径字段
-const MD_IMAGE = /!\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+"[^"]*")?\s*\)/g;
+const MD_IMAGE = /!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^)\s]+))(?:\s+"[^"]*")?\s*\)/g;
 const ATTR_SRC = /\b(?:src|bg|cover|banner)\s*=\s*"([^"]+)"/g;
-const FM_FIELD = /^\s*-?\s*(?:image|avatar|backgroundImage):\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
+const FM_FIELD = /^\s*-?\s*(?:image|avatar|backgroundImage):\s*(?:(['"])(.+?)\1|([^'"\s#][^\s#]*))\s*(?:#.*)?$/gm;
 // 这几个字段支持 @img/，指向 public/ 时提示可以迁移
-const FM_IMAGE_FIELD = /^\s*-?\s*(?:src|cover|banner):\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
+const FM_IMAGE_FIELD = /^\s*-?\s*(?:src|cover|banner):\s*(?:(['"])(.+?)\1|([^'"\s#][^\s#]*))\s*(?:#.*)?$/gm;
 const JSON_STRING = /"([^"]+\.(?:png|jpe?g|webp|gif|svg|avif))"/gi;
 
 // 代码块和行内代码里的路径只是示例，不算引用
@@ -106,10 +106,10 @@ for (const file of contentFiles) {
     if (ext(file) === '.json') {
         for (const m of text.matchAll(JSON_STRING)) add(m[1], true);
     } else {
-        for (const m of text.matchAll(MD_IMAGE)) add(m[1], true);
+        for (const m of text.matchAll(MD_IMAGE)) add(m[1] ?? m[2], true);
         for (const m of text.matchAll(ATTR_SRC)) add(m[1], false);
-        for (const m of text.matchAll(FM_FIELD)) add(m[1], false);
-        for (const m of text.matchAll(FM_IMAGE_FIELD)) add(m[1], true);
+        for (const m of text.matchAll(FM_FIELD)) add(m[2] ?? m[3], false);
+        for (const m of text.matchAll(FM_IMAGE_FIELD)) add(m[2] ?? m[3], true);
     }
     for (const [ref, fromMarkdown] of refs) {
         let target;
