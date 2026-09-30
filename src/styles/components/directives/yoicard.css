@@ -127,10 +127,16 @@
     background: var(--yc-bg-gradient);
 }
 
-.md-directive-yoicard.md-yc-has-image {
-    background-image: var(--yc-bg-image);
-    background-size: cover;
-    background-position: center;
+/* 背景图是一张铺满的 <img>，垫在最底层：遮罩在 1 层，正文在 2 层，装饰线和 logo 在 3 层 */
+.md-directive-yoicard .md-yc-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .md-directive-yoicard.md-yc-has-image.md-yc-bg-mode-full::before {
@@ -146,20 +152,30 @@
     z-index: 2;
 }
 
-.md-directive-yoicard.md-yc-bg-mode-left {
-    background-image:
-        linear-gradient(90deg, transparent 0%, transparent 40%, var(--yc-bg, #fdfdfb) 60%, var(--yc-bg, #fdfdfb) 100%),
-        var(--yc-bg-image);
-    background-size: cover;
-    background-position: left center;
+.md-directive-yoicard.md-yc-bg-mode-left .md-yc-bg-img {
+    object-position: left center;
 }
 
-.md-directive-yoicard.md-yc-bg-mode-right {
-    background-image:
-        linear-gradient(90deg, var(--yc-bg, #fdfdfb) 0%, var(--yc-bg, #fdfdfb) 40%, transparent 60%, transparent 100%),
-        var(--yc-bg-image);
-    background-size: cover;
-    background-position: right center;
+.md-directive-yoicard.md-yc-bg-mode-right .md-yc-bg-img {
+    object-position: right center;
+}
+
+/* left / right 模式：图片从一侧淡出，渐变盖在图片上 */
+.md-directive-yoicard.md-yc-has-image.md-yc-bg-mode-left::before,
+.md-directive-yoicard.md-yc-has-image.md-yc-bg-mode-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.md-directive-yoicard.md-yc-has-image.md-yc-bg-mode-left::before {
+    background: linear-gradient(90deg, transparent 0%, transparent 40%, var(--yc-bg, #fdfdfb) 60%, var(--yc-bg, #fdfdfb) 100%);
+}
+
+.md-directive-yoicard.md-yc-has-image.md-yc-bg-mode-right::before {
+    background: linear-gradient(90deg, var(--yc-bg, #fdfdfb) 0%, var(--yc-bg, #fdfdfb) 40%, transparent 60%, transparent 100%);
 }
 
 /* ── Pattern presets ── */

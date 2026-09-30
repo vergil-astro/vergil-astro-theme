@@ -537,32 +537,6 @@ const isArticle = head.pageType === 'article';
             })();
         </script>
 
-        <!-- 图片懒加载淡入 -->
-        <script is:inline>
-        (function() {
-            function initLazyImages() {
-                document.querySelectorAll('img[loading="lazy"]').forEach(function(img) {
-                    if (img.complete) {
-                        img.classList.add('img-loaded');
-                    } else {
-                        img.addEventListener('load', function() {
-                            img.classList.add('img-loaded');
-                        });
-                        img.addEventListener('error', function() {
-                            img.classList.add('img-loaded');
-                        });
-                    }
-                });
-            }
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initLazyImages);
-            } else {
-                initLazyImages();
-            }
-            document.addEventListener('astro:page-load', initLazyImages);
-        })();
-        </script>
-
         <!-- 滚动显现（reveal） -->
         <script>
             import '../scripts/search.js';

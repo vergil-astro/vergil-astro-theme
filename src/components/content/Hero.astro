@@ -88,12 +88,13 @@ const paragraphs = text.split(/\n\n+/).map(p => p.replace(/\*\*(.+?)\*\*/g, '<st
 </div>
 
 <style>
-    .hero :global(a) {
+    /* 只管介绍文字里的链接，下面的按钮有自己的颜色 */
+    .hero .prose :global(a) {
         color: var(--text-main);
         text-decoration: underline;
         text-decoration-style: dashed;
     }
-    .hero :global(a:hover) {
+    .hero .prose :global(a:hover) {
         text-decoration-style: solid;
     }
 </style>

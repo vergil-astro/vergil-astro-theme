@@ -1,8 +1,11 @@
 import { getIconSvg, resolveColor, escapeHtml, escapeUrl, safeUrl, safeCssValue } from './shared.mjs';
+import { createDirectiveImages } from '../directive-images.mjs';
 
 export function processMediaDirective(node) {
     const name = node.name;
     const attrs = node.attributes || {};
+    // 封面图可以是本地图片（@img/ 或相对路径），交给 Astro 处理
+    const images = createDirectiveImages();
 
     if (name === 'video') {
         const src = attrs.src || '';
@@ -37,13 +40,13 @@ export function processMediaDirective(node) {
                 ? `<button type="button" class="md-video-pip-btn" data-video-pip="${uid}" aria-label="Picture-in-picture">${pipBtnIcon}</button>`
                 : '';
             if (poster) {
-                videoHtml = `<img class="md-video-poster-img" src="${escapeUrl(poster)}" alt="" loading="lazy" onerror="this.style.display='none'" /><video class="md-video-element" id="${uid}" src="${escapeUrl(src)}" preload="metadata" playsinline disablePictureInPicture ${autoplay ? 'autoplay muted ' : ''}data-pip-video="${uid}" data-pip-mode="${escapeHtml(pip)}"></video><div class="md-video-overlay" data-video-id="${uid}"><button type="button" class="md-video-play-btn" data-video-play="${uid}" aria-label="Play">${playIcon}</button></div>${pipBtnHtml}`;
+                videoHtml = `${images.img(poster, { class: 'md-video-poster-img', alt: '', loading: 'lazy', onerror: 'vergilImgHide(this)' })}<video class="md-video-element" id="${uid}" src="${escapeUrl(src)}" preload="metadata" playsinline disablePictureInPicture ${autoplay ? 'autoplay muted ' : ''}data-pip-video="${uid}" data-pip-mode="${escapeHtml(pip)}"></video><div class="md-video-overlay" data-video-id="${uid}"><button type="button" class="md-video-play-btn" data-video-play="${uid}" aria-label="Play">${playIcon}</button></div>${pipBtnHtml}`;
                 node.data = { hName: 'div', hProperties: { class: 'md-directive md-directive-video md-video-has-poster', style: containerStyle } };
             } else {
                 videoHtml = `<video class="md-video-element" id="${uid}" src="${escapeUrl(src)}" controls preload="metadata" playsinline disablePictureInPicture ${autoplay ? 'autoplay muted ' : ''}data-pip-video="${uid}" data-pip-mode="${escapeHtml(pip)}"></video>${pipBtnHtml}`;
                 node.data = { hName: 'div', hProperties: { class: 'md-directive md-directive-video', style: containerStyle } };
             }
-            node.children = [{ type: 'html', value: `<div class="md-video-wrap">${videoHtml}</div>` }];
+            node.children = images.toNodes(`<div class="md-video-wrap">${videoHtml}</div>`);
         } else if (bilibili) {
             const rawBvid = bilibili.startsWith('BV') ? bilibili : 'BV' + bilibili;
             const bvid = /^BV[\w]+$/.test(rawBvid) ? rawBvid : '';
@@ -104,14 +107,11 @@ export function processMediaDirective(node) {
         } else if (src) {
             const playIcon = getIconSvg('lucide:play', 18);
             const pauseIcon = getIconSvg('lucide:pause', 18);
-            const coverHtml = cover ? `<img src="${escapeUrl(cover)}" alt="${escapeHtml(title || 'Cover')}" loading="lazy" />` : `<div class="md-audio-cover-default">${getIconSvg('lucide:music', 18)}</div>`;
+            const coverHtml = cover ? images.img(cover, { alt: title || 'Cover', loading: 'lazy' }) : `<div class="md-audio-cover-default">${getIconSvg('lucide:music', 18)}</div>`;
             const autoplayAttr = attrs.autoplay === 'true' || attrs.autoplay === '' ? ' autoplay' : '';
 
             node.data = { hName: 'div', hProperties: { class: 'md-directive md-directive-audio', 'data-src': safeUrl(src), ...(containerStyle ? { style: containerStyle } : {}) } };
-            node.children = [{
-                type: 'html',
-                value: `<div class="md-audio-player" id="${uid}"${autoplayAttr ? ' data-autoplay="1"' : ''}><div class="md-audio-cover">${coverHtml}</div><div class="md-audio-meta"><div class="md-audio-title">${escapeHtml(title || 'Unknown')}</div><div class="md-audio-artist">${escapeHtml(artist || '')}</div></div><button type="button" class="md-audio-btn" aria-label="Play"><span class="md-audio-play">${playIcon}</span><span class="md-audio-pause" style="display:none">${pauseIcon}</span></button><div class="md-audio-progress-wrap"><span class="md-audio-time-current">00:00</span><div class="md-audio-progress-bar"><div class="md-audio-progress-fill"></div></div><span class="md-audio-time-total">00:00</span></div><audio preload="metadata" style="display:none"${autoplayAttr}><source src="${escapeUrl(src)}" type="audio/mpeg"></audio></div>`
-            }];
+            node.children = images.toNodes(`<div class="md-audio-player" id="${uid}"${autoplayAttr ? ' data-autoplay="1"' : ''}><div class="md-audio-cover">${coverHtml}</div><div class="md-audio-meta"><div class="md-audio-title">${escapeHtml(title || 'Unknown')}</div><div class="md-audio-artist">${escapeHtml(artist || '')}</div></div><button type="button" class="md-audio-btn" aria-label="Play"><span class="md-audio-play">${playIcon}</span><span class="md-audio-pause" style="display:none">${pauseIcon}</span></button><div class="md-audio-progress-wrap"><span class="md-audio-time-current">00:00</span><div class="md-audio-progress-bar"><div class="md-audio-progress-fill"></div></div><span class="md-audio-time-total">00:00</span></div><audio preload="metadata" style="display:none"${autoplayAttr}><source src="${escapeUrl(src)}" type="audio/mpeg"></audio></div>`);
         } else {
             node.data = { hName: 'div', hProperties: { class: 'md-directive md-directive-audio', ...(containerStyle ? { style: containerStyle } : {}) } };
             node.children = [{ type: 'html', value: '<p style="color:var(--text-secondary);font-size:0.875rem;">Please provide a src, netease, or voice attribute</p>' }];

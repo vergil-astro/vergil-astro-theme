@@ -7,7 +7,8 @@
  * pnpm build 会先运行 images:organize，把它们改回 @img/。
  *
  * 处理范围：blog、projects、pages、docs、albums、series、thoughts 下的 .md/.mdx，
- * 正文里的 ![](...) 和 frontmatter 里的 src、cover、banner。代码块里的写法示例不动。
+ * 正文里的 ![](...)、内容指令 image/photo 的 src 和 banner 的 bg/avatar、frontmatter 里的 src、cover、banner。
+ * 代码块里的写法示例不动。
  *
  * 不处理：图文动态（JSON，编辑器预览不了，它的图片只支持 @img/）。
  */
@@ -40,6 +41,37 @@ function toRelative(ref, file) {
     return rel;
 }
 
+// 内容指令里放图片的属性。sites、posters 的图片来自 links.ts 配置，不在内容里，不用处理；
+// story 的镜头图片是表格里的 ![](...)，走正文图片的规则
+const IMG_DIRECTIVES = {
+    image: ['src'],
+    photo: ['src'],
+    banner: ['bg', 'avatar'],
+    video: ['poster'],
+    audio: ['cover'],
+    yoicard: ['bg-image', 'logo'],
+    button: ['icon'],
+    quot: ['icon'],
+    title: ['prefix', 'suffix']
+};
+// :name{...}、::name{...}、:::name{...}，以及带文字的 :name[文字]{...}
+const DIRECTIVE = /(:{1,4})([a-z]+)(\[[^\]]*\])?\{([^}]*)\}/g;
+const DIRECTIVE_ATTR = /(?<![a-z0-9-])([a-z][a-z0-9-]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'}]+))/g;
+
+/** 找出指令属性里的图片路径，回调返回新值则替换（统一写成双引号） */
+function mapDirectiveImages(text, onRef) {
+    return text.replace(DIRECTIVE, (all, colons, name, label, body) => {
+        const keys = IMG_DIRECTIVES[name];
+        if (!keys) return all;
+        const next = body.replace(DIRECTIVE_ATTR, (attr, key, dq, sq, bare) => {
+            if (!keys.includes(key)) return attr;
+            const value = onRef(dq ?? sq ?? bare);
+            return value ? `${key}="${value}"` : attr;
+        });
+        return `${colons}${name}${label || ''}{${next}}`;
+    });
+}
+
 // 正文图片：路径可以用 <...> 包起来，里面允许空格
 const MD_IMAGE = /(!\[[^\]]*\]\(\s*)(?:<(@img\/[^>]+)>|(@img\/[^)\s]+))((?:\s+"[^"]*")?\s*\))/g;
 // frontmatter：值可以加引号（允许空格），后面可以跟 # 注释
@@ -66,12 +98,13 @@ function expand(text, file) {
             }
             continue;
         }
-        const f = line.match(/^\s*(`{3,}|~{3,})/);
+        // 代码块里的是写法示例；:::private 里的内容会被加密成字符串，图片没法交给 Astro，都跳过
+        const f = line.match(/^\s*(`{3,}|~{3,})/) || line.match(/^\s*(:{3,})(?:private(?![a-z])|\s*$)/);
         if (fence) {
             if (f && f[1][0] === fence[0] && f[1].length >= fence.length) fence = null;
             continue;
         }
-        if (f) {
+        if (f && !/^\s*:{3,}\s*$/.test(line)) {
             fence = f[1];
             continue;
         }
@@ -81,11 +114,18 @@ function expand(text, file) {
             .map((part) =>
                 part.startsWith('`')
                     ? part
-                    : part.replace(MD_IMAGE, (all, head, angled, plain, tail) => {
-                          count++;
-                          const rel = toRelative(angled ?? plain, file);
-                          return `${head}${angled !== undefined || /\s/.test(rel) ? `<${rel}>` : rel}${tail}`;
-                      })
+                    : mapDirectiveImages(
+                          part.replace(MD_IMAGE, (all, head, angled, plain, tail) => {
+                              count++;
+                              const rel = toRelative(angled ?? plain, file);
+                              return `${head}${angled !== undefined || /\s/.test(rel) ? `<${rel}>` : rel}${tail}`;
+                          }),
+                          (ref) => {
+                              if (!ref.startsWith(IMG_ALIAS)) return null;
+                              count++;
+                              return toRelative(ref, file);
+                          }
+                      )
             )
             .join('');
     }

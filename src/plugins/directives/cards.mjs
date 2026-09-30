@@ -1,8 +1,11 @@
 import { getIconSvg, resolveColor, escapeHtml, escapeUrl, safeCssValue, h, isLightBg, labelTextColor, getScreenshotUrl } from './shared.mjs';
 import QRCode from 'qrcode-svg';
+import { createDirectiveImages } from '../directive-images.mjs';
 
 export function processCardDirective(node, options = {}) {
-    const { links, screenshotService } = options;
+    const { links, screenshotService, ogImages } = options;
+    // 封面、图标、logo、背景图可以是本地图片（@img/ 或相对路径），交给 Astro 处理
+    const images = createDirectiveImages();
     const attrs = node.attributes || {};
 
     switch (node.name) {
@@ -94,7 +97,11 @@ export function processCardDirective(node, options = {}) {
                 node.children = [{ type: 'html', value: `<p style="color:var(--text-secondary);font-size:0.875rem;">Group "${escapeHtml(group)}" has no site data</p>` }];
             } else {
                 const cells = items.map(item => {
-                    const cover = item.cover || getScreenshotUrl(item.url, screenshotService);
+                    // 封面：自己填的 cover → 站点的 og:image → 截图服务。
+                    // 用 og:image 时把截图地址放在 data-fallback-src，og:image 日后失效也能换成截图
+                    const screenshot = getScreenshotUrl(item.url, screenshotService);
+                    const ogImage = !item.cover && ogImages?.get(item.url);
+                    const cover = item.cover || ogImage || screenshot;
                     const icon = item.icon || `${new URL(item.url).origin}/favicon.ico`;
                     const desc = item.description || item.url;
                     let labelsHtml = '';
@@ -110,10 +117,10 @@ export function processCardDirective(node, options = {}) {
                     return `<div class="md-sites-cell">` +
                         `<a class="md-sites-link" href="${escapeUrl(item.url, '#')}" target="_blank" rel="external nofollow noopener noreferrer">` +
                         `<div class="md-sites-cover">` +
-                        `<img src="${escapeUrl(cover)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('md-sites-cover-fallback');" />` +
+                        images.img(cover, { alt: item.title, loading: 'lazy', 'data-fallback-src': ogImage ? screenshot : undefined, 'data-fallback-class': 'md-sites-cover-fallback', onerror: 'vergilImgHide(this)' }) +
                         `</div>` +
                         `<div class="md-sites-info">` +
-                        `<img class="md-sites-icon" src="${escapeUrl(icon)}" alt="" loading="lazy" onerror="this.style.display='none'" />` +
+                        images.img(icon, { class: 'md-sites-icon', alt: '', loading: 'lazy', onerror: 'vergilImgHide(this)' }) +
                         `<span class="md-sites-title">${escapeHtml(item.title)}</span>` +
                         `<span class="md-sites-desc">${escapeHtml(desc)}</span>` +
                         `</div>` +
@@ -124,7 +131,7 @@ export function processCardDirective(node, options = {}) {
 
                 const html = `<div class="md-directive md-directive-sites"><div class="md-sites-grid">${cells}</div></div>`;
                 node.data = { hName: 'div', hProperties: {} };
-                node.children = [{ type: 'html', value: html }];
+                node.children = images.toNodes(html);
             }
             break;
         }
@@ -151,7 +158,7 @@ export function processCardDirective(node, options = {}) {
                             : `<div class="md-posters-link">`) +
                         `<div class="md-posters-cover">` +
                         (cover
-                            ? `<img src="${escapeUrl(cover)}" alt="${escapeHtml(title)}" loading="lazy" onerror="this.style.display='none'" />`
+                            ? images.img(cover, { alt: title, loading: 'lazy', onerror: 'vergilImgHide(this)' })
                             : '') +
                         `</div>` +
                         `<div class="md-posters-meta">` +
@@ -163,7 +170,7 @@ export function processCardDirective(node, options = {}) {
 
                 const html = `<div class="md-directive md-directive-posters" data-ratio="${escapeHtml(ratio)}"${cols ? ` data-cols="${escapeHtml(cols)}"` : ''}><div class="md-posters-grid">${cells}</div></div>`;
                 node.data = { hName: 'div', hProperties: {} };
-                node.children = [{ type: 'html', value: html }];
+                node.children = images.toNodes(html);
             }
             break;
         }
@@ -281,8 +288,7 @@ export function processCardDirective(node, options = {}) {
             if (bgImage) {
                 cardClasses.push('md-yc-has-image');
                 cardClasses.push(`md-yc-bg-mode-${/^[a-z0-9-]+$/i.test(bgMode) ? bgMode : 'full'}`);
-                const safeBgImage = safeCssValue(bgImage).replace(/[()\s]/g, encodeURIComponent);
-                if (safeBgImage) cardStyle += `--yc-bg-image:url('${safeBgImage}');`;
+                // 背景图用铺满的 <img>（见下方 bgImageHtml），而不是 CSS 背景图，这样本地图片也能被 Astro 优化
                 if (bgMode === 'full' && bgOverlay !== 'none') {
                     const overlayMap = {
                         dark: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%)',
@@ -361,10 +367,11 @@ export function processCardDirective(node, options = {}) {
 
             const logoAttr = attrs.logo || '';
             const logoShape = attrs['logo-shape'] || 'circle';
+            const bgImageHtml = bgImage ? images.img(bgImage, { class: 'md-yc-bg-img', alt: '', 'aria-hidden': 'true', loading: 'lazy', decoding: 'async' }) : '';
             let logoHtml = '';
             if (logoAttr) {
                 const shapeClass = `md-yc-logo-${['circle', 'square', 'rounded'].includes(logoShape) ? logoShape : 'circle'}`;
-                logoHtml = `<img class="md-yc-logo ${shapeClass}" src="${escapeHtml(logoAttr)}" alt="" loading="lazy" onerror="this.style.display='none'" />`;
+                logoHtml = images.img(logoAttr, { class: `md-yc-logo ${shapeClass}`, alt: '', loading: 'lazy', onerror: 'vergilImgHide(this)' });
             }
 
             const originalChildren = node.children || [];
@@ -441,8 +448,9 @@ export function processCardDirective(node, options = {}) {
             if (cardStyle) hProps.style = cardStyle;
             node.data = { hName: 'div', hProperties: hProps };
             node.children = [
+                ...(bgImageHtml ? images.toNodes(bgImageHtml) : []),
                 { type: 'html', value: `<div class="md-yc-accent">${accentHtml}</div>` },
-                { type: 'html', value: logoHtml },
+                ...images.toNodes(logoHtml),
                 { type: 'html', value: '<div class="md-yc-body">' },
                 ...bodyChildren,
                 { type: 'html', value: '</div>' }

@@ -51,7 +51,38 @@ const textFiles = [...allFiles, path.join(ROOT, 'astro.config.mjs')].filter(
 // ── 从内容文件里提取本地图片引用 ──
 // 覆盖：Markdown 图片语法、HTML/指令的 src="..."、frontmatter 里的图片路径字段
 const MD_IMAGE = /!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^)\s]+))(?:\s+"[^"]*")?\s*\)/g;
-const ATTR_SRC = /\b(?:src|bg|cover|banner)\s*=\s*"([^"]+)"/g;
+const ATTR_SRC = /\b(?:src|bg|cover|banner|avatar)\s*=\s*"([^"]+)"/g;
+// 内容指令里放图片的属性。sites、posters 的图片来自 links.ts 配置，不在内容里，不用处理；
+// story 的镜头图片是表格里的 ![](...)，走正文图片的规则
+const IMG_DIRECTIVES = {
+    image: ['src'],
+    photo: ['src'],
+    banner: ['bg', 'avatar'],
+    video: ['poster'],
+    audio: ['cover'],
+    yoicard: ['bg-image', 'logo'],
+    button: ['icon'],
+    quot: ['icon'],
+    title: ['prefix', 'suffix']
+};
+// :name{...}、::name{...}、:::name{...}，以及带文字的 :name[文字]{...}
+const DIRECTIVE = /(:{1,4})([a-z]+)(\[[^\]]*\])?\{([^}]*)\}/g;
+const DIRECTIVE_ATTR = /(?<![a-z0-9-])([a-z][a-z0-9-]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'}]+))/g;
+
+/** 找出指令属性里的图片路径，回调返回新值则替换（统一写成双引号） */
+function mapDirectiveImages(text, onRef) {
+    return text.replace(DIRECTIVE, (all, colons, name, label, body) => {
+        const keys = IMG_DIRECTIVES[name];
+        if (!keys) return all;
+        const next = body.replace(DIRECTIVE_ATTR, (attr, key, dq, sq, bare) => {
+            if (!keys.includes(key)) return attr;
+            const value = onRef(dq ?? sq ?? bare);
+            return value ? `${key}="${value}"` : attr;
+        });
+        return `${colons}${name}${label || ''}{${next}}`;
+    });
+}
+
 const FM_FIELD = /^\s*-?\s*(?:image|avatar|backgroundImage):\s*(?:(['"])(.+?)\1|([^'"\s#][^\s#]*))\s*(?:#.*)?$/gm;
 // 这几个字段支持 @img/，指向 public/ 时提示可以迁移
 const FM_IMAGE_FIELD = /^\s*-?\s*(?:src|cover|banner):\s*(?:(['"])(.+?)\1|([^'"\s#][^\s#]*))\s*(?:#.*)?$/gm;
@@ -62,12 +93,13 @@ function stripCode(text) {
     const out = [];
     let fence = null;
     for (const line of text.split('\n')) {
-        const m = line.match(/^\s*(`{3,}|~{3,})/);
+        // 代码块里的是写法示例；:::private 里的内容会被加密成字符串，图片没法交给 Astro，都跳过
+        const m = line.match(/^\s*(`{3,}|~{3,})/) || line.match(/^\s*(:{3,})(?:private(?![a-z])|\s*$)/);
         if (fence) {
             if (m && m[1][0] === fence[0] && m[1].length >= fence.length) fence = null;
             continue;
         }
-        if (m) {
+        if (m && !/^\s*:{3,}\s*$/.test(line)) {
             fence = m[1];
             continue;
         }
@@ -107,6 +139,11 @@ for (const file of contentFiles) {
         for (const m of text.matchAll(JSON_STRING)) add(m[1], true);
     } else {
         for (const m of text.matchAll(MD_IMAGE)) add(m[1] ?? m[2], true);
+        // 支持 @img/ 的指令里的图，指向 public/ 时也提示可以迁移
+        mapDirectiveImages(text, (ref) => {
+            add(ref, true);
+            return null;
+        });
         for (const m of text.matchAll(ATTR_SRC)) add(m[1], false);
         for (const m of text.matchAll(FM_FIELD)) add(m[2] ?? m[3], false);
         for (const m of text.matchAll(FM_IMAGE_FIELD)) add(m[2] ?? m[3], true);

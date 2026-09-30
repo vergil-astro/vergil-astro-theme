@@ -204,7 +204,10 @@ export function labelTextColor(hex) {
 /** Get website screenshot URL */
 export function getScreenshotUrl(url, service) {
     if (service === 'mshots') {
-        return `https://s0.wp.com/mshots/v1/${encodeURIComponent(url)}?w=1280&h=720`;
+        // w/h 是截图的视口尺寸，1280×800 是 3:2，正好是 sites 卡片的比例
+        return `https://s0.wp.com/mshots/v1/${encodeURIComponent(url)}?w=1280&h=800`;
     }
-    return `https://image.thum.io/get/width/1280/crop/720/${url}`;
+    // noanimate：不要返回转圈的动画占位图，直接等最终截图；allowJPG：体积更小。
+    // thum.io 默认视口 1200 宽，crop/800 截成 3:2，正好是 sites 卡片的比例，不用再裁
+    return `https://image.thum.io/get/width/1280/crop/800/noanimate/allowJPG/${url}`;
 }

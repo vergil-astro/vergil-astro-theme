@@ -1,6 +1,7 @@
 import { visit } from 'unist-util-visit';
 import { getIconSvg, resolveColor, escapeHtml, escapeUrl, safeCssValue, h, serializeToHtml } from './shared.mjs';
 import { processPlanDirective } from './plan.mjs';
+import { createDirectiveImages, isLocalImageFile } from '../directive-images.mjs';
 
 export function processBlockDirective(node, options = {}) {
     const { links, screenshotService, locale = 'zh-CN' } = options;
@@ -255,10 +256,11 @@ export function processBlockDirective(node, options = {}) {
             visit({ type: 'root', children: node.children }, 'text', (t) => { text += t.value; });
             text = text.trim();
             const defaultIcon = getIconSvg('bxs:quote-left', 28);
+            const images = createDirectiveImages();
             let iconHtml = '';
             if (icon) {
-                if (/^https?:\/\//i.test(icon)) {
-                    iconHtml = `<img class="md-quot-icon" src="${escapeUrl(icon)}" alt="" style="height:28px;width:auto;" />`;
+                if (/^https?:\/\//i.test(icon) || isLocalImageFile(icon)) {
+                    iconHtml = images.img(icon, { class: 'md-quot-icon', alt: '', style: 'height:28px;width:auto;' });
                 } else {
                     const iconifyMatch = icon.match(/^([a-z0-9-]+):([a-z0-9-]+)$/i);
                     if (iconifyMatch) {
@@ -275,7 +277,7 @@ export function processBlockDirective(node, options = {}) {
             }
             const html = `<div class="md-directive md-directive-quot">${iconHtml}<p class="md-quot-text">${escapeHtml(text)}</p></div>`;
             node.data = { hName: 'div', hProperties: {} };
-            node.children = [{ type: 'html', value: html }];
+            node.children = images.toNodes(html);
             break;
         }
 
@@ -300,8 +302,10 @@ export function processBlockDirective(node, options = {}) {
             }
             function renderIcon(value) {
                 if (!value) return '';
-                if (/^https?:\/\//i.test(value)) {
-                    return { type: 'html', value: `<img class="md-title-icon-img" src="${escapeUrl(value)}" alt="" />` };
+                if (/^https?:\/\//i.test(value) || isLocalImageFile(value)) {
+                    // 本地图片返回图片节点交给 Astro 处理，外链返回 HTML
+                    const images = createDirectiveImages();
+                    return images.toNodes(images.img(value, { class: 'md-title-icon-img', alt: '' }))[0];
                 }
                 const iconifyMatch = value.match(/^([a-z0-9-]+):([a-z0-9-]+)$/i);
                 if (iconifyMatch) {

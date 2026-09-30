@@ -6,6 +6,7 @@
  */
 
 import { escapeHtml } from './shared.mjs';
+import { createDirectiveImages } from '../directive-images.mjs';
 
 const KNOWN_COLS = new Set(['shot', 'image', 'desc', 'dialogue', 'note']);
 
@@ -77,7 +78,7 @@ function parseStoryTable(node) {
     return { columns, rows };
 }
 
-function renderStoryHtml(data, i18n) {
+function renderStoryHtml(data, i18n, images) {
     const { columns, rows, error } = data;
     if (error) {
         return `<div class="md-directive md-directive-story"><p class="md-story-error">${escapeHtml(error)}</p></div>`;
@@ -100,7 +101,7 @@ function renderStoryHtml(data, i18n) {
         // Optional image
         if (row.image) {
             html += '<div class="md-story-image">';
-            html += `<img src="${escapeHtml(row.image)}" alt="" loading="lazy" decoding="async">`;
+            html += images.img(row.image, { alt: '', loading: 'lazy', decoding: 'async' });
             html += '</div>';
         }
 
@@ -147,8 +148,10 @@ function renderStoryHtml(data, i18n) {
 export function processStoryDirective(node, options = {}) {
     const i18n = options.i18n?.story ?? { empty: '暂无分镜内容' };
     const data = parseStoryTable(node);
-    const html = renderStoryHtml(data, i18n);
+    // 镜头图片可以是本地图片（@img/ 或相对路径），交给 Astro 处理
+    const images = createDirectiveImages();
+    const html = renderStoryHtml(data, i18n, images);
 
     node.data = { hName: 'div', hProperties: {} };
-    node.children = [{ type: 'html', value: html }];
+    node.children = images.toNodes(html);
 }

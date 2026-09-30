@@ -115,3 +115,62 @@ function formatCanonicalURL(url: string | URL) {
 {description && <meta name="twitter:description" content={description} />}
 {resolvedImage?.src && <meta name="twitter:image" content={resolvedImage.src} />}
 {resolvedImage?.alt && <meta name="twitter:image:alt" content={resolvedImage.alt} />}
+
+<!--
+    内容指令里图片的加载状态。<img> 上写 onload="vergilImgLoad(this)"，调用里不带引号：
+    交给 Astro 优化的本地图片，属性值里的引号会被转义两次，内联脚本一带引号就会失效。
+-->
+<script is:inline>
+    window.vergilImgLoad = function (img) {
+        img.classList.add('md-image-loaded');
+        var wrap = img.closest('.md-image-img-wrap');
+        if (wrap) wrap.classList.add('is-loaded');
+    };
+    window.vergilImgError = function (img) {
+        img.classList.add('md-image-error');
+        var wrap = img.closest('.md-image-img-wrap');
+        if (wrap) wrap.classList.add('has-error');
+    };
+    // 加载失败时隐藏图片；带 data-fallback-class 时给父元素加上这个 class，显示兜底样式。
+    // 带 data-fallback-src 时先换成这个备用地址再试一次，备用地址也失败才隐藏
+    window.vergilImgHide = function (img) {
+        var backup = img.getAttribute('data-fallback-src');
+        if (backup) {
+            img.removeAttribute('data-fallback-src');
+            img.src = backup;
+            return;
+        }
+        img.style.display = 'none';
+        var fallback = img.getAttribute('data-fallback-class');
+        if (fallback && img.parentElement) img.parentElement.classList.add(fallback);
+    };
+</script>
+
+<!--
+    懒加载图片的淡入：animations.css 里 img[loading="lazy"] 默认透明，加载完加上 img-loaded 才显示。
+    这段脚本放在所有布局共用的 BaseHead 里；之前只在 BaseLayout 里，文档、极简、简历页面的懒加载图片一直是透明的。
+-->
+<script is:inline>
+    (function () {
+        function initLazyImages() {
+            document.querySelectorAll('img[loading="lazy"]').forEach(function (img) {
+                if (img.complete) {
+                    img.classList.add('img-loaded');
+                } else {
+                    img.addEventListener('load', function () {
+                        img.classList.add('img-loaded');
+                    });
+                    img.addEventListener('error', function () {
+                        img.classList.add('img-loaded');
+                    });
+                }
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initLazyImages);
+        } else {
+            initLazyImages();
+        }
+        document.addEventListener('astro:page-load', initLazyImages);
+    })();
+</script>
