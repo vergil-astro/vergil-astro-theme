@@ -97,7 +97,12 @@
     word-wrap: normal !important;
     overflow-x: auto !important;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+    scrollbar-color: transparent transparent;
+}
+
+/* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
+.md-terminal-body pre.is-scrolling {
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
 }
 
 .md-terminal-body pre::-webkit-scrollbar {
@@ -109,8 +114,12 @@
 }
 
 .md-terminal-body pre::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: transparent;
     border-radius: 3px;
+}
+
+.md-terminal-body pre.is-scrolling::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.28);
 }
 
 .md-terminal-body pre code {

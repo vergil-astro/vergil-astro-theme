@@ -302,7 +302,7 @@ const isArticle = head.pageType === 'article';
     <body class="bg-main text-main">
         <a class="skip-link" href="#main-content">{t.a11y.skipToContent}</a>
         {isArticle && (
-            <div id="reading-progress" class="fixed top-0 left-0 h-[2px] bg-accent z-[60] w-0 transition-none"></div>
+            <div id="reading-progress" data-progress="page" class="fixed top-0 left-0 h-[2px] w-full origin-left bg-accent z-[60] transition-none" style="transform: scaleX(0)"></div>
         )}
         <slot name="splash" />
 
@@ -334,28 +334,48 @@ const isArticle = head.pageType === 'article';
 
         <script is:inline>
             (function () {
+                // 这段脚本在无刷新切换页面后还会再跑。上一次绑定的监听记在 window 上，先解绑再绑，否则每切换一次就多一个监听。
+                // 三个布局各有一份进度条脚本，data-progress 标明当前页面用的是哪一份。进度用 transform 缩放，不改宽度，滚动时不触发布局
                 function initProgress() {
-                    var bar = document.getElementById('reading-progress');
-                    if (!bar) return;
-                    function update() {
-                        var scrollTop = window.scrollY;
-                        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-                        var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-                        bar.style.width = pct + '%';
+                    if (window.__vergilProgressDocs) {
+                        window.removeEventListener('scroll', window.__vergilProgressDocs);
+                        window.__vergilProgressDocs = null;
                     }
-                    window.removeEventListener('scroll', update);
-                    window.addEventListener('scroll', update, { passive: true });
+                    var bar = document.getElementById('reading-progress');
+                    if (!bar || bar.dataset.progress !== 'page') return;
+                    var ticking = false;
+                    function update() {
+                        ticking = false;
+                        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                        var ratio = docHeight > 0 ? Math.min(1, Math.max(0, window.scrollY / docHeight)) : 0;
+                        bar.style.transform = 'scaleX(' + ratio + ')';
+                    }
+                    function onScroll() {
+                        if (!ticking) {
+                            ticking = true;
+                            requestAnimationFrame(update);
+                        }
+                    }
+                    window.__vergilProgressDocs = onScroll;
+                    window.addEventListener('scroll', onScroll, { passive: true });
                     update();
                 }
-                document.addEventListener('astro:page-load', initProgress);
+                if (!window.__vergilProgressDocsInit) {
+                    window.__vergilProgressDocsInit = true;
+                    document.addEventListener('astro:page-load', initProgress);
+                }
                 initProgress();
             })();
         </script>
 
         <script>
+            // medium-zoom 只建一个实例，每次换页解绑旧图片、绑定新图片。
+            // 它一创建就在 document 上挂滚动和按键监听，detach() 不会移除，每页新建一个的话监听会越积越多
+            let zoomInstance = null;
+
             async function initZoom() {
                 const { default: mediumZoom } = await import('medium-zoom');
-                mediumZoom('img[data-zoomable="1"]', {
+                zoomInstance ??= mediumZoom({
                     background: 'rgba(0, 0, 0, 0.85)',
                     margin: 24,
                     onOpen: (target) => {
@@ -373,9 +393,11 @@ const isArticle = head.pageType === 'article';
                         }
                     },
                 });
+                zoomInstance.attach('img[data-zoomable="1"]');
             }
 
             document.addEventListener('astro:page-load', initZoom);
+            document.addEventListener('astro:before-swap', () => zoomInstance?.detach());
             if (document.readyState !== 'loading') {
                 initZoom();
             }

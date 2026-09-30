@@ -300,7 +300,7 @@ const isArticle = head.pageType === 'article';
     <body class="bg-main text-main">
         <a class="skip-link" href="#main-content">{t.a11y.skipToContent}</a>
         {isArticle && (
-            <div id="reading-progress" class="fixed top-0 left-0 h-[2px] bg-accent z-[60] w-0 transition-none"></div>
+            <div id="reading-progress" data-progress="main" class="fixed top-0 left-0 h-[2px] w-full origin-left bg-accent z-[60] transition-none" style="transform: scaleX(0)"></div>
         )}
         <slot name="splash" />
 
@@ -332,16 +332,22 @@ const isArticle = head.pageType === 'article';
 
         <script is:inline>
             (function () {
+                // 这段脚本在无刷新切换页面后还会再跑。上一次绑定的监听记在 window 上，先解绑再绑，否则每切换一次就多一个监听。
+                // 三个布局各有一份进度条脚本，data-progress 标明当前页面用的是哪一份。进度用 transform 缩放，不改宽度，滚动时不触发布局
                 function initProgress() {
+                    if (window.__vergilProgressMain) {
+                        window.removeEventListener('scroll', window.__vergilProgressMain);
+                        window.__vergilProgressMain = null;
+                    }
                     var bar = document.getElementById('reading-progress');
-                    if (!bar) return;
+                    if (!bar || bar.dataset.progress !== 'main') return;
 
                     var main = document.querySelector('main');
                     var ticking = false;
 
                     function update() {
                         if (!main) {
-                            bar.style.width = '0%';
+                            bar.style.transform = 'scaleX(0)';
                             return;
                         }
                         var scrollTop = window.scrollY;
@@ -349,8 +355,8 @@ const isArticle = head.pageType === 'article';
                         var contentHeight = main.scrollHeight;
                         var viewportH = window.innerHeight;
                         var readableHeight = Math.max(0, contentHeight - viewportH);
-                        var pct = readableHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / readableHeight) * 100)) : 0;
-                        bar.style.width = pct + '%';
+                        var ratio = readableHeight > 0 ? Math.min(1, Math.max(0, scrollTop / readableHeight)) : 0;
+                        bar.style.transform = 'scaleX(' + ratio + ')';
                     }
 
                     function onScroll() {
@@ -363,12 +369,15 @@ const isArticle = head.pageType === 'article';
                         }
                     }
 
-                    window.removeEventListener('scroll', onScroll);
+                    window.__vergilProgressMain = onScroll;
                     window.addEventListener('scroll', onScroll, { passive: true });
                     // ViewTransitions 后延迟一帧，确保 DOM 已更新
                     requestAnimationFrame(update);
                 }
-                document.addEventListener('astro:page-load', initProgress);
+                if (!window.__vergilProgressMainInit) {
+                    window.__vergilProgressMainInit = true;
+                    document.addEventListener('astro:page-load', initProgress);
+                }
                 initProgress();
             })();
         </script>
@@ -411,7 +420,9 @@ const isArticle = head.pageType === 'article';
         {siteConfig.floatingAudio?.enabled && <FloatingAudioPlayer />}
 
         <script>
-            // medium-zoom 按需加载：只在页面有可缩放图片时才导入
+            // medium-zoom 按需加载：只在页面有可缩放图片时才导入。
+            // 只建一个实例，每次换页解绑旧图片、绑定新图片：它一创建就在 document 上挂滚动和按键监听，
+            // detach() 不会移除，每页新建一个的话监听会越积越多
             let zoomInstance = null;
 
             async function initZoom() {
@@ -419,7 +430,7 @@ const isArticle = head.pageType === 'article';
                 if (images.length === 0) return;
 
                 const { default: mediumZoom } = await import('medium-zoom');
-                zoomInstance = mediumZoom('img[data-zoomable="1"]', {
+                zoomInstance ??= mediumZoom({
                     background: 'rgba(0, 0, 0, 0.85)',
                     margin: 24,
                     onOpen: (target) => {
@@ -437,13 +448,11 @@ const isArticle = head.pageType === 'article';
                         }
                     },
                 });
+                zoomInstance.attach('img[data-zoomable="1"]');
             }
 
             function disposeZoom() {
-                if (zoomInstance) {
-                    zoomInstance.detach();
-                    zoomInstance = null;
-                }
+                zoomInstance?.detach();
             }
 
             document.addEventListener('astro:page-load', initZoom);

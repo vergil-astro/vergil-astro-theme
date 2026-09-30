@@ -36,3 +36,181 @@
 .splash-gradient.h-72  { height: 18rem; }
 .splash-gradient.h-80  { height: 20rem; }
 .splash-gradient.h-96  { height: 24rem; }
+
+/* ══════════════════════════════════════════
+   开屏控件的玻璃效果（splash.glass：导航胶囊，知识库封面上是「开始阅读」按钮）
+   ══════════════════════════════════════════
+   想调玻璃的质感，改下面这几个变量就行。底色浓度也可以直接在 splash.glass.tint 里配，
+   知识库封面在 _meta.md 的 splash.glass.tint 里配，会覆盖这里的默认值。 */
+#hero-splash {
+    --splash-glass-tint: 0.1; /* 玻璃底色浓度，越大越不透明，0 完全透明 */
+    --splash-frosted-blur: 14px; /* 毛玻璃的模糊程度 */
+    --splash-liquid-fallback-blur: 3px; /* 液态玻璃在 Safari、Firefox 上的模糊程度 */
+    --splash-liquid-brightness: 1.14; /* 透过液态玻璃看到的画面提亮多少 */
+    --splash-liquid-saturate: 165%; /* 透过液态玻璃看到的画面饱和度 */
+}
+
+/* 注意：这里不写 position。这些类和 Tailwind 的 absolute 等工具类同时出现时，
+   不在层里的样式会盖过工具类，下滑箭头就定不了位了。需要定位的地方在标签上加 relative */
+
+/* ── 毛玻璃：底色很淡，靠较强的背景模糊和提饱和度，让背后的图变成柔和的色块透出来 ── */
+.splash-glass-frosted {
+    isolation: isolate;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, calc(var(--splash-glass-tint) * 1.8)) 0%,
+        rgba(255, 255, 255, calc(var(--splash-glass-tint) * 0.6)) 100%
+    );
+    -webkit-backdrop-filter: blur(var(--splash-frosted-blur)) saturate(170%);
+    backdrop-filter: blur(var(--splash-frosted-blur)) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+        0 10px 30px -10px rgba(0, 0, 0, 0.35);
+}
+
+/* 左上角的柔光，像光线打在玻璃上 */
+.splash-glass-frosted::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 55%);
+    pointer-events: none;
+}
+
+html.dark .splash-glass-frosted {
+    background: linear-gradient(
+        135deg,
+        rgba(20, 20, 24, calc(var(--splash-glass-tint) * 3.2)) 0%,
+        rgba(20, 20, 24, calc(var(--splash-glass-tint) * 1.4)) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* ── 液态玻璃 ──
+   默认是「清透玻璃」：模糊很轻，背景基本清晰，靠高光边和反光做出玻璃感，所有浏览器都能看到。
+   Chromium 上脚本会加 is-liquid，换成 SVG 折射滤镜：边缘的背景像透过凸透镜一样被弯曲 */
+.splash-glass-liquid {
+    isolation: isolate;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, var(--splash-glass-tint)) 0%,
+        rgba(255, 255, 255, calc(var(--splash-glass-tint) * 0.2)) 100%
+    );
+    -webkit-backdrop-filter: blur(var(--splash-liquid-fallback-blur)) saturate(160%) brightness(1.06);
+    backdrop-filter: blur(var(--splash-liquid-fallback-blur)) saturate(160%) brightness(1.06);
+    /* 内侧一圈柔光：背景很暗、细节很少时，玻璃也能从背景里浮出来 */
+    box-shadow:
+        inset 1.5px 1.5px 1px -0.5px rgba(255, 255, 255, 0.7),
+        inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.35),
+        inset 0 0 18px rgba(255, 255, 255, 0.14),
+        0 10px 28px -10px rgba(0, 0, 0, 0.4);
+}
+
+.splash-glass-liquid.is-liquid {
+    /* 上亮下暗的一层薄光，再把背后的画面提亮一点，像光穿过玻璃 */
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, var(--splash-glass-tint)) 0%,
+        rgba(255, 255, 255, calc(var(--splash-glass-tint) * 0.2)) 55%,
+        rgba(255, 255, 255, calc(var(--splash-glass-tint) * 0.6)) 100%
+    );
+    /* 每个元素各有一份滤镜，id 由脚本写进 --splash-liquid-filter */
+    -webkit-backdrop-filter: var(--splash-liquid-filter) saturate(var(--splash-liquid-saturate)) brightness(var(--splash-liquid-brightness));
+    backdrop-filter: var(--splash-liquid-filter) saturate(var(--splash-liquid-saturate)) brightness(var(--splash-liquid-brightness));
+}
+
+/* 高光边：左上和右下亮、两侧暗，像光从左上打过来 */
+.splash-glass-liquid::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.25) 28%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.25) 72%,
+        rgba(255, 255, 255, 0.7) 100%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+}
+
+/* 顶部一道很淡的反光 */
+.splash-glass-liquid::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(90% 60% at 30% 0%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 60%);
+    pointer-events: none;
+}
+
+html.dark .splash-glass-liquid {
+    background: linear-gradient(
+        135deg,
+        rgba(20, 20, 24, calc(var(--splash-glass-tint) * 2.2)) 0%,
+        rgba(20, 20, 24, calc(var(--splash-glass-tint) * 0.8)) 100%
+    );
+}
+
+/* ── 两种玻璃共用：玻璃上的文字和图标 ── */
+.splash-glass-item {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 10px rgba(0, 0, 0, 0.25);
+}
+
+.splash-glass-item svg {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+/* 按钮本身就是一块玻璃，悬停时抬起（Tailwind 的 hover:-translate-y-0.5）再亮一点 */
+button.splash-glass-item:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+/* 导航胶囊里的每一项：悬停时浮起一块小玻璃，和「开始阅读」按钮的悬停是一个感觉。
+   只铺一层白色在花的背景上几乎看不出来，所以加上玻璃的高光边、投影和一点抬升 */
+a.splash-glass-item:hover {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.1) 100%);
+    box-shadow:
+        inset 1px 1px 1px -0.5px rgba(255, 255, 255, 0.85),
+        inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.35),
+        0 6px 14px -6px rgba(0, 0, 0, 0.35);
+    transform: translateY(-1px);
+}
+
+a.splash-glass-item:active {
+    transform: translateY(0);
+    box-shadow:
+        inset 1px 1px 1px -0.5px rgba(255, 255, 255, 0.6),
+        inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.25);
+}
+
+.splash-liquid-svg {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+/* 连模糊都不支持的浏览器，退回能看清字的半透明深底 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .splash-glass-frosted,
+    .splash-glass-liquid {
+        background: rgba(20, 20, 24, 0.55);
+    }
+}

@@ -148,7 +148,12 @@ const docs = defineCollection({
                 fallbackBg: z.string().optional(),
                 gradientColor: z.string().optional(),
                 gradientHeight: z.string().default('h-56'),
-                backdropBlur: z.string().default('12px')
+                backdropBlur: z.string().default('12px'),
+                /** 开屏控件的玻璃效果，只写想改的项，其余沿用站点配置 splash.glass */
+                glass: z.object({
+                    nav: z.enum(['solid', 'frosted', 'liquid']).optional(),
+                    tint: z.number().min(0).max(1).optional()
+                }).optional()
             }).optional()
         })
 });

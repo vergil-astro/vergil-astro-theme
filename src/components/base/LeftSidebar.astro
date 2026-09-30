@@ -312,9 +312,10 @@ function isActive(href: string): boolean {
     overflow: hidden !important;
   }
 
+  /* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
   .sidebar {
     scrollbar-width: thin;
-    scrollbar-color: var(--border-light) transparent;
+    scrollbar-color: transparent transparent;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
   }
@@ -328,7 +329,15 @@ function isActive(href: string): boolean {
   }
 
   .sidebar::-webkit-scrollbar-thumb {
-    background-color: var(--border-light);
+    background-color: transparent;
     border-radius: 2px;
+  }
+
+  .sidebar.is-scrolling {
+    scrollbar-color: var(--border-light) transparent;
+  }
+
+  .sidebar.is-scrolling::-webkit-scrollbar-thumb {
+    background-color: var(--border-light);
   }
 </style>
