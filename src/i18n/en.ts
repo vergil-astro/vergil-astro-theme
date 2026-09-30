@@ -96,6 +96,7 @@ const en: typeof zhCN = {
         posts: (n: number) => `${n}`,
         running: 'Running for',
         runningDays: (n: number) => `${n} day${n === 1 ? '' : 's'}`,
+        runningYears: (n: string) => `${n} year${Number(n) === 1 ? '' : 's'}`,
         lastActive: 'Last active',
         daysAgo: (n: number) => `${n} day${n === 1 ? '' : 's'} ago`,
         totalWords: 'Total words',

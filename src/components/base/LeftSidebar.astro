@@ -6,15 +6,13 @@ import { lucideNavIcons } from '../../utils/lucide-icons';
 import CustomImage from '../ui/CustomImage.astro';
 import SidebarRecentPosts from '../widgets/SidebarRecentPosts.astro';
 import { t } from '../../i18n';
+import { countWords } from '../../utils/word-count';
 
 const currentPath = Astro.url.pathname;
 
 const posts = await getCollection('blog', ({ data }) => !data.draft);
 const totalPosts = posts.length;
-const totalWords = posts.reduce((sum, post) => {
-  const content = post.body || '';
-  return sum + content.replace(/[\s\n\r\t]/g, '').length;
-}, 0);
+const totalWords = posts.reduce((sum, post) => sum + countWords(post.body || ''), 0);
 
 function formatNumber(num: number): string {
   if (num >= 10000) {
@@ -26,30 +24,33 @@ function formatNumber(num: number): string {
   return num.toString();
 }
 
+// Relative labels are calculated at build time, like the heatmap.
+const now = Date.now();
+const dayMs = 1000 * 60 * 60 * 24;
+const configuredStart = siteConfig.startDate;
+if (configuredStart && (
+  !/^\d{4}-\d{2}-\d{2}$/.test(configuredStart) ||
+  !Number.isFinite(Date.parse(configuredStart)) ||
+  new Date(configuredStart).toISOString().slice(0, 10) !== configuredStart
+)) {
+  throw new Error('siteConfig.startDate must be a valid YYYY-MM-DD date');
+}
+
 function getRunningTime(): string {
-  if (posts.length === 0) return t.sidebar.runningDays(0);
-  const sortedPosts = [...posts].sort((a, b) =>
-    new Date(a.data.publishDate).getTime() - new Date(b.data.publishDate).getTime()
-  );
-  const firstPost = sortedPosts[0];
-  const startDate = new Date(firstPost.data.publishDate);
-  const now = new Date();
-  const diffTime = now.getTime() - startDate.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  const years = (diffDays / 365).toFixed(2);
-  return years + ' 年';
+  const start = configuredStart
+    ? Date.parse(configuredStart)
+    : posts.length ? Math.min(...posts.map(post => post.data.publishDate.getTime())) : now;
+  const days = Math.max(0, Math.floor((now - start) / dayMs));
+  return t.sidebar.runningYears((days / 365).toFixed(2));
 }
 
 function getLastActive(): string {
   if (posts.length === 0) return t.time.never;
-  const sortedPosts = [...posts].sort((a, b) =>
-    new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
-  );
-  const lastPost = sortedPosts[0];
-  const lastDate = new Date(lastPost.data.publishDate);
-  const now = new Date();
-  const diffTime = now.getTime() - lastDate.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const lastActive = Math.max(...posts.map(post => Math.max(
+    post.data.publishDate.getTime(),
+    post.data.updatedDate?.getTime() ?? 0
+  )));
+  const diffDays = Math.max(0, Math.floor((now - lastActive) / dayMs));
   if (diffDays === 0) return t.time.today;
   if (diffDays === 1) return t.time.yesterday;
   return t.sidebar.daysAgo(diffDays);

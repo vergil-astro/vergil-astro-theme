@@ -113,6 +113,8 @@ export type IcpRecord = {
 
 export type SiteConfig = {
     website: string;
+    /** 建站日期 YYYY-MM-DD；留空时使用最早的非草稿文章发布日期 */
+    startDate?: string;
     /** 备案信息，留空则不显示 */
     icp?: IcpRecord[];
     /** 主题界面文案语言，见 src/i18n */

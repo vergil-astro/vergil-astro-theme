@@ -1,5 +1,7 @@
 export const siteInfo = {
     title: 'Vergil',
+    /** 建站日期 YYYY-MM-DD（按 UTC 零点）；留空使用最早的非草稿文章日期。运行时间在构建时计算。 */
+    startDate: '',
     /** 主题界面文案的语言，也决定 <html lang> 和日期格式。可选 'zh-CN' | 'en' */
     locale: 'zh-CN',
     /** 界面皮肤，决定圆角、按钮、投影、底纹这些形状质感，和配色互不影响。

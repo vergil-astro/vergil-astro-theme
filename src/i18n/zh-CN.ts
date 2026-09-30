@@ -105,6 +105,7 @@ export default {
         posts: (n: number) => `${n} 篇`,
         running: '已运行时间',
         runningDays: (n: number) => `${n} 天`,
+        runningYears: (n: string) => `${n} 年`,
         lastActive: '最后活动时间',
         /** LeftSidebar 专用：原文是「N 天前」，带空格，和 time.daysAgo 的紧排写法不同 */
         daysAgo: (n: number) => `${n} 天前`,

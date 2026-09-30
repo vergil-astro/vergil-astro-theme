@@ -1,4 +1,6 @@
 ---
+import { countWords } from '../../utils/word-count';
+
 interface Props {
     content: string;
     class?: string;
@@ -6,14 +8,7 @@ interface Props {
 
 const { content, class: className = '' } = Astro.props;
 
-function calculateReadingTime(text: string): number {
-    const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
-    const englishWords = (text.match(/[a-zA-Z]+/g) || []).length;
-    const total = chineseChars + englishWords;
-    return Math.ceil(total / 300) || 1;
-}
-
-const readingTime = calculateReadingTime(content);
+const readingTime = Math.ceil(countWords(content) / 300) || 1;
 ---
 
 <span class={className}>
