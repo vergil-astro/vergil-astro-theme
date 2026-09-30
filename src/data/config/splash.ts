@@ -12,6 +12,14 @@ export const splash = {
     gradientColor: '#2d2d2d',
     gradientHeight: 'h-56',
     backdropBlur: '12px',
+    /**
+     * 开屏页控件的玻璃效果：'solid' 普通、'frosted' 毛玻璃、'liquid' 液态玻璃。
+     * 知识库封面（_meta.md 的 splash.glass）没写的项沿用这里
+     */
+    glass: {
+        nav: 'liquid', // 导航胶囊，知识库封面上是「开始阅读」按钮
+        tint: 0.1 // 玻璃底色浓度，越大越不透明
+    },
     slideDuration: 12,
     title: 'Vergil',
     description: 'Astro Framework for Content Creators',

@@ -104,7 +104,13 @@ const minimalEnabled = siteConfig.views?.minimal?.enabled === true;
 
 <script is:inline>
     (function() {
+        // 无刷新切换页面后会重新初始化。上一次绑定的监听记在 window 上，先解绑再绑，
+        // 否则每切换一次就多一个监听，还会拽着上一页的 DOM
         function initToolbarScroll() {
+            if (window.__vergilToolbarScroll) {
+                window.removeEventListener('scroll', window.__vergilToolbarScroll);
+                window.__vergilToolbarScroll = null;
+            }
             var toolbar = document.getElementById('floating-toolbar');
             if (!toolbar) return;
 
@@ -116,16 +122,19 @@ const minimalEnabled = siteConfig.views?.minimal?.enabled === true;
                 }
             }
 
-            window.removeEventListener('scroll', update);
+            window.__vergilToolbarScroll = update;
             window.addEventListener('scroll', update, { passive: true });
             update();
         }
 
+        if (!window.__vergilToolbarInit) {
+            window.__vergilToolbarInit = true;
+            document.addEventListener('astro:page-load', initToolbarScroll);
+        }
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initToolbarScroll);
         } else {
             initToolbarScroll();
         }
-        document.addEventListener('astro:page-load', initToolbarScroll);
     })();
 </script>

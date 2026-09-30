@@ -795,8 +795,13 @@
 }
 
 .md-fa-playlist-items::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
+    background: transparent;
     border-radius: 2px;
+}
+
+/* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
+.md-fa-playlist-items.is-scrolling::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
 }
 
 .md-fa-pl-item {

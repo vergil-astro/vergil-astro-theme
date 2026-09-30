@@ -108,8 +108,12 @@ const homepageSlug = await getDocHomepageSlug(docId);
 </script>
 
 <style>
+    /* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
     .sidebar {
         scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+    .sidebar.is-scrolling {
         scrollbar-color: var(--border-light) transparent;
     }
     .sidebar::-webkit-scrollbar {
@@ -119,7 +123,10 @@ const homepageSlug = await getDocHomepageSlug(docId);
         background: transparent;
     }
     .sidebar::-webkit-scrollbar-thumb {
-        background-color: var(--border-light);
+        background-color: transparent;
         border-radius: 2px;
+    }
+    .sidebar.is-scrolling::-webkit-scrollbar-thumb {
+        background-color: var(--border-light);
     }
 </style>

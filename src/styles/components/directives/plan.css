@@ -376,6 +376,11 @@
     min-height: 0;
     padding-top: 2px;
     scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+/* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
+.md-plan-board__cards.is-scrolling {
     scrollbar-color: var(--border-light) transparent;
 }
 
@@ -388,8 +393,12 @@
 }
 
 .md-plan-board__cards::-webkit-scrollbar-thumb {
-    background: var(--border-light);
+    background: transparent;
     border-radius: 2px;
+}
+
+.md-plan-board__cards.is-scrolling::-webkit-scrollbar-thumb {
+    background: var(--border-light);
 }
 
 .md-plan-board__header-bar {

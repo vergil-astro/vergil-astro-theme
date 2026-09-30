@@ -1,19 +1,54 @@
-/* Global scrollbar: hidden by default, show on hover */
+/* ── 全站滚动条：平时透明，哪个区域在滚动才显示它的滚动条，停下 0.8 秒后隐藏 ──
+   is-scrolling 由 BaseHead 里的脚本加在正在滚动的元素上。
+   原来是鼠标一进页面就显示，页面里所有可滚动区域（代码块、表格、侧栏）的横竖滚动条会一起冒出来。
+   宽度始终保留 6px，只切换颜色，滚动条出现、消失时区域内容不会挪动 */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+.is-scrolling {
+    scrollbar-color: color-mix(in srgb, var(--text-muted) 45%, transparent) transparent;
+}
+
+/* 页面本身的原生滚动条完全隐藏：它会占掉页面宽度，全宽的开屏图旁边会露出一道底色。
+   用 BaseHead 里的浮动滑块代替 */
 html {
     scrollbar-width: none;
 }
-html:hover {
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--border-light) 35%, transparent) transparent;
-}
 
-::-webkit-scrollbar {
+html::-webkit-scrollbar {
     width: 0;
     height: 0;
 }
 
-html:hover ::-webkit-scrollbar,
-html:hover::-webkit-scrollbar {
+#vergil-scroll-thumb {
+    position: fixed;
+    top: 0;
+    right: 2px;
+    z-index: 9999;
+    width: 6px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--text-muted) 45%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, width 0.15s ease;
+}
+
+#vergil-scroll-thumb.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 鼠标放上去或拖动时稍微变粗、变深，方便抓住 */
+#vergil-scroll-thumb.is-visible:hover,
+#vergil-scroll-thumb.is-dragging {
+    width: 8px;
+    background: color-mix(in srgb, var(--text-muted) 70%, transparent);
+}
+
+/* Safari 还不支持 scrollbar-color，走 webkit 伪元素；Chrome、Firefox 用上面的标准属性 */
+::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
@@ -27,35 +62,9 @@ html:hover::-webkit-scrollbar {
     border-radius: 3px;
 }
 
-html:hover ::-webkit-scrollbar-thumb,
-html:hover::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--border-light) 35%, transparent);
-}
-
+.is-scrolling::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, var(--text-muted) 60%, transparent);
-}
-
-/* Right sidebar container: hide scrollbar until hover */
-.right-sidebar-container {
-    scrollbar-width: none;
-}
-.right-sidebar-container:hover {
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--border-light) 35%, transparent) transparent;
-}
-.right-sidebar-container::-webkit-scrollbar {
-    width: 0;
-}
-.right-sidebar-container:hover::-webkit-scrollbar {
-    width: 4px;
-}
-.right-sidebar-container::-webkit-scrollbar-thumb {
-    background: transparent;
-}
-.right-sidebar-container:hover::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--border-light) 35%, transparent);
-    border-radius: 3px;
+    background: color-mix(in srgb, var(--text-muted) 45%, transparent);
 }
 
 .font-display {

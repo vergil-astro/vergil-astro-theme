@@ -138,10 +138,14 @@ html[data-skin="island"] #floating-toolbar::after {
     mask: radial-gradient(circle at 0% 100%, transparent calc(var(--radius-2xl) - 0.5px), #000 var(--radius-2xl));
 }
 
-/* ── 开屏图：底部那段模糊渐隐原本只渐到 55% 的页面底色，默认皮肤靠毛玻璃顶栏盖住接缝。
-   海岛皮肤的顶栏条带是实色，接缝会露成一道硬边，所以让渐隐一直走到 100% ── */
+/* ── 开屏图底部：做成暗角，而不是渐隐到页面底色。
+   海岛的底色是奶油色，从深色图渐隐过去，中间一大段会是发灰发亮的雾，下滑箭头也会落进浅色里看不见。
+   开屏图一滚动就整个让开，底边不会和下面的页面同时出现，所以不用担心接缝；
+   底部压暗，两个下角再暗一点，保留基础样式里的渐进模糊 ── */
 html[data-skin="island"] .splash-gradient {
-    background: linear-gradient(to top, var(--bg-main) 0%, transparent 100%);
+    background:
+        linear-gradient(to top, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.22) 22%, rgba(0, 0, 0, 0.08) 45%, transparent 70%),
+        radial-gradient(120% 70% at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.28) 100%);
 }
 
 /* ── 首页 Hero 的行动按钮：Hero 自己有一条规则把区域里所有链接改成正文色加虚线下划线，

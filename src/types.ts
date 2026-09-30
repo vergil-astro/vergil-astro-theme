@@ -61,6 +61,21 @@ export type Subscribe = {
     form?: SubscribeForm;
 };
 
+/** 开屏页控件的样式：solid 普通，frosted 毛玻璃，liquid 液态玻璃 */
+export type SplashGlassStyle = 'solid' | 'frosted' | 'liquid';
+
+/**
+ * 开屏页控件的玻璃效果。没写的项按 solid 处理；没有背景图时一律退回 solid。
+ * 液态玻璃在 Chromium 内核的浏览器上有边缘折射，Safari、Firefox 上是清透玻璃。
+ * 知识库的 _meta.md 里也可以写 splash.glass，只写想改的项，其余沿用这里的站点配置。
+ */
+export type SplashGlassConfig = {
+    /** 首页的导航胶囊；知识库封面上是「开始阅读」按钮 */
+    nav?: SplashGlassStyle;
+    /** 玻璃底色的浓度，默认 0.1，越大越不透明，0 完全透明。模糊、提亮等细节见 styles/components/splash.css 开头 */
+    tint?: number;
+};
+
 export type SplashConfig = {
     enabled?: boolean;
     backgroundImage?: string | string[];
@@ -80,6 +95,8 @@ export type SplashConfig = {
     subtitle?: string;
     description?: string;
     nav?: { text: string; href: string; icon?: string }[];
+    /** 开屏页上各个控件的玻璃效果，见 SplashGlassConfig */
+    glass?: SplashGlassConfig;
 };
 
 export type FontConfig = {

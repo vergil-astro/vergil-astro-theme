@@ -2,6 +2,7 @@
 import { ChevronDown, ChevronRight } from '@lucide/astro';
 import siteConfig from '../../data/site-config';
 import { lucideNavIcons } from '../../utils/lucide-icons';
+import type { SplashGlassConfig, SplashGlassStyle } from '../../types';
 import '../../styles/components/splash.css';
 
 interface Props {
@@ -18,6 +19,8 @@ interface Props {
     slideDuration?: number;
     buttonText?: string;
     snapScroll?: boolean;
+    /** 知识库封面传进来的玻璃效果，只覆盖写了的项，其余沿用站点配置 splash.glass */
+    glass?: SplashGlassConfig;
 }
 
 const {
@@ -33,7 +36,8 @@ const {
     backdropBlur = siteConfig.splash?.backdropBlur,
     slideDuration = siteConfig.splash?.slideDuration,
     buttonText,
-    snapScroll = false
+    snapScroll = false,
+    glass
 } = Astro.props;
 
 const images = backgroundImage
@@ -58,11 +62,28 @@ function bgStyle(url: string) {
     return `background-image: url('${url}');`;
 }
 
+// 开屏控件的玻璃效果：站点配置打底，知识库封面传进来的只覆盖它写了的项
+const glassConfig: SplashGlassConfig = { ...(siteConfig.splash?.glass ?? {}), ...(glass ?? {}) };
+const GLASS_CLASSES: Record<SplashGlassStyle, string> = {
+    solid: '',
+    frosted: 'splash-glass-frosted',
+    liquid: 'splash-glass-liquid'
+};
+// 毛玻璃、液态玻璃要透出背景图才有意义，没有背景图时退回普通；不认识的值也按普通处理，免得白字配白底
+const glassStyleOf = (value?: string): SplashGlassStyle =>
+    hasBg && value && value in GLASS_CLASSES ? (value as SplashGlassStyle) : 'solid';
+const navGlass = glassStyleOf(glassConfig.nav);
+const anyLiquid = navGlass === 'liquid';
+const glassTint = typeof glassConfig.tint === 'number' ? Math.min(1, Math.max(0, glassConfig.tint)) : undefined;
+const navClass = navGlass === 'solid' ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg' : `relative ${GLASS_CLASSES[navGlass]}`;
+const navItemClass = navGlass === 'solid' ? 'text-main hover:bg-white/50 dark:hover:bg-gray-800/50' : 'splash-glass-item';
+
 const cssVars = [
     `--splash-gradient-color: ${resolvedGradientColor};`,
     `--splash-backdrop-blur: ${resolvedBackdropBlur};`,
     `--slide-duration: ${resolvedSlideDuration}s;`,
-    `--slide-count: ${images.length};`
+    `--slide-count: ${images.length};`,
+    glassTint !== undefined ? `--splash-glass-tint: ${glassTint};` : ''
 ].join(' ');
 
 // Use nav from siteConfig only when no custom buttonText is provided
@@ -115,28 +136,27 @@ const hasActions = !!buttonText || navItems.length > 0;
         )}
 
         {buttonText && (
+            <!-- 玻璃样式的按钮不挂 ui-btn-primary、card-interactive：皮肤会给这两个类加描边、清掉 box-shadow，玻璃的高光全靠 box-shadow -->
             <button
                 id="splash-action-btn"
                 type="button"
-                class="ui-btn-primary inline-flex items-center justify-center px-8 py-3 sm:px-10 sm:py-3.5 rounded-full text-sm font-medium
-                       bg-white/90 dark:bg-gray-900/90 text-main dark:text-white
-                       hover:bg-white dark:hover:bg-gray-800
-                       backdrop-blur-md shadow-lg hover:shadow-xl
-                       transition-all duration-300 card-interactive hover:-translate-y-0.5
-                       border border-white/20 dark:border-gray-700/30
-                       cursor-pointer"
+                class={`${navGlass === 'solid' ? 'ui-btn-primary ' : ''}inline-flex items-center justify-center px-10 py-3.5 sm:px-12 sm:py-4 rounded-full text-base font-medium
+                       transition-all duration-300 hover:-translate-y-0.5 cursor-pointer
+                       ${navGlass === 'solid'
+                           ? 'card-interactive bg-white/90 dark:bg-gray-900/90 text-main dark:text-white hover:bg-white dark:hover:bg-gray-800 backdrop-blur-md shadow-lg hover:shadow-xl border border-white/20 dark:border-gray-700/30'
+                           : `${navClass} splash-glass-item`}`}
             >
                 {buttonText}
-                <ChevronRight class="ml-2 w-4 h-4" />
+                <ChevronRight class="ml-2 w-5 h-5" />
             </button>
         )}
 
         {!buttonText && navItems.length > 0 && (
-            <div class="inline-flex items-center gap-1 p-1.5 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg">
+            <div class={`inline-flex items-center gap-1 p-1.5 rounded-full ${navClass}`}>
                 {navItems.map((item) => (
                     <a
                         href={item.href}
-                        class="flex flex-col items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-main hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-200 group"
+                        class={`flex flex-col items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-full transition-all duration-200 group ${navItemClass}`}
                     >
                         {lucideNavIcons[item.icon] && (
                             <span class="text-xl sm:text-2xl mb-1 group-hover:scale-105 transition-transform">
@@ -147,6 +167,28 @@ const hasActions = !!buttonText || navItems.length > 0;
                     </a>
                 ))}
             </div>
+        )}
+
+        {anyLiquid && (
+            <!--
+                液态玻璃的折射滤镜：位移图由下方脚本按胶囊尺寸生成；三个通道位移量不同，边缘会有一点色散。
+                用在 backdrop-filter 上时坐标原点不在胶囊左上角，所以全部按胶囊自身尺寸计算（objectBoundingBox），
+                scale 也是胶囊尺寸的比例：横向乘宽、纵向乘高
+            -->
+            <svg class="splash-liquid-svg" width="0" height="0" aria-hidden="true" focusable="false">
+                <filter id="splash-liquid-glass-template" x="0" y="0" width="1" height="1" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+                    <feImage x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map" />
+                    <feDisplacementMap in="SourceGraphic" in2="map" scale="0.4" xChannelSelector="R" yChannelSelector="G" result="dispR" />
+                    <feColorMatrix in="dispR" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
+                    <feDisplacementMap in="SourceGraphic" in2="map" scale="0.37" xChannelSelector="R" yChannelSelector="G" result="dispG" />
+                    <feColorMatrix in="dispG" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g" />
+                    <feDisplacementMap in="SourceGraphic" in2="map" scale="0.34" xChannelSelector="R" yChannelSelector="G" result="dispB" />
+                    <feColorMatrix in="dispB" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b" />
+                    <feBlend in="r" in2="g" mode="screen" result="rg" />
+                    <feBlend in="rg" in2="b" mode="screen" result="rgb" />
+                    <feGaussianBlur in="rgb" stdDeviation="0.002 0.008" />
+                </filter>
+            </svg>
         )}
     </div>
 
@@ -326,21 +368,28 @@ const hasActions = !!buttonText || navItems.length > 0;
             if (e.key === 'Escape') scrollToContent();
         }, { signal });
 
-        // Scroll past 1/4 of splash → same as clicking the arrow; below 1/4 → snap back to top
+        // 停下 30ms 后，如果停在开屏图和正文之间，按最后的滚动方向判断：
+        // 往下滚过开屏图的 1/4 就去正文，从正文往上滚过 1/4 就回开屏图，不到就回原处
         let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+        let lastY = window.scrollY;
+        let direction = 0;
         window.addEventListener('scroll', () => {
+            const current = window.scrollY;
+            if (current !== lastY) direction = current > lastY ? 1 : -1;
+            lastY = current;
             if (scrollTimeout) clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
                 const y = window.scrollY;
                 const h = splashHeight();
                 if (y > 0 && y < h) {
-                    if (y > h * 0.25) {
+                    const toContent = direction >= 0 ? y > h * 0.25 : y > h * 0.75;
+                    if (toContent) {
                         scrollToContent();
                     } else {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 }
-            }, 50);
+            }, 30);
         }, { signal, passive: true });
     }
 
@@ -365,5 +414,137 @@ const hasActions = !!buttonText || navItems.length > 0;
             clearTimeout(_typewriterTimer);
             _typewriterTimer = null;
         }
+    });
+</script>
+
+<script>
+    /**
+     * 液态玻璃：按胶囊的实际尺寸生成一张「边缘位移图」，交给上面的 SVG 滤镜，
+     * 让胶囊边缘附近的背景像透过凸透镜一样被弯曲。
+     *
+     * 只有 Chromium 内核支持把 SVG 滤镜用在 backdrop-filter 上，Safari、Firefox 会忽略，
+     * 所以只在 Chromium 上加 is-liquid；其余浏览器保持 CSS 里的清透玻璃兜底。
+     */
+    let _liquidAC: AbortController | null = null;
+    const LIQUID_EDGE_Y = 6;
+    const LIQUID_EDGE_X = 9;
+    function isChromium() {
+        const brands = (navigator as Navigator & { userAgentData?: { brands?: { brand: string }[] } }).userAgentData?.brands;
+        return !!brands?.some((b) => /Chromium|Google Chrome|Microsoft Edge/.test(b.brand));
+    }
+
+    /**
+     * 胶囊（圆角等于半高的圆角矩形）的位移图：R、G 通道分别是 x、y 方向的偏移，128 表示不动。
+     * kx 是横向相对纵向的强度，滤镜的 scale 横向乘宽、纵向乘高，这里先换算好
+     */
+    function buildDisplacementMap(w: number, h: number, kx: number) {
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '';
+        const img = ctx.createImageData(w, h);
+        const r = h / 2;
+        const band = Math.min(h * 0.32, 20); // 折射只发生在靠近边缘的这一圈
+        const hw = w / 2 - r;
+        const hh = h / 2 - r;
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                const px = x + 0.5 - w / 2;
+                const py = y + 0.5 - h / 2;
+                const qx = Math.abs(px) - hw;
+                const qy = Math.abs(py) - hh;
+                const ox = Math.max(qx, 0);
+                const oy = Math.max(qy, 0);
+                const sdf = Math.hypot(ox, oy) + Math.min(Math.max(qx, qy), 0) - r; // 负数在里面
+                let dx = 0;
+                let dy = 0;
+                const depth = -sdf;
+                if (depth > 0 && depth < band) {
+                    // 越靠近边缘偏移越大，往里很快衰减到零，胶囊中间保持清晰
+                    const t = 1 - depth / band;
+                    const mag = t * t * t;
+                    let nx: number;
+                    let ny: number;
+                    if (ox > 0 || oy > 0) {
+                        const len = Math.hypot(ox, oy) || 1;
+                        nx = (ox / len) * Math.sign(px);
+                        ny = (oy / len) * Math.sign(py);
+                    } else if (qx > qy) {
+                        nx = Math.sign(px);
+                        ny = 0;
+                    } else {
+                        nx = 0;
+                        ny = Math.sign(py);
+                    }
+                    // 往里取样：边缘显示的是内侧被拉出来的画面，看起来像被放大、弯曲
+                    dx = -nx * mag;
+                    dy = -ny * mag;
+                }
+                const i = (y * w + x) * 4;
+                img.data[i] = Math.round(128 + dx * kx * 127);
+                img.data[i + 1] = Math.round(128 + dy * 127);
+                img.data[i + 2] = 128;
+                img.data[i + 3] = 255;
+            }
+        }
+        ctx.putImageData(img, 0, 0);
+        return canvas.toDataURL('image/png');
+    }
+
+    /** 从模板复制一份滤镜，返回它和里面的 feImage */
+    function cloneFilter(template: HTMLElement, id: string) {
+        const filter = template.cloneNode(true) as SVGFilterElement;
+        filter.id = id;
+        template.parentNode?.appendChild(filter);
+        return { filter, map: filter.querySelector('feImage') };
+    }
+
+    /** 设定三个通道的位移量：边缘最多偏 edgeY（纵向）/ edgeX（横向）像素，依次减弱一点做出轻微色散 */
+    function setScales(filter: SVGFilterElement, w: number, h: number, edgeY: number, edgeX: number) {
+        const scale = (2 * edgeY) / h;
+        filter.querySelectorAll('feDisplacementMap').forEach((node, i) => {
+            node.setAttribute('scale', String(scale * [1, 0.95, 0.9][i]));
+        });
+        // 横向位移乘宽度、纵向乘高度，这里换算成横向要乘的系数
+        return Math.min(1, edgeX / (0.5 * scale * w));
+    }
+
+    function initLiquidGlass() {
+        _liquidAC?.abort();
+        _liquidAC = new AbortController();
+        const signal = _liquidAC.signal;
+        const template = document.getElementById('splash-liquid-glass-template');
+        const chromium = isChromium();
+        let serial = 0;
+
+        // 玻璃气泡（导航胶囊或按钮）：按各自尺寸生成胶囊形状的位移图
+        if (template && chromium) {
+            document.querySelectorAll<HTMLElement>('.splash-glass-liquid').forEach((el) => {
+                const { filter, map } = cloneFilter(template, `splash-liquid-glass-${serial++}`);
+                if (!map) return;
+                let lastKey = '';
+                const update = () => {
+                    const w = Math.round(el.offsetWidth);
+                    const h = Math.round(el.offsetHeight);
+                    if (!w || !h || `${w}x${h}` === lastKey) return;
+                    lastKey = `${w}x${h}`;
+                    const kx = setScales(filter, w, h, LIQUID_EDGE_Y, LIQUID_EDGE_X);
+                    map.setAttribute('href', buildDisplacementMap(w, h, kx));
+                    el.style.setProperty('--splash-liquid-filter', `url(#${filter.id})`);
+                    el.classList.add('is-liquid');
+                };
+                update();
+                const ro = new ResizeObserver(update);
+                ro.observe(el);
+                signal.addEventListener('abort', () => { ro.disconnect(); filter.remove(); });
+            });
+        }
+    }
+
+    document.addEventListener('astro:page-load', initLiquidGlass);
+    document.addEventListener('astro:before-swap', () => {
+        _liquidAC?.abort();
+        _liquidAC = null;
     });
 </script>
