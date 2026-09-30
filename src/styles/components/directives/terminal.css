@@ -89,7 +89,9 @@
     border: none !important;
     border-radius: 0 !important;
     background: var(--code-bg) !important;
-    color: #e2e8f0;
+    /* 窗口始终是深色，文字用 shiki 暗色主题的值。pre 的行内 style 里带着亮色主题的 color，
+       没有语法高亮的纯文本块会直接继承它，变成深色字压深色底，所以这里必须 !important */
+    color: var(--shiki-dark, #e2e8f0) !important;
     padding: 12px 0 !important;
     white-space: pre !important;
     word-wrap: normal !important;

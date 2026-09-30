@@ -41,14 +41,26 @@ function toRelative(ref, file) {
     return rel;
 }
 
-// 支持 @img/ 的内容指令，以及它们放图片的属性。只列这几个：其他指令还不支持 @img/，改了会坏
-const IMG_DIRECTIVES = { image: ['src'], photo: ['src'], banner: ['bg', 'avatar'] };
-const DIRECTIVE = /(:{1,4})([a-z]+)\{([^}]*)\}/g;
-const DIRECTIVE_ATTR = /\b([a-z]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'}]+))/g;
+// 内容指令里放图片的属性。sites、posters 的图片来自 links.ts 配置，不在内容里，不用处理；
+// story 的镜头图片是表格里的 ![](...)，走正文图片的规则
+const IMG_DIRECTIVES = {
+    image: ['src'],
+    photo: ['src'],
+    banner: ['bg', 'avatar'],
+    video: ['poster'],
+    audio: ['cover'],
+    yoicard: ['bg-image', 'logo'],
+    button: ['icon'],
+    quot: ['icon'],
+    title: ['prefix', 'suffix']
+};
+// :name{...}、::name{...}、:::name{...}，以及带文字的 :name[文字]{...}
+const DIRECTIVE = /(:{1,4})([a-z]+)(\[[^\]]*\])?\{([^}]*)\}/g;
+const DIRECTIVE_ATTR = /(?<![a-z0-9-])([a-z][a-z0-9-]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'}]+))/g;
 
 /** 找出指令属性里的图片路径，回调返回新值则替换（统一写成双引号） */
 function mapDirectiveImages(text, onRef) {
-    return text.replace(DIRECTIVE, (all, colons, name, body) => {
+    return text.replace(DIRECTIVE, (all, colons, name, label, body) => {
         const keys = IMG_DIRECTIVES[name];
         if (!keys) return all;
         const next = body.replace(DIRECTIVE_ATTR, (attr, key, dq, sq, bare) => {
@@ -56,7 +68,7 @@ function mapDirectiveImages(text, onRef) {
             const value = onRef(dq ?? sq ?? bare);
             return value ? `${key}="${value}"` : attr;
         });
-        return `${colons}${name}{${next}}`;
+        return `${colons}${name}${label || ''}{${next}}`;
     });
 }
 
@@ -86,12 +98,13 @@ function expand(text, file) {
             }
             continue;
         }
-        const f = line.match(/^\s*(`{3,}|~{3,})/);
+        // 代码块里的是写法示例；:::private 里的内容会被加密成字符串，图片没法交给 Astro，都跳过
+        const f = line.match(/^\s*(`{3,}|~{3,})/) || line.match(/^\s*(:{3,})(?:private(?![a-z])|\s*$)/);
         if (fence) {
             if (f && f[1][0] === fence[0] && f[1].length >= fence.length) fence = null;
             continue;
         }
-        if (f) {
+        if (f && !/^\s*:{3,}\s*$/.test(line)) {
             fence = f[1];
             continue;
         }

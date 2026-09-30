@@ -28,6 +28,9 @@ html[data-theme="A"] {
     --border-light: #e0dfdb;
     --accent-color: #4a7c59;
     --accent-hover: #3d6649;
+    /* 压在强调色上的文字。亮色配色白字都够看；暗色配色的强调色偏亮，白字对比度只有 2～3.7，
+       统一换成当前配色的页面底色，见下面 html.dark 的规则 */
+    --accent-text: #ffffff;
 }
 html[data-theme="A"].dark {
     --text-main: #f0f0f0;
@@ -306,10 +309,6 @@ html[data-theme="J"].dark {
     --accent-color: #f18b71;
     --accent-hover: #f5a08a;
 }
-/* 暗色下强调色是亮珊瑚，压在上面的白字看不清，换成深色字 */
-html[data-theme="J"].dark .bg-accent.text-white {
-    color: #2a1510;
-}
 /* 热力图：从浅桃到珊瑚，和强调色同一色系 */
 html[data-theme="J"] .heatmap-cell[data-level="0"] { background-color: var(--bg-card); }
 html[data-theme="J"] .heatmap-cell[data-level="1"] { background-color: #f9d6bf; }
@@ -407,9 +406,8 @@ html[data-theme="L"].dark .heatmap-cell[data-level="2"] { background-color: #846
 html[data-theme="L"].dark .heatmap-cell[data-level="3"] { background-color: #af8758; }
 html[data-theme="L"].dark .heatmap-cell[data-level="4"] { background-color: #d7b174; }
 
-/* 暗色下强调色是亮杏色，压在上面的白字看不清，换成深色字 */
-html[data-theme="L"].dark .bg-accent.text-white {
-    color: #2a1a10;
+html.dark {
+    --accent-text: var(--bg-main);
 }
 
 @theme inline {
@@ -445,6 +443,8 @@ html[data-theme="L"].dark .bg-accent.text-white {
     .border-light { border-color: var(--border-light); }
     .text-accent { color: var(--accent-color); }
     .bg-accent { background-color: var(--accent-color); }
+    /* 按钮、选中态这类「强调色底 + 白字」的组合，文字色跟着配色走 */
+    .bg-accent.text-white { color: var(--accent-text); }
     .hover\:text-accent:hover { color: var(--accent-color); }
     .hover\:bg-accent:hover { background-color: var(--accent-color); }
 

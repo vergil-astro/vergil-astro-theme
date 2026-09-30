@@ -6,6 +6,7 @@
  *          :checkbox[] :radio[] :emoji[]
  */
 import { getIconSvg, resolveColor, escapeHtml, escapeUrl, safeUrl, safeCssValue, HASHTAG_COLORS, EMOJI_SOURCES } from './shared.mjs';
+import { createDirectiveImages, isLocalImageFile } from '../directive-images.mjs';
 
 let hashtagIndex = 0;
 
@@ -72,8 +73,9 @@ export function processInlineDirective(node) {
             node.data = { hName: 'a', hProperties: { href, class: classes.join(' '), style: `--tag-btn-bg:${color}` } };
             const children = [];
             if (icon) {
-                if (/^https?:\/\//i.test(icon)) {
-                    children.push({ type: 'html', value: `<img class="md-btn-icon" src="${escapeUrl(icon)}" alt="" />` });
+                if (/^https?:\/\//i.test(icon) || isLocalImageFile(icon)) {
+                    const images = createDirectiveImages();
+                    children.push(...images.toNodes(images.img(icon, { class: 'md-btn-icon', alt: '' })));
                 } else {
                     const iconifyMatch = icon.match(/^([a-z0-9-]+):([a-z0-9-]+)$/i);
                     if (iconifyMatch) {
