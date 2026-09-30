@@ -3,7 +3,7 @@ import QRCode from 'qrcode-svg';
 import { createDirectiveImages } from '../directive-images.mjs';
 
 export function processCardDirective(node, options = {}) {
-    const { links, screenshotService } = options;
+    const { links, screenshotService, ogImages } = options;
     // 封面、图标、logo、背景图可以是本地图片（@img/ 或相对路径），交给 Astro 处理
     const images = createDirectiveImages();
     const attrs = node.attributes || {};
@@ -97,7 +97,11 @@ export function processCardDirective(node, options = {}) {
                 node.children = [{ type: 'html', value: `<p style="color:var(--text-secondary);font-size:0.875rem;">Group "${escapeHtml(group)}" has no site data</p>` }];
             } else {
                 const cells = items.map(item => {
-                    const cover = item.cover || getScreenshotUrl(item.url, screenshotService);
+                    // 封面：自己填的 cover → 站点的 og:image → 截图服务。
+                    // 用 og:image 时把截图地址放在 data-fallback-src，og:image 日后失效也能换成截图
+                    const screenshot = getScreenshotUrl(item.url, screenshotService);
+                    const ogImage = !item.cover && ogImages?.get(item.url);
+                    const cover = item.cover || ogImage || screenshot;
                     const icon = item.icon || `${new URL(item.url).origin}/favicon.ico`;
                     const desc = item.description || item.url;
                     let labelsHtml = '';
@@ -113,7 +117,7 @@ export function processCardDirective(node, options = {}) {
                     return `<div class="md-sites-cell">` +
                         `<a class="md-sites-link" href="${escapeUrl(item.url, '#')}" target="_blank" rel="external nofollow noopener noreferrer">` +
                         `<div class="md-sites-cover">` +
-                        images.img(cover, { alt: item.title, loading: 'lazy', 'data-fallback-class': 'md-sites-cover-fallback', onerror: 'vergilImgHide(this)' }) +
+                        images.img(cover, { alt: item.title, loading: 'lazy', 'data-fallback-src': ogImage ? screenshot : undefined, 'data-fallback-class': 'md-sites-cover-fallback', onerror: 'vergilImgHide(this)' }) +
                         `</div>` +
                         `<div class="md-sites-info">` +
                         images.img(icon, { class: 'md-sites-icon', alt: '', loading: 'lazy', onerror: 'vergilImgHide(this)' }) +

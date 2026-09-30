@@ -219,8 +219,8 @@ write(
  */
 export const links = {};
 
-/** 自动截图服务，:::sites 没填 icon 时用它生成缩略图。可选 'thumio' | 'mshots' */
-export const screenshotService = 'thumio';
+/** :::sites 没填 cover 时，先用站点的分享卡片图（og:image），没有才用这里的截图服务。可选 'mshots' | 'thumio'，mshots 对靠 JS 渲染的站点效果更好 */
+export const screenshotService = 'mshots';
 `
 );
 

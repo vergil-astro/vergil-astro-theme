@@ -5,6 +5,8 @@ export const links = {
             url: 'https://unsplash.com',
             description: 'Photos for everyone.',
             icon: 'https://unsplash.com/favicon.ico',
+            // Unsplash 没有分享卡片图，还拦截截图服务，直接给一张封面
+            cover: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
             labels: [{ name: '图片', color: '#3b82f6' }]
         },
         {
@@ -137,7 +139,7 @@ export const links = {
         {
             title: '大话西游',
             url: 'https://movie.douban.com/subject/1299398/',
-            cover: 'https://images.unsplash.com/photo-1517604931442-710535c64c1f?w=400&q=80'
+            cover: 'https://images.unsplash.com/photo-1594908900066-3f47337549d8?w=400&q=80'
         },
         {
             title: '霸王别姬',
@@ -147,4 +149,9 @@ export const links = {
     ]
 };
 
-export const screenshotService = 'thumio';
+/**
+ * :::sites 没填 cover 时，先用站点自己的分享卡片图（og:image），没有才用这里的截图服务。可选 'mshots' | 'thumio'。
+ * mshots 会等页面脚本跑完再截，靠 JS 渲染的站点也能截到内容；thum.io 免费版不等，这类站点常截成空白。
+ * 少数站点既没有分享卡片图、又拦截截图机器人（比如 Unsplash），给它们直接填 cover。
+ */
+export const screenshotService = 'mshots';

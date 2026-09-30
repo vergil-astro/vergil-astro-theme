@@ -131,8 +131,15 @@ function formatCanonicalURL(url: string | URL) {
         var wrap = img.closest('.md-image-img-wrap');
         if (wrap) wrap.classList.add('has-error');
     };
-    // 加载失败时隐藏图片；带 data-fallback-class 时给父元素加上这个 class，显示兜底样式
+    // 加载失败时隐藏图片；带 data-fallback-class 时给父元素加上这个 class，显示兜底样式。
+    // 带 data-fallback-src 时先换成这个备用地址再试一次，备用地址也失败才隐藏
     window.vergilImgHide = function (img) {
+        var backup = img.getAttribute('data-fallback-src');
+        if (backup) {
+            img.removeAttribute('data-fallback-src');
+            img.src = backup;
+            return;
+        }
         img.style.display = 'none';
         var fallback = img.getAttribute('data-fallback-class');
         if (fallback && img.parentElement) img.parentElement.classList.add(fallback);
