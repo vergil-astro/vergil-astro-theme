@@ -1,7 +1,7 @@
 ---
 import { locale, t } from '../i18n';
 import { skin, defaultScheme } from '../utils/skin';
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import BaseHead, { type Props as HeadProps } from '../components/base/BaseHead.astro';
 import Footer from '../components/base/Footer.astro';
 import DocsSidebar from '../components/docs/DocsSidebar.astro';
@@ -49,7 +49,7 @@ const isArticle = head.pageType === 'article';
                 } catch(e) {}
             })();
         </script>
-        <ViewTransitions />
+        <ClientRouter />
         <script>
             import '../scripts/theme-toggle.js';
             import '../scripts/copy-btn.js';

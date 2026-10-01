@@ -30,13 +30,24 @@ async function resolveSiteCovers(tree, links) {
     return new Map(entries.filter(([, image]) => image));
 }
 
+/** 没人认领的行内指令（比如 a:b 里被当成指令的 :b）还原成原文，否则会渲染成空 div，吞掉文字还截断段落 */
+function restoreAsText(node, file) {
+    const { start, end } = node.position ?? {};
+    const value = start && end ? String(file.value).slice(start.offset, end.offset) : `:${node.name}`;
+    Object.assign(node, { type: 'text', value });
+    delete node.name;
+    delete node.attributes;
+    delete node.children;
+}
+
 export function remarkContentDirectives(options = {}) {
-    return async (tree) => {
+    return async (tree, file) => {
         const ogImages = await resolveSiteCovers(tree, options.links);
         options = { ...options, ogImages };
 
-        visit(tree, 'textDirective', (node) => {
-            processInlineDirective(node);
+        visit(tree, 'textDirective', (node, _index, parent) => {
+            processInlineDirective(node, parent);
+            if (!node.data?.hName) restoreAsText(node, file);
         });
 
         visit(tree, 'containerDirective', (node) => {

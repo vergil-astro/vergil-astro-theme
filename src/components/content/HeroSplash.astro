@@ -135,8 +135,8 @@ const hasActions = !!buttonText || navItems.length > 0;
             </p>
         )}
 
+        <!-- 玻璃样式的按钮不挂 ui-btn-primary、card-interactive：皮肤会给这两个类加描边、清掉 box-shadow，玻璃的高光全靠 box-shadow -->
         {buttonText && (
-            <!-- 玻璃样式的按钮不挂 ui-btn-primary、card-interactive：皮肤会给这两个类加描边、清掉 box-shadow，玻璃的高光全靠 box-shadow -->
             <button
                 id="splash-action-btn"
                 type="button"
@@ -169,12 +169,12 @@ const hasActions = !!buttonText || navItems.length > 0;
             </div>
         )}
 
-        {anyLiquid && (
-            <!--
+        <!--
                 液态玻璃的折射滤镜：位移图由下方脚本按胶囊尺寸生成；三个通道位移量不同，边缘会有一点色散。
                 用在 backdrop-filter 上时坐标原点不在胶囊左上角，所以全部按胶囊自身尺寸计算（objectBoundingBox），
                 scale 也是胶囊尺寸的比例：横向乘宽、纵向乘高
             -->
+        {anyLiquid && (
             <svg class="splash-liquid-svg" width="0" height="0" aria-hidden="true" focusable="false">
                 <filter id="splash-liquid-glass-template" x="0" y="0" width="1" height="1" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">
                     <feImage x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map" />

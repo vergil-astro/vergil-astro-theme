@@ -1,7 +1,7 @@
 ---
 import { locale, t } from '../i18n';
 import { skin, defaultScheme } from '../utils/skin';
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import BaseHead, { type Props as HeadProps } from '../components/base/BaseHead.astro';
 import Footer from '../components/base/Footer.astro';
 import LeftSidebar from '../components/base/LeftSidebar.astro';
@@ -44,7 +44,7 @@ const isArticle = head.pageType === 'article';
                 } catch(e) {}
             })();
         </script>
-        <ViewTransitions />
+        <ClientRouter />
         <script>
             import '../scripts/theme-toggle.js';
             import '../scripts/copy-btn.js';
@@ -558,7 +558,6 @@ const isArticle = head.pageType === 'article';
         </script>
 
         {siteConfig.serviceWorker?.enabled ? (
-            <!-- PWA Service Worker -->
             <script is:inline>
                 (function() {
                     if ('serviceWorker' in navigator) {
@@ -567,7 +566,6 @@ const isArticle = head.pageType === 'article';
                 })();
             </script>
         ) : (
-            <!-- Service Worker -->
             <script is:inline>
                 (function() {
                     if (!('serviceWorker' in navigator)) return;

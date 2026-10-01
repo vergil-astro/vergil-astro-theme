@@ -3,19 +3,45 @@
  *
  * Handles: :mark[] :kbd[] :blur[] :psw[] :u[] :emp[] :wavy[] :del[]
  *          :sup[] :sub[] :hashtag[] :button[] :step-brackets[]
- *          :checkbox[] :radio[] :emoji[]
+ *          :checkbox[] :radio[] :emoji[] :ann[]
  */
 import { getIconSvg, resolveColor, escapeHtml, escapeUrl, safeUrl, safeCssValue, HASHTAG_COLORS, EMOJI_SOURCES } from './shared.mjs';
 import { createDirectiveImages, isLocalImageFile } from '../directive-images.mjs';
 
 let hashtagIndex = 0;
 
-export function processInlineDirective(node) {
+const ANNOTATION_DIRECTIONS = {
+    top: 's',
+    'top-right': 'sw',
+    right: 'w',
+    'bottom-right': 'nw',
+    bottom: 'n',
+    'bottom-left': 'ne',
+    left: 'e',
+    'top-left': 'se',
+};
+const ANNOTATION_COLORS = new Set(['amber', 'blue', 'green', 'red', 'purple', 'rainbow']);
+
+export function processInlineDirective(node, parent) {
     const name = node.name;
     const attrs = node.attributes || {};
     const text = node.children?.map(c => c.value || '').join('') || '';
 
     switch (name) {
+        case 'ann': {
+            const direction = ANNOTATION_DIRECTIONS[attrs.direction || 'bottom'];
+            const color = ANNOTATION_COLORS.has(attrs.color) ? attrs.color : '';
+            const classes = ['ann', direction && `ann-${direction}`, color && `ann-${color}`].filter(Boolean);
+            node.data = { hName: 'span', hProperties: { className: classes, ...(attrs.note ? { 'data-note': attrs.note } : {}) } };
+
+            if (parent?.type === 'paragraph') {
+                const properties = (parent.data ||= {}).hProperties ||= {};
+                const existing = properties.className;
+                const parentClasses = Array.isArray(existing) ? existing : existing ? [existing] : [];
+                properties.className = [...new Set([...parentClasses, 'md-annotation-area'])];
+            }
+            break;
+        }
         case 'mark': {
             const bg = resolveColor(attrs.color || 'yellow');
             const bgAlpha = bg.startsWith('var(') ? `color-mix(in srgb,${bg} 30%,transparent)` : bg + '55';

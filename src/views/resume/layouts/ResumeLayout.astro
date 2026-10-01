@@ -1,7 +1,7 @@
 ---
 import { locale, t } from '../../../i18n';
 import { skin, defaultScheme } from '../../../utils/skin';
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import BaseHead, { type Props as HeadProps } from '../../../components/base/BaseHead.astro';
 import ResumeSidebar from '../components/ResumeSidebar.astro';
 import ThemeToggle from '../../../components/ui/ThemeToggle.astro';
@@ -30,7 +30,7 @@ const { resume, headings, ...head } = Astro.props;
                 } catch(e) {}
             })();
         </script>
-        <ViewTransitions />
+        <ClientRouter />
         <script>
             import '../../../scripts/theme-toggle.js';
         </script>

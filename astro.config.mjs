@@ -1,4 +1,4 @@
-import { rehypeHeadingIds } from '@astrojs/markdown-remark';
+import { rehypeHeadingIds, unified } from '@astrojs/markdown-remark';
 import sitemap from '@astrojs/sitemap';
 import icon from 'astro-icon';
 import { transformerNotationDiff, transformerNotationHighlight, transformerNotationWordHighlight } from '@shikijs/transformers';
@@ -29,10 +29,12 @@ export default defineConfig({
     },
     integrations: [sitemap(), icon()],
     markdown: {
-        remarkPlugins: [remarkDirective, remarkMath, remarkImageDirectives, [remarkPhotoDirectives, { brands: t.directive.photo.brands }], [remarkContentDirectives, { links: siteConfig.links, screenshotService: siteConfig.screenshotService, locale, i18n: t.directive, time: t.time }], remarkTerminal],
-        // rehypeHeadingIds 要显式排在前面：Astro 自己那一次在用户插件之后才跑，
-        // 那时 rehypeHeadingAnchors 还读不到标题 id。这个插件是幂等的，跑两次无副作用。
-        rehypePlugins: [rehypeMathDispatcher, rehypeTitleHeadings, rehypeHeadingIds, [rehypeHeadingAnchors, { anchorTo: t.a11y.anchorTo, anchorToHeading: t.a11y.anchorToHeading }]],
+        processor: unified({
+            remarkPlugins: [remarkDirective, remarkMath, remarkImageDirectives, [remarkPhotoDirectives, { brands: t.directive.photo.brands }], [remarkContentDirectives, { links: siteConfig.links, screenshotService: siteConfig.screenshotService, locale, i18n: t.directive, time: t.time }], remarkTerminal],
+            // rehypeHeadingIds 要显式排在前面：Astro 自己那一次在用户插件之后才跑，
+            // 那时 rehypeHeadingAnchors 还读不到标题 id。这个插件是幂等的，跑两次无副作用。
+            rehypePlugins: [rehypeMathDispatcher, rehypeTitleHeadings, rehypeHeadingIds, [rehypeHeadingAnchors, { anchorTo: t.a11y.anchorTo, anchorToHeading: t.a11y.anchorToHeading }]]
+        }),
         shikiConfig: {
             themes: {
                 light: 'github-light',

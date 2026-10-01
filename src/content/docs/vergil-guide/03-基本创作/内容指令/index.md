@@ -138,7 +138,7 @@ Vergil 提供 50 个指令，按用途分为八类：
 - **[标签链接（hashtag）](/docs/vergil-guide/03-基本创作/内容指令/卡片与链接/#标签链接hashtag)** — 带样式的标签
 - **[按钮（button）](/docs/vergil-guide/03-基本创作/内容指令/卡片与链接/#按钮button)** — 链接按钮
 
-### [文字与交互（14个指令）](/docs/vergil-guide/03-基本创作/内容指令/文字与交互/)
+### [文字与交互](/docs/vergil-guide/03-基本创作/内容指令/文字与交互/)
 
 用于美化文字和增加互动性：
 
@@ -155,6 +155,7 @@ Vergil 提供 50 个指令，按用途分为八类：
 - **[单选框（radio）](/docs/vergil-guide/03-基本创作/内容指令/文字与交互/#单选框radio)** — 单选列表
 - **[步骤标记（step-brackets）](/docs/vergil-guide/03-基本创作/内容指令/文字与交互/#步骤标记step-brackets)** — 步骤编号
 - **[表情包（emoji）](/docs/vergil-guide/03-基本创作/内容指令/文字与交互/#表情包emoji)** — 插入各种表情包
+- **[手绘标注（ann）](/docs/vergil-guide/03-基本创作/内容指令/手绘标注/)** — 手绘箭头和说明标签
 
 ### [图表可视化（2个指令）](/docs/vergil-guide/03-基本创作/内容指令/图表可视化/)
 
