@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="public/favicon.svg" width="96" alt="Vergil">
+
 # Vergil
 
 </div>
@@ -61,7 +63,7 @@ pnpm reset     # 确认后真正清理
 :::
 ```
 
-一共 50 个指令，按用途分为八类：结构排版、内容展示、媒体嵌入、卡片与链接、文字与交互、图表可视化、时间规划、可视化叙事。数学公式用 `$...$` 直接写，不需要指令。
+一共 51 个指令，按用途分为八类：结构排版、内容展示、媒体嵌入、卡片与链接、文字与交互、图表可视化、时间规划、可视化叙事。数学公式用 `$...$` 直接写，不需要指令。
 
 除了指令，Vergil 还提供这些：
 
@@ -166,7 +168,7 @@ Here's a quick tip your readers can spot at a glance.
 :::
 ```
 
-There are 50 directives across eight categories: structure and layout, content display, media embeds, cards and links, text and interaction, charts and visualization, time planning, and visual storytelling. Write math formulas directly with `$...$`—no directive needed.
+There are 51 directives across eight categories: structure and layout, content display, media embeds, cards and links, text and interaction, charts and visualization, time planning, and visual storytelling. Write math formulas directly with `$...$`—no directive needed.
 
 Beyond directives, Vergil also includes:
 

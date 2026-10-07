@@ -8,7 +8,7 @@ categories: ["Vergil", "上手"]
 ---
 
 :::note{title="先说结论"}
-Vergil 有 50 个内容指令，日常写作常用的不到十个。这篇挑几种写作中最常遇到的情况，每种配一个指令，你看到的效果都是直接写在这篇文章里的。
+Vergil 有 51 个内容指令，日常写作常用的不到十个。这篇挑几种写作中最常遇到的情况，每种配一个指令，你看到的效果都是直接写在这篇文章里的。
 :::
 
 上面这块就是第一种情况：**开头先给结论**，用 `note` 高亮块。读者扫一眼就知道这篇讲什么，要不要往下读。
@@ -64,7 +64,7 @@ git clone https://github.com/vergil-astro/vergil-astro-theme.git my-blog
 ::::folding{title="看这篇文章的写法"}
 `````markdown
 :::note{title="先说结论"}
-Vergil 有 50 个内容指令……
+Vergil 有 51 个内容指令……
 :::
 
 一句话里只有一个词最重要时，:mark[给它加个高亮]就够了。

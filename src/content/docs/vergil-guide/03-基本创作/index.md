@@ -11,7 +11,7 @@ autoRender: true
 ## 本章内容
 
 - [内容形式](/docs/vergil-guide/) — 博客、图文动态、项目展示、知识库，该选哪种
-- [内容指令](/docs/vergil-guide/03-基本创作/内容指令/) — 50 个指令速查：提示框、标签页、时间线、图片画廊等
+- [内容指令](/docs/vergil-guide/03-基本创作/内容指令/) — 51 个指令速查：提示框、标签页、时间线、图片画廊等
 - [内容组织](/docs/vergil-guide/03-基本创作/内容组织/) — 专栏、分类、标签，三种方式的区别与用法
 - [内容字段参考](/docs/vergil-guide/03-基本创作/内容字段参考/) — 所有内容类型的 frontmatter 字段速查表
 - [图片与静态资源](/docs/vergil-guide/03-基本创作/图片与静态资源/) — 图片放在哪、怎么用 `@img/` 引用，以及 `pnpm images:organize` 整理、`pnpm images:check` 体检

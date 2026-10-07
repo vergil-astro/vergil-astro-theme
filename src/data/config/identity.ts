@@ -42,7 +42,7 @@ export const siteInfo = {
  */
 export const heroData = {
     title: '用 **Markdown** 写，交给 **Vergil** 呈现',
-    text: '一套面向创作者的 Astro 建站框架。50 个内容指令、多视图架构、多主题相册，全部写在 Markdown 里，不碰一行组件代码。\n\n这个站点本身就是用 Vergil 搭的，你看到的每一个效果都能在文档里找到写法。',
+    text: '一套面向创作者的 Astro 建站框架。51 个内容指令、多视图架构、多主题相册，全部写在 Markdown 里，不碰一行组件代码。\n\n这个站点本身就是用 Vergil 搭的，你看到的每一个效果都能在文档里找到写法。',
     titleIcon: 'Sparkles',
     textIcon: 'Zap',
     actions: [

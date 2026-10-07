@@ -331,7 +331,7 @@ export function processBlockDirective(node, options = {}) {
             if (style === 'quote') {
                 const defaultPrefix = getIconSvg('bxs:quote-left', '1em');
                 const defaultSuffix = getIconSvg('bxs:quote-right', '1em');
-                const p = attrs.prefix !== undefined ? renderIcon(attrs.prefix) : { type: 'html', value: defaultPrefix };
+                const p = !showPrefix ? '' : attrs.prefix !== undefined ? renderIcon(attrs.prefix) : { type: 'html', value: defaultPrefix };
                 const s = suffixAttr ? renderIcon(suffixAttr) : { type: 'html', value: defaultSuffix };
                 children = [
                     p ? h('span', { class: 'md-title-quote-icon', style: `--title-color:${color}` }, [p]) : undefined,
@@ -340,16 +340,12 @@ export function processBlockDirective(node, options = {}) {
                 ].filter(Boolean);
             } else if (style === 'badge') {
                 const defaultPrefix = getIconSvg('solar:hashtag-square-bold', '1em');
-                const p = attrs.prefix !== undefined ? renderIcon(attrs.prefix) : { type: 'html', value: defaultPrefix };
+                const p = !showPrefix ? '' : attrs.prefix !== undefined ? renderIcon(attrs.prefix) : { type: 'html', value: defaultPrefix };
                 const badgeProps = { class: 'md-title-badge', style: `--title-color:${color}` };
-                let badgeChildren = [];
-                if (p) {
-                    badgeChildren = [p];
-                }
                 children = [
-                    h('span', badgeProps, badgeChildren),
+                    p ? h('span', badgeProps, [p]) : undefined,
                     h('span', { class: 'md-title-text' }, [{ type: 'text', value: text }])
-                ];
+                ].filter(Boolean);
             } else {
                 const prefixHtml = centered && showPrefix
                     ? h('span', { class: 'md-title-prefix' }, [{ type: 'text', value: '#'.repeat(level) }])
