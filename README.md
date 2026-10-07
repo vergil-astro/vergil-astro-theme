@@ -85,7 +85,7 @@ pnpm reset     # 确认后真正清理
 ## 生态工具
 
 - **[vergil-cli](https://github.com/vergil-astro/vergil-cli)** — 命令行工具 `vg`，初始化项目、新建文章相册动态、发布草稿
-- **[vergil-writing-skills](https://github.com/vergil-astro/vergil-writing-skills)** — AI 写作技能，让助手用 Vergil 指令帮你排版，支持 Claude Code、Codex CLI、Cursor、Gemini CLI
+- **[vergil-writing-skills](https://github.com/vergil-astro/vergil-writing-skills)** — AI 写作和排版技能，让助手起稿、润色，或者给已有文章排版、用上 Vergil 指令，目前支持 Claude Code 和 Codex CLI
 
 ## 参与贡献
 
@@ -190,7 +190,7 @@ For configuration and writing instructions, visit `/docs` after starting the sit
 ## Ecosystem Tools
 
 - **[vergil-cli](https://github.com/vergil-astro/vergil-cli)** — The `vg` command-line tool for initializing projects, creating posts, galleries, and updates, and publishing drafts
-- **[vergil-writing-skills](https://github.com/vergil-astro/vergil-writing-skills)** — AI writing skills that help assistants format your content with Vergil directives. Supports Claude Code, Codex CLI, Cursor, and Gemini CLI
+- **[vergil-writing-skills](https://github.com/vergil-astro/vergil-writing-skills)** — An AI writing and formatting skill that lets your assistant draft and polish posts, or format existing ones with Vergil directives. Currently supports Claude Code and Codex CLI
 
 ## Contributing
 
