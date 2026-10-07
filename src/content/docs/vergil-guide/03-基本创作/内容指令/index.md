@@ -1,6 +1,7 @@
 ---
 title: 内容指令
 order: 0
+autoRender: false
 ---
 
 # 内容指令
