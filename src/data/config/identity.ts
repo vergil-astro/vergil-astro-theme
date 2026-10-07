@@ -28,7 +28,7 @@ export const siteInfo = {
      * 左侧栏底部的社交图标。改成你自己的地址；留空这个图标就不显示。
      */
     socials: {
-        github: 'https://github.com/wsjz/vergil-astro-theme'
+        github: 'https://github.com/vergil-astro/vergil-astro-theme'
     },
 
     icp: [] as Array<{ text: string; href?: string }>

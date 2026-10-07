@@ -31,6 +31,6 @@ Vergil 是一套基于 [Astro](https://astro.build) 的内容站点主题。它�
 
 ## 参与进来
 
-Vergil 是开源的，仓库在 [GitHub](https://github.com/wsjz/vergil-astro-theme)。
+Vergil 是开源的，仓库在 [GitHub](https://github.com/vergil-astro/vergil-astro-theme)。
 
 发现 bug、觉得文档哪里说不清楚、或者想加个指令，都欢迎提 issue。改代码之前建议先开一个 issue 聊聊思路，免得白写。

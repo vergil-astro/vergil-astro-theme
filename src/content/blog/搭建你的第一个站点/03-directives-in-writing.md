@@ -46,7 +46,7 @@ pnpm dev
 
 与其贴一个光秃秃的链接，不如放一张 GitHub 卡片，星标数和简介会自动拉取：
 
-:::ghcard{type="repo" repo="wsjz/vergil-astro-theme"}
+:::ghcard{type="repo" repo="vergil-astro/vergil-astro-theme"}
 :::
 
 ## 让读者复制一行命令
@@ -54,7 +54,7 @@ pnpm dev
 读者要照着敲的命令，放进 `copy`，点一下就复制好了：
 
 :::copy{label="创建站点"}
-git clone https://github.com/wsjz/vergil-astro-theme.git my-blog
+git clone https://github.com/vergil-astro/vergil-astro-theme.git my-blog
 :::
 
 ## 别用太多
@@ -82,11 +82,11 @@ pnpm install
 ```
 :::
 
-:::ghcard{type="repo" repo="wsjz/vergil-astro-theme"}
+:::ghcard{type="repo" repo="vergil-astro/vergil-astro-theme"}
 :::
 
 :::copy{label="创建站点"}
-git clone https://github.com/wsjz/vergil-astro-theme.git my-blog
+git clone https://github.com/vergil-astro/vergil-astro-theme.git my-blog
 :::
 `````
 ::::

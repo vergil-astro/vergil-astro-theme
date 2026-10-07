@@ -22,7 +22,7 @@ order: 1
 打开终端，运行以下命令：
 
 ```bash
-git clone https://github.com/wsjz/vergil-astro-theme.git my-blog
+git clone https://github.com/vergil-astro/vergil-astro-theme.git my-blog
 cd my-blog
 ```
 

@@ -54,7 +54,7 @@ export const footerNavLinks = [
     },
     {
         text: '贡献',
-        href: 'https://github.com/wsjz/vergil-astro-theme'
+        href: 'https://github.com/vergil-astro/vergil-astro-theme'
     },
     {
         text: '赞助',

@@ -26,7 +26,7 @@ export const splash = {
     nav: [
         { text: '博客', href: '/blog', icon: 'book-open' },
         { text: '文档', href: '/docs/vergil-guide/', icon: 'file-text' },
-        { text: 'GitHub', href: 'https://github.com/wsjz/vergil-astro-theme', icon: 'github' },
+        { text: 'GitHub', href: 'https://github.com/vergil-astro/vergil-astro-theme', icon: 'github' },
         { text: '关于', href: '/about', icon: 'user' }
     ]
 };
