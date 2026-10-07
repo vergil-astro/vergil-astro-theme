@@ -54,5 +54,5 @@ seo:
 
 ## 仓库
 
-:::ghcard{type="repo" repo="wsjz/vergil-astro-theme"}
+:::ghcard{type="repo" repo="vergil-astro/vergil-astro-theme"}
 :::

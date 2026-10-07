@@ -4,7 +4,7 @@ Vergil 由个人在业余时间维护，任何形式的参与都欢迎 — 提 B
 
 ## 先开 issue
 
-改代码之前建议先开一个 [issue](https://github.com/wsjz/vergil-astro-theme/issues) 说明你想做什么。
+改代码之前建议先开一个 [issue](https://github.com/vergil-astro/vergil-astro-theme/issues) 说明你想做什么。
 
 不是流程要求，是怕你白写：有些改动和主题的设计方向不一致，或者已经有人在做了，提前聊十分钟能省掉一个周末。
 

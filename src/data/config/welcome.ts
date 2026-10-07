@@ -13,6 +13,6 @@ export const welcome = {
     quote: '',
     actions: [
         { text: '快速开始', href: '/docs/vergil-guide/01-快速开始/', icon: 'zap' },
-        { text: 'GitHub', href: 'https://github.com/wsjz/vergil-astro-theme', icon: 'github' },
+        { text: 'GitHub', href: 'https://github.com/vergil-astro/vergil-astro-theme', icon: 'github' },
     ],
 } satisfies MemoItem;

@@ -20,7 +20,7 @@ categories: ["Vergil", "上手"]
 ---
 
 ```bash title="终端"
-git clone https://github.com/wsjz/vergil-astro-theme.git my-blog
+git clone https://github.com/vergil-astro/vergil-astro-theme.git my-blog
 cd my-blog
 ```
 :::

@@ -210,7 +210,7 @@ JSON 解析、文本对比、图片转 WebP，全部在浏览器里运行，数�
 ---
 
 ```bash title="终端"
-git clone https://github.com/wsjz/vergil-astro-theme.git my-blog
+git clone https://github.com/vergil-astro/vergil-astro-theme.git my-blog
 cd my-blog
 pnpm install
 pnpm dev
@@ -252,4 +252,4 @@ pnpm reset
 
 所有功能的完整用法都在站内文档里，GitHub 上可以提问题。
 
-:button[快速开始]{href="/docs/vergil-guide/01-快速开始/" color="accent" icon="lucide:zap"} :button[内容指令]{href="/docs/vergil-guide/03-基本创作/内容指令/" color="blue" icon="lucide:puzzle"} :button[站点配置]{href="/docs/vergil-guide/02-站点配置/" color="purple" icon="lucide:settings"} :button[GitHub]{href="https://github.com/wsjz/vergil-astro-theme" color="cyan" icon="lucide:github"}
+:button[快速开始]{href="/docs/vergil-guide/01-快速开始/" color="accent" icon="lucide:zap"} :button[内容指令]{href="/docs/vergil-guide/03-基本创作/内容指令/" color="blue" icon="lucide:puzzle"} :button[站点配置]{href="/docs/vergil-guide/02-站点配置/" color="purple" icon="lucide:settings"} :button[GitHub]{href="https://github.com/vergil-astro/vergil-astro-theme" color="cyan" icon="lucide:github"}

@@ -12,7 +12,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/wsjz/vergil-astro-theme?style=social)](https://github.com/wsjz/vergil-astro-theme)
+[![GitHub stars](https://img.shields.io/github/stars/vergil-astro/vergil-astro-theme?style=social)](https://github.com/vergil-astro/vergil-astro-theme)
 
 ![Vergil 深色文档页与浅色首页](public/assets/site/vergil-preview.jpg)
 
@@ -23,7 +23,7 @@
 需要 Node.js 22（CI 上用的版本）和 pnpm。
 
 ```bash
-git clone https://github.com/wsjz/vergil-astro-theme.git
+git clone https://github.com/vergil-astro/vergil-astro-theme.git
 cd vergil-astro-theme
 pnpm install
 pnpm dev
@@ -84,9 +84,9 @@ pnpm reset     # 确认后真正清理
 
 Vergil 由个人在业余时间维护，欢迎提 Bug、聊想法、改文档、翻译界面文字。
 
-改代码之前建议先开一个 [issue](https://github.com/wsjz/vergil-astro-theme/issues) 聊聊思路，免得白写。提交信息遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
+改代码之前建议先开一个 [issue](https://github.com/vergil-astro/vergil-astro-theme/issues) 聊聊思路，免得白写。提交信息遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
 
-接下来要做什么、已经在做什么，都在 [issues](https://github.com/wsjz/vergil-astro-theme/issues) 里。
+接下来要做什么、已经在做什么，都在 [issues](https://github.com/vergil-astro/vergil-astro-theme/issues) 里。
 
 ## 关于名字
 

@@ -52,7 +52,7 @@ contact:
 ## 开源贡献
 
 - [awesome-project](https://github.com) - 一个实用的前端工具库，Star 2k+
-- [vergil-astro-theme](https://github.com/wsjz/vergil-astro-theme) - 本博客使用的 Astro 主题
+- [vergil-astro-theme](https://github.com/vergil-astro/vergil-astro-theme) - 本博客使用的 Astro 主题
 
 ## 自我评价
 
