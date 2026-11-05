@@ -29,8 +29,8 @@ export default defineConfig({
             include: ['mermaid', 'echarts'],
         },
     },
-    // 皮肤和配色按 identity.ts 里的名字从 skins/、schemes/ 目录加载，见 src/appearance/integration.mjs
-    integrations: [sitemap(), icon(), appearance({ skins: siteInfo.skins, schemes: siteInfo.schemes })],
+    // 皮肤按 identity.ts 里的名字从 skins/ 目录加载，皮肤自带的配色跟着一起注册，见 src/appearance/integration.mjs
+    integrations: [sitemap(), icon(), appearance({ skins: siteInfo.skins })],
     markdown: {
         processor: unified({
             remarkPlugins: [remarkDirective, remarkMath, remarkImageDirectives, [remarkPhotoDirectives, { brands: t.directive.photo.brands }], [remarkContentDirectives, { links: siteConfig.links, screenshotService: siteConfig.screenshotService, locale, i18n: t.directive, time: t.time }], remarkTerminal],

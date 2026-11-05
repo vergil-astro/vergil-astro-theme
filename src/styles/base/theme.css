@@ -12,7 +12,7 @@ html {
 
 /* ══════════════════════════════════════════
    Built-in Color Schemes  A–I, K
-   其余配色跟着皮肤或单独的配色包提供，见 src/appearance/integration.mjs
+   其余配色由皮肤自带，见 src/appearance/integration.mjs
    ══════════════════════════════════════════ */
 
 /* ── Palette A: Warm Parchment ── */

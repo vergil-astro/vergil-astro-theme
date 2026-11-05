@@ -12,8 +12,6 @@ export const siteInfo = {
      * island 是治愈系海岛风，参考动森风格的 animal-island-ui；
      * brutalism 是报纸风的新粗野主义，规则照 Newsprint 设计规范，参考 superdesign 的 brutalism 和 BrutxUI */
     skins: ['island', 'brutalism'] as string[],
-    /** 启用的单独配色，放在站点根目录的 schemes/<名字>/ 下。皮肤自带的配色不用写在这里 */
-    schemes: [] as string[],
     subtitle: 'Astro Framework for Content Creators',
     description: 'A content-driven Astro framework for building personal websites with Markdown',
     image: {

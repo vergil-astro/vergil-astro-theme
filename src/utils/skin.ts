@@ -4,8 +4,8 @@ import { skins as registeredSkins, schemes as registeredSchemes, type Appearance
 
 /**
  * 界面皮肤和配色。皮肤挂在 <html data-skin> 上，只管形状和质感；配色挂在 <html data-theme> 上，只管颜色，两者可以任意组合。
- * 经典皮肤和配色 A–I、K 是内置的；其他的放在站点根目录的 skins/、schemes/ 下，
- * 在 identity.ts 的 skins、schemes 里按名字启用，注册过程见 src/appearance/integration.mjs。
+ * 经典皮肤和配色 A–I、K 是内置的；其他皮肤放在站点根目录的 skins/ 下，在 identity.ts 的 skins 里按名字启用，
+ * 内置之外的配色只能由皮肤自带，注册过程见 src/appearance/integration.mjs。
  * 访客可以在顶栏的外观面板里切换，配置里的 skin 只决定访客没选过时用哪一个。
  */
 export const skins = registeredSkins;

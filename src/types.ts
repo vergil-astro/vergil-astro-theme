@@ -123,8 +123,6 @@ export type SiteConfig = {
     skin?: string;
     /** 启用的皮肤名，对应站点根目录的 skins/<名字>/ */
     skins?: string[];
-    /** 启用的单独配色名，对应站点根目录的 schemes/<名字>/ */
-    schemes?: string[];
     fonts: FontConfig;
     avatar?: ImageInput;
     title: string;

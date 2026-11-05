@@ -2,8 +2,8 @@
  * 核心自带的外观：经典皮肤，和不依赖任何皮肤的配色 A–I、K。
  * 它们的样式在 src/styles/ 里，跟着 global.css 一起加载。
  *
- * 其他皮肤和配色都是独立的包，放在站点根目录的 skins/、schemes/ 下，
- * 在 src/data/config/identity.ts 的 skins、schemes 里按名字启用，见 integration.mjs。
+ * 其他皮肤是独立的包，放在站点根目录的 skins/ 下，在 src/data/config/identity.ts 的 skins 里按名字启用；
+ * 内置之外的配色只能由皮肤自带，见 integration.mjs。
  */
 
 export const fallbackSkin = 'classic';

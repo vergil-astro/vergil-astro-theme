@@ -2,14 +2,12 @@
  * 外观注册：按名字找到启用的皮肤和配色，校验后交给页面使用。
  *
  * 用法像 zsh 的插件：把皮肤目录放进站点根目录的 skins/<名字>/，再在 identity.ts 的 skins 里写上名字；
- * 单独的配色放进 schemes/<名字>/，在 schemes 里写名字。经典皮肤和配色 A–I、K 是内置的，不用写。
+ * 经典皮肤和配色 A–I、K 是内置的，不用写。内置之外的配色只能由皮肤自带，没有单独的配色包。
  *
  * 皮肤目录里只有数据和样式，构建时只读不执行：
  *   skins/<名字>/skin.json         显示名、推荐配色、自带的配色列表
  *   skins/<名字>/skin.css          样式入口
  *   skins/<名字>/schemes/<id>.css  自带配色，每套一个文件，文件名就是配色 ID
- *   schemes/<名字>/scheme.json     单独配色的显示名和色点，配色 ID 就是目录名
- *   schemes/<名字>/scheme.css      单独配色的样式
  *
  * 注册结果通过两个虚拟模块提供：
  *   virtual:vergil/appearance         皮肤和配色的列表（纯数据），面板、切换脚本、首屏脚本都从这里读
@@ -42,7 +40,7 @@ class AppearanceError extends Error {
 }
 
 /**
- * @param {{ skins?: string[], schemes?: string[] }} options identity.ts 里启用的皮肤名和配色名
+ * @param {{ skins?: string[] }} options identity.ts 里启用的皮肤名
  */
 export default function appearance(options = {}) {
     return {
@@ -51,7 +49,7 @@ export default function appearance(options = {}) {
             'astro:config:setup': ({ config, updateConfig, addWatchFile, logger }) => {
                 const root = fileURLToPath(config.root);
                 const registry = buildRegistry(root, options, logger);
-                // skin.json、scheme.json 改了要重启开发服务器才能重新注册；CSS 改了走正常的热更新
+                // skin.json 改了要重启开发服务器才能重新注册；CSS 改了走正常的热更新
                 for (const file of registry.watchFiles) addWatchFile(file);
                 updateConfig({ vite: { plugins: [appearanceVitePlugin(registry)] } });
             },
@@ -131,21 +129,7 @@ function buildRegistry(root, options, logger) {
         skins.push({ name, labels: readLabels(manifest.labels, where, name), recommendedScheme });
     }
 
-    for (const name of readNameList(options.schemes, 'schemes', logger)) {
-        const dir = resolvePackageDir(root, 'schemes', name);
-        if (!dir) {
-            logger.warn(`配色 "${name}" 没有安装，已跳过：请把它放到 schemes/${name}/`);
-            continue;
-        }
-        const where = `schemes/${name}/scheme.json`;
-        const manifestPath = path.join(dir, 'scheme.json');
-        const manifest = readManifest(manifestPath, where);
-        watchFiles.push(manifestPath);
-        addScheme(readSchemeFields(manifest, where, name), where);
-        styles.push(toRootPath(root, requireFile(dir, 'scheme.css', `schemes/${name}/scheme.css`)));
-    }
-
-    // 推荐配色可以是内置的、自己带的，也可以是另一个包提供的，所以等全部注册完再检查
+    // 推荐配色可以是内置的、自己带的，也可以是另一个已启用的皮肤带的，所以等全部注册完再检查
     for (const skin of skins) {
         if (!schemes.some((s) => s.id === skin.recommendedScheme)) {
             throw new AppearanceError(`皮肤 "${skin.name}" 推荐的配色 "${skin.recommendedScheme}" 没有注册`);
@@ -173,7 +157,7 @@ function readNameList(list, field, logger) {
     return names;
 }
 
-/** skins/<名字>/ 或 schemes/<名字>/。目录不存在返回 null；软链接指到外面去的一律拒绝 */
+/** skins/<名字>/。目录不存在返回 null；软链接指到外面去的一律拒绝 */
 function resolvePackageDir(root, kind, name) {
     const base = path.join(root, kind);
     const dir = path.join(base, name);
