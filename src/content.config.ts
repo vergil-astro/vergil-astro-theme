@@ -164,13 +164,30 @@ const resume = defineCollection({
         z.object({
             title: z.string(),
             name: z.string(),
+            // 姓名下面的一行，比如「高级前端工程师」，不写就不显示
+            headline: z.string().optional(),
             avatar: z.string().optional(),
             contact: z.object({
                 email: z.string().optional(),
                 phone: z.string().optional(),
                 location: z.string().optional(),
-                website: z.string().optional()
-            }).optional()
+                website: z.string().optional(),
+                // GitHub 主页地址，比如 https://github.com/zhangsan
+                github: z.string().optional()
+            }).optional(),
+            // 这些信息先模糊显示，访客点一下才看得清，比如 [phone, email]
+            blur: z.array(z.enum(['name', 'headline', 'email', 'phone', 'location', 'github', 'website'])).default([]),
+            // 加密的简历允许没有密码的访客预览删减版：redact 里的分组（## 标题）中，每段经历的标题（###）用遮挡条盖住；
+            // hide 里的联系方式换成模糊的占位符。这些内容在构建时就删掉了，页面里没有原文，访客也展开不了
+            preview: z
+                .object({
+                    redact: z.array(z.string()).default([]),
+                    hide: z.array(z.enum(['email', 'phone', 'location', 'github', 'website'])).default(['email', 'phone'])
+                })
+                .optional(),
+            // 写了就加密：页面里只放密文，访客输入密码，或者打开分享链接（/views/resume/#口令，口令由密码派生）才能看到。
+            // 拿到链接的人都能看，它不是登录密码，只用来挡住搜索引擎和随手点进来的人
+            password: z.string().min(1).optional()
         })
 });
 

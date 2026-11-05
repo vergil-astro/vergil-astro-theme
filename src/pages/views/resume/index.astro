@@ -23,7 +23,7 @@ const { Content, headings } = await render(resume);
 
 <ResumeLayout
     title={resume.data.title}
-    description={t.page.resume.description(resume.data.name)}
+    description={resume.data.password ? t.page.resume.lockedDescription : t.page.resume.description(resume.data.name)}
     pageType="website"
     resume={resume}
     headings={headings}

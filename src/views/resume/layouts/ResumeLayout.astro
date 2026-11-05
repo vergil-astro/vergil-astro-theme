@@ -2,10 +2,16 @@
 import { locale, t } from '../../../i18n';
 import { defaultSkin } from '../../../utils/skin';
 import { ClientRouter } from 'astro:transitions';
+import { ChevronLeft, Printer } from '@lucide/astro';
 import BaseHead, { type Props as HeadProps } from '../../../components/base/BaseHead.astro';
 import ThemeInit from '../../../components/base/ThemeInit.astro';
-import ResumeSidebar from '../components/ResumeSidebar.astro';
+import ResumeProfile from '../components/ResumeProfile.astro';
+import ResumeToc from '../components/ResumeToc.astro';
+import ResumeLock from '../components/ResumeLock.astro';
+import ResumeShare from '../components/ResumeShare.astro';
+import Sealed from '../components/Sealed.astro';
 import ThemeToggle from '../../../components/ui/ThemeToggle.astro';
+import { redactSections } from '../../../utils/resume-preview';
 
 export type Props = HeadProps & {
     resume: import('astro:content').CollectionEntry<'resume'>;
@@ -13,6 +19,11 @@ export type Props = HeadProps & {
 };
 
 const { resume, headings, ...head } = Astro.props;
+// 简历写了 password 就加密：个人信息、目录和正文都只输出密文，先显示锁屏
+const { password } = resume.data;
+// 加密时还配置了 preview，就另外生成一份删减版：遮住的内容在构建时就删掉了，没有密码的访客可以先看这一份
+const preview = password ? resume.data.preview : undefined;
+const previewHtml = preview ? redactSections(await Astro.slots.render('default'), preview.redact, t.page.resume.redacted) : null;
 ---
 
 <!doctype html>
@@ -23,36 +34,327 @@ const { resume, headings, ...head } = Astro.props;
         <ClientRouter />
         <script>
             import '../../../scripts/theme-toggle.js';
+            import '../scripts/resume-vault';
         </script>
         <meta name="robots" content="noindex" />
     </head>
-    <body class="bg-main text-main">
+    {/* 加密的简历锁着时只显示锁屏，工具栏和纸面都藏起来，解锁后由 resume-vault.ts 去掉 data-resume-locked */}
+    <body class="bg-main text-main" data-resume-locked={password ? '' : undefined}>
         <a class="skip-link" href="#main-content">{t.a11y.skipToContent}</a>
-        <ResumeSidebar resume={resume} headings={headings} />
 
-        <main id="main-content" class="ml-0 md:ml-72 min-h-screen">
-            <div class="max-w-3xl mx-auto px-8 py-12 print:px-0 print:py-0">
-                <!-- ThemeToggle 放在文章右上角 -->
-                <div class="flex justify-end mb-6 print:hidden">
+        {/* 顶部细工具栏：左边返回站点，中间目录，右边分享、打印和外观 */}
+        <div class="resume-toolbar sticky top-0 z-40 border-b border-light bg-main/85 backdrop-blur print:hidden">
+            <div class="mx-auto flex h-12 max-w-[68rem] items-center justify-between gap-6 px-4 sm:px-6">
+                <a href="/" class="inline-flex shrink-0 items-center gap-1 text-xs text-muted transition-colors hover:text-accent">
+                    <ChevronLeft class="h-3.5 w-3.5" />
+                    <span>{t.page.resume.backToSite}</span>
+                </a>
+                <div class="hidden min-w-0 flex-1 justify-center md:flex">
+                    <Sealed password={password}>
+                        <ResumeToc headings={headings} />
+                    </Sealed>
+                    {preview && (
+                        <div data-resume-preview hidden>
+                            <ResumeToc headings={headings} />
+                        </div>
+                    )}
+                </div>
+                <div class="flex shrink-0 items-center gap-1">
+                    <ResumeShare sealed={Boolean(password)} />
+                    <button
+                        type="button"
+                        onclick="window.print()"
+                        class="resume-print flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-accent transition-all duration-200 hover:bg-card hover:shadow-sm"
+                        aria-label={t.page.resume.print}
+                        title={t.page.resume.print}
+                    >
+                        <Printer class="h-4 w-4" />
+                    </button>
                     <ThemeToggle />
                 </div>
-                <article class="prose sm:prose-lg max-w-none print:prose-sm">
-                    <slot />
-                </article>
+            </div>
+        </div>
+
+        <main id="main-content" class="pb-16 sm:px-6 sm:pt-10 print:p-0">
+            {password && <ResumeLock preview={Boolean(preview)} />}
+
+            {preview && (
+                <div data-resume-preview hidden class="mx-auto mb-4 max-w-[68rem] px-4 pt-4 sm:px-0 sm:pt-0">
+                    <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-light bg-card px-4 py-2.5 text-sm text-secondary">
+                        <span>{t.page.resume.previewNotice}</span>
+                        <button type="button" data-resume-preview-exit class="cursor-pointer font-medium text-accent hover:opacity-80">
+                            {t.page.resume.previewUnlock}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/*
+              一张纸，宽屏分两栏：左边个人信息（随滚动固定），右边正文；手机上个人信息排在正文上方。
+              纸面用 overflow-clip 裁圆角：overflow-hidden 会让纸面变成滚动容器，左栏的 sticky 就跟着页面滚不起来了
+            */}
+            <div class="resume-frame mx-auto max-w-[68rem]">
+                <div data-resume-title={resume.data.title} class="resume-paper overflow-clip bg-card sm:rounded-2xl sm:border sm:border-light sm:shadow-sm md:grid md:grid-cols-[16.5rem_minmax(0,1fr)]">
+                    <aside class="resume-side border-b border-light bg-muted/50 px-6 py-8 md:border-b-0 md:border-r">
+                        <div class="md:sticky md:top-20">
+                            <Sealed password={password}>
+                                <ResumeProfile resume={resume} />
+                            </Sealed>
+                            {preview && (
+                                <div data-resume-preview hidden>
+                                    <ResumeProfile resume={resume} masked={preview.hide} />
+                                </div>
+                            )}
+                        </div>
+                    </aside>
+                    <article class="resume-main min-w-0 px-5 py-8 sm:px-10 sm:py-10">
+                        <div class="resume-article prose max-w-none">
+                            <Sealed password={password}>
+                                <slot />
+                            </Sealed>
+                        </div>
+                        {/* 删减版和正文平级，直接套用正文的排版 */}
+                        {previewHtml && <div data-resume-preview hidden class="resume-article prose max-w-none" set:html={previewHtml} />}
+                    </article>
+                </div>
             </div>
         </main>
 
         <style is:global>
+            body[data-resume-locked] .resume-toolbar,
+            body[data-resume-locked] .resume-frame {
+                display: none;
+            }
+
+            /* 预览时不能分享、打印 */
+            body[data-resume-mode='preview'] :is(#resume-share, .resume-print) {
+                display: none;
+            }
+            /* 遮挡条：盖住公司、职位和学校；点了回到输入密码页 */
+            .resume-redact {
+                display: inline-block;
+                height: 0.95em;
+                border-radius: 2px;
+                background: var(--text-main);
+                opacity: 0.82;
+                vertical-align: -0.1em;
+            }
+            .resume-redact-sep {
+                margin: 0 0.45em;
+                color: var(--text-muted);
+            }
+            body[data-resume-mode='preview'] :is(.resume-redacted, .resume-masked) {
+                cursor: pointer;
+            }
+
+            /* 简历用无衬线字体，不跟博客正文的字体走；想换可以在站点样式里改 --resume-font */
+            .resume-paper,
+            .resume-toc {
+                font-family: var(--resume-font, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
+            }
+            /* .prose 和标题自带博客的正文、标题字体，这里一律改成跟纸面走 */
+            .resume-paper .prose,
+            .resume-paper :is(h1, h2, h3, h4, strong) {
+                font-family: inherit;
+            }
+
+
+            /*
+             * 简历正文。Markdown 约定：## 是分组（工作经历、开源贡献…），### 是一段经历或一个项目，
+             * 紧跟在 ### 后面只有一段斜体的那一行是时间（*2022.05 - 2024.09*）。
+             * 所有间距都只写在 margin-top 上：宽屏下正文是网格（时间要和标题排在同一行），网格里的外边距不会合并
+             */
+            .resume-article {
+                font-size: 0.975rem;
+                line-height: 1.7;
+                /* .prose 默认 overflow-x: auto，时间贴着右边时最后一个数字会被裁掉一点 */
+                overflow: visible;
+            }
+            /* 简历标题不需要悬停出现的锚点图标，它还会把标题行撑高 */
+            .resume-article .heading-anchor {
+                display: none;
+            }
+            .resume-article > * {
+                margin-top: 0.6em;
+                margin-bottom: 0;
+            }
+            .resume-article > h2 {
+                display: flex;
+                align-items: center;
+                gap: 0.55em;
+                margin-top: 2.2em;
+                color: var(--text-main);
+                font-size: 1.05em;
+                font-weight: 700;
+                letter-spacing: 0.06em;
+                scroll-margin-top: 4.5rem;
+            }
+            /* 分组标题前面一小段强调色竖条 */
+            .resume-article > h2::before {
+                content: '';
+                width: 4px;
+                height: 1em;
+                border-radius: 2px;
+                background: var(--accent-color);
+            }
+            .resume-article > :first-child {
+                margin-top: 0;
+            }
+            .resume-article > h2 + * {
+                margin-top: 0.9em;
+            }
+            .resume-article > h3 {
+                margin-top: 1.4em;
+                font-size: 1em;
+                font-weight: 600;
+            }
+            .resume-article > h2 + h3 {
+                margin-top: 0.9em;
+            }
+            .resume-article > h3 + p:has(> em:only-child) {
+                margin-top: 0.1em;
+                color: var(--text-muted);
+                font-size: 0.875em;
+            }
+            .resume-article > h3 + p:has(> em:only-child) em {
+                font-style: normal;
+                font-variant-numeric: tabular-nums;
+            }
+            .resume-article > p:has(> em:only-child) + ul,
+            .resume-article > h3 + ul {
+                margin-top: 0.35em;
+            }
+            .resume-article > ul + p {
+                margin-top: 0.5em;
+                color: var(--text-secondary);
+                font-size: 0.875em;
+            }
+            .resume-article ul {
+                padding-left: 1.1em;
+            }
+            .resume-article ul > li {
+                margin-top: 0.2em;
+                margin-bottom: 0;
+                padding-left: 0.2em;
+                color: var(--text-secondary);
+            }
+            .resume-article ul > li::marker {
+                color: var(--text-muted);
+            }
+            .resume-article strong {
+                color: var(--text-main);
+                font-weight: 600;
+            }
+
+            /* 宽屏和打印：时间排在标题右边 */
+            @media (min-width: 640px), print {
+                .resume-article {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) auto;
+                    column-gap: 1.5rem;
+                }
+                .resume-article > * {
+                    grid-column: 1 / -1;
+                }
+                .resume-article > h3:has(+ p > em:only-child) {
+                    grid-column: 1;
+                    align-self: baseline;
+                }
+                .resume-article > h3 + p:has(> em:only-child) {
+                    grid-column: 2;
+                    align-self: baseline;
+                    justify-self: end;
+                    white-space: nowrap;
+                }
+            }
+
             @media print {
+                /*
+                 * 页脚：右边是署名和页码；左边的「姓名 · 标题」由 resume-vault.ts 在解锁后加上，
+                 * 加密的简历里姓名不能以明文出现在页面上。较新的 Chrome（131 起）支持页边距里的内容
+                 */
                 @page {
-                    margin: 2cm;
+                    size: A4;
+                    margin: 12mm 12mm 14mm;
+
+                    @bottom-right {
+                        content: 'Generated by Vergil Astro Theme · ' counter(page) ' / ' counter(pages);
+                        color: #9a9a9a;
+                        font-family: ui-sans-serif, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                        font-size: 7.5pt;
+                    }
+                }
+                /* 打印保留屏幕上的两栏设计：侧栏底色、头像、强调色都要打出来 */
+                html {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                /* 暗色模式下打印前会切回亮色（见 resume-vault.ts）；这里兜底，万一没切回来也是浅底深字 */
+                html.dark {
+                    --text-main: #1f1f1f !important;
+                    --text-secondary: #3a3a3a !important;
+                    --text-muted: #6b6b6b !important;
+                    --bg-main: #fff !important;
+                    --bg-card: #fff !important;
+                    --bg-muted: #f3f1ee !important;
+                    --border-main: #b5b5b5 !important;
+                    --border-light: #dcdcdc !important;
                 }
                 body {
                     background: white !important;
-                    color: black !important;
                 }
-                main {
-                    margin-left: 0 !important;
+                .skip-link {
+                    display: none !important;
+                }
+                /* 纸面正好和 A4 内容区一样宽时，右边 1px 的边框会落在可打印区域外被裁掉，左右各收一点 */
+                .resume-frame {
+                    max-width: none !important;
+                    padding: 0 0.5mm !important;
+                }
+                /*
+                 * 和屏幕上一样是一张带边框的圆角纸。只有开头和结尾是圆角，分页处是开口（box-decoration-break 默认的 slice），
+                 * 看得出纸还接着下一页。A4 的内容宽度不到 md 断点，屏幕上的两栏在这里单独写一遍
+                 */
+                .resume-paper {
+                    display: grid !important;
+                    grid-template-columns: 52mm minmax(0, 1fr);
+                    border: 1px solid var(--border-light) !important;
+                    border-radius: 5mm !important;
+                    box-shadow: none !important;
+                }
+                .resume-side {
+                    padding: 7mm 5mm !important;
+                    border: 0 !important;
+                    border-right: 1px solid var(--border-light) !important;
+                }
+                .resume-side > div {
+                    position: static !important;
+                }
+                .resume-main {
+                    padding: 6mm 7mm 4mm !important;
+                }
+                .resume-article {
+                    font-size: 9.5pt;
+                    line-height: 1.55;
+                }
+                .resume-article > h2 {
+                    margin-top: 1.4em;
+                    font-size: 11pt;
+                }
+                .resume-article > h3 {
+                    margin-top: 0.9em;
+                    font-size: 10pt;
+                }
+                .resume-article > h2,
+                .resume-article > h3 {
+                    break-after: avoid;
+                }
+                .resume-article li {
+                    break-inside: avoid;
+                }
+                .resume-article a {
+                    color: inherit;
+                    text-decoration: none;
                 }
             }
         </style>

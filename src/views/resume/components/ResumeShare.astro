@@ -1,0 +1,45 @@
+---
+/**
+ * 分享简历：手机上调起系统分享面板，电脑上复制链接并把链接显示出来，复制不了就让访客手动复制。
+ * 加密简历分享的链接带着由密码派生的口令（/views/resume/#口令），对方打开就能直接看，链接里看不出密码；锁着的时候整排按钮都不显示。
+ * 逻辑在 src/views/resume/scripts/resume-vault.ts
+ */
+import { Share2 } from '@lucide/astro';
+import { t } from '../../../i18n';
+
+interface Props {
+    sealed: boolean;
+}
+
+const { sealed } = Astro.props;
+---
+
+<div
+    id="resume-share"
+    class="relative"
+    data-msg-copied={sealed ? t.page.resume.shareCopiedWithPassword : t.page.resume.shareCopied}
+    data-msg-manual={t.page.resume.shareManual}
+>
+    <button
+        id="resume-share-trigger"
+        type="button"
+        class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-accent transition-all duration-200 hover:bg-card hover:shadow-sm"
+        aria-label={t.page.resume.share}
+        title={t.page.resume.share}
+        aria-expanded="false"
+        aria-controls="resume-share-panel"
+    >
+        <Share2 class="h-4 w-4" />
+    </button>
+
+    <div id="resume-share-panel" class="absolute right-0 top-full z-50 mt-2 hidden w-80 max-w-[calc(100vw-2rem)]">
+        <div class="ui-panel rounded-xl border border-light bg-card p-3 shadow-lg">
+            <p class="resume-share-msg mb-2 text-xs text-secondary" role="status"></p>
+            <input
+                class="resume-share-url ui-input w-full rounded-lg border border-light bg-main px-2 py-1.5 text-xs text-main outline-none focus:border-accent"
+                readonly
+                aria-label={t.page.resume.share}
+            />
+        </div>
+    </div>
+</div>

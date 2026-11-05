@@ -1,0 +1,28 @@
+---
+/**
+ * 简历里需要加密的一块。传了 password 就把里面的内容先渲染成 HTML 再加密，页面里只留密文，
+ * 解锁后由 src/views/resume/scripts/resume-vault.ts 原样换回去；没传就直接输出内容
+ */
+import { seal } from '../../../utils/resume-crypto';
+
+interface Props {
+    password?: string;
+}
+
+const { password } = Astro.props;
+const sealed = password ? await seal(await Astro.slots.render('default'), password) : null;
+---
+
+{
+    sealed ? (
+        <div
+            data-sealed
+            data-salt={sealed.salt}
+            data-iv={sealed.iv}
+            data-iter={sealed.iter}
+            data-ciphertext={sealed.ciphertext}
+        />
+    ) : (
+        <slot />
+    )
+}

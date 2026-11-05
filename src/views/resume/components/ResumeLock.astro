@@ -1,0 +1,93 @@
+---
+/**
+ * 加密简历的锁屏。锁着的时候工具栏和纸面都隐藏，页面上只剩这一块；配置了预览时可以先看删减版；
+ * 解锁逻辑在 src/views/resume/scripts/resume-vault.ts，解开后整块移除
+ */
+import { Lock, LoaderCircle, ChevronLeft, Eye } from '@lucide/astro';
+import { t } from '../../../i18n';
+
+interface Props {
+    /** 简历配置了 preview 时，锁屏上多一个「预览」按钮 */
+    preview?: boolean;
+}
+
+const { preview = false } = Astro.props;
+---
+
+<div
+    id="resume-lock"
+    class="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center text-center"
+    data-state="form"
+    data-msg-wrong={t.page.resume.wrongPassword}
+    data-msg-invalid-link={t.page.resume.invalidLink}
+    data-msg-insecure={t.page.resume.insecureContext}
+    data-msg-preview-locked={t.page.resume.previewLocked}
+>
+    <Lock class="mb-3 h-5 w-5 text-muted" />
+    <h1 class="text-base font-medium text-main">{t.page.resume.lockedTitle}</h1>
+
+    <div class="resume-lock-busy mt-6 h-10 items-center justify-center gap-2 text-sm text-muted" role="status">
+        <LoaderCircle class="h-4 w-4 animate-spin" />
+        <span>{t.page.resume.unlocking}</span>
+    </div>
+
+    <form class="resume-lock-form mt-6 w-full max-w-xs">
+        <div class="flex gap-2">
+            <input
+                name="password"
+                type="password"
+                autocomplete="off"
+                required
+                placeholder={t.page.resume.passwordPlaceholder}
+                aria-label={t.page.resume.passwordPlaceholder}
+                class="ui-input min-w-0 flex-1 rounded-lg border border-light bg-card px-3 py-2 text-sm text-main outline-none placeholder:text-muted/60"
+            />
+            <button
+                type="submit"
+                class="ui-btn ui-btn-primary shrink-0 cursor-pointer rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            >
+                {t.page.resume.unlock}
+            </button>
+        </div>
+        <p class="resume-lock-error mt-2 min-h-4 text-xs text-red-500" role="alert"></p>
+        {preview && (
+            <button
+                type="button"
+                data-resume-preview-open
+                class="mt-1 inline-flex cursor-pointer items-center gap-1.5 text-sm text-secondary transition-colors hover:text-accent"
+            >
+                <Eye class="h-4 w-4" />
+                <span>{t.page.resume.preview}</span>
+            </button>
+        )}
+    </form>
+
+    <a href="/" class="mt-6 inline-flex items-center gap-1 text-xs text-muted transition-colors hover:text-accent">
+        <ChevronLeft class="h-3.5 w-3.5" />
+        <span>{t.page.resume.backToSite}</span>
+    </a>
+</div>
+
+<script is:inline>
+    // 链接里带了口令，或者这个标签页解锁过，先显示「正在解锁」，免得密码框闪一下
+    (function () {
+        var lock = document.getElementById('resume-lock');
+        try {
+            if (lock && (location.hash.length > 1 || sessionStorage.getItem('vergil:resume-key'))) {
+                lock.dataset.state = 'unlocking';
+            }
+        } catch {}
+    })();
+</script>
+
+<style>
+    .resume-lock-busy {
+        display: none;
+    }
+    #resume-lock[data-state='unlocking'] .resume-lock-busy {
+        display: flex;
+    }
+    #resume-lock[data-state='unlocking'] .resume-lock-form {
+        display: none;
+    }
+</style>

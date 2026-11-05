@@ -1,0 +1,126 @@
+---
+/**
+ * 简历的个人信息栏：头像、姓名、头衔和联系方式。宽屏时放在纸面左侧，手机上排在正文上方，打印时变成页面顶部的抬头。
+ * frontmatter 的 blur 里列出的信息先模糊显示，点一下才看得清（逻辑在 resume-vault.ts）；
+ * 链接类的联系方式只模糊文字，图标照常显示，没点开之前点链接只会显示内容，不会拨号或发邮件。
+ * 预览版（masked）里列出的联系方式换成占位符再模糊，不带链接，页面里没有原文
+ */
+import { t } from '../../../i18n';
+import { Mail, Phone, MapPin, Globe, Github } from '@lucide/astro';
+import siteConfig from '../../../data/site-config';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+    resume: CollectionEntry<'resume'>;
+    /** 预览版里要藏起来的联系方式 */
+    masked?: string[];
+}
+
+const { name, headline, avatar, contact, blur } = Astro.props.resume.data;
+const masked = new Set(Astro.props.masked ?? []);
+/** 占位符的长度和原文相近，只是看起来像一串被模糊的字 */
+const placeholder = (text: string) => '•'.repeat(Math.min(Math.max(text.length, 6), 18));
+const avatarSrc = avatar ?? siteConfig.avatar?.src;
+
+/** 网址只显示域名和路径，去掉 https:// 和末尾的斜杠 */
+const displayUrl = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+const hidden = new Set(blur);
+const blurAttrs = (field: (typeof blur)[number], focusable = false) =>
+    hidden.has(field)
+        ? { 'data-resume-blur': '', title: t.page.resume.clickToReveal, ...(focusable ? { tabindex: 0, role: 'button' } : {}) }
+        : {};
+
+const items = [
+    contact?.email && { field: 'email', icon: Mail, text: contact.email, href: `mailto:${contact.email}` },
+    contact?.phone && { field: 'phone', icon: Phone, text: contact.phone, href: `tel:${contact.phone.replace(/\s+/g, '')}` },
+    contact?.location && { field: 'location', icon: MapPin, text: contact.location },
+    contact?.github && { field: 'github', icon: Github, text: displayUrl(contact.github), href: contact.github, external: true },
+    contact?.website && { field: 'website', icon: Globe, text: displayUrl(contact.website), href: contact.website, external: true }
+].filter(Boolean) as { field: (typeof blur)[number]; icon: typeof Mail; text: string; href?: string; external?: boolean }[];
+---
+
+<div class="resume-profile">
+    {avatarSrc && <img src={avatarSrc} alt="" class="resume-avatar mb-5 h-20 w-20 rounded-full border border-light object-cover" />}
+    <h1 class="resume-name text-2xl font-semibold tracking-wide text-main">
+        <span {...blurAttrs('name', true)}>{name}</span>
+    </h1>
+    {headline && (
+        <p class="resume-headline mt-1.5 text-sm leading-relaxed text-secondary">
+            <span {...blurAttrs('headline', true)}>{headline}</span>
+        </p>
+    )}
+    {items.length > 0 && (
+        <ul class="resume-contact mt-5 flex flex-wrap gap-x-4 gap-y-2 text-[0.8125rem] text-secondary md:block md:space-y-2.5">
+            {items.map(({ field, icon: Icon, text, href, external }) => (
+                <li class="min-w-0">
+                    {masked.has(field) ? (
+                        <span class="inline-flex max-w-full items-center gap-2" title={t.page.resume.hiddenInPreview}>
+                            <Icon class="h-3.5 w-3.5 shrink-0 text-muted" />
+                            <span class="resume-masked" aria-hidden="true">{placeholder(text)}</span>
+                        </span>
+                    ) : href ? (
+                        <a
+                            href={href}
+                            class="inline-flex max-w-full items-center gap-2 transition-colors hover:text-accent"
+                            {...(external ? { target: '_blank', rel: 'noopener' } : {})}
+                        >
+                            <Icon class="h-3.5 w-3.5 shrink-0 text-muted" />
+                            <span class="truncate" {...blurAttrs(field)}>{text}</span>
+                        </a>
+                    ) : (
+                        <span class="inline-flex max-w-full items-center gap-2">
+                            <Icon class="h-3.5 w-3.5 shrink-0 text-muted" />
+                            <span class="truncate" {...blurAttrs(field, true)}>{text}</span>
+                        </span>
+                    )}
+                </li>
+            ))}
+        </ul>
+    )}
+</div>
+
+<style>
+    /* 和 :blur[] 指令一样的模糊程度，但悬停不会显示，只有点了才显示 */
+    [data-resume-blur] {
+        transition: filter 0.3s ease;
+    }
+    [data-resume-blur]:not([data-revealed]) {
+        filter: blur(4px);
+        cursor: pointer;
+        user-select: none;
+    }
+    /* 预览版的占位符：一直模糊，点了也不会显示 */
+    .resume-masked {
+        filter: blur(4px);
+        user-select: none;
+    }
+
+    @media print {
+        /* 打印出来的简历要能直接联系到人，模糊的信息一律显示 */
+        [data-resume-blur] {
+            filter: none !important;
+            transition: none !important;
+        }
+        .resume-avatar {
+            width: 18mm;
+            height: 18mm;
+            margin-bottom: 4mm;
+        }
+        .resume-name {
+            font-size: 16pt;
+        }
+        .resume-headline {
+            font-size: 9pt;
+        }
+        /* 打印纸宽不到 md 断点，联系方式在这里单独排成竖列 */
+        .resume-contact {
+            display: block !important;
+            margin-top: 5mm;
+            font-size: 8.5pt;
+        }
+        .resume-contact > li + li {
+            margin-top: 2mm;
+        }
+    }
+</style>

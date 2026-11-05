@@ -1,0 +1,26 @@
+---
+/** 简历目录：顶部工具栏中间的一排分组锚点（## 标题），窄屏和打印时不显示 */
+import { t } from '../../../i18n';
+
+interface Props {
+    headings: { depth: number; slug: string; text: string }[];
+}
+
+const sections = Astro.props.headings.filter((h) => h.depth === 2);
+---
+
+{
+    sections.length > 0 && (
+        <nav class="resume-toc" aria-label={t.page.resume.toc}>
+            <ul class="flex items-center gap-5">
+                {sections.map((h) => (
+                    <li>
+                        <a href={`#${h.slug}`} class="whitespace-nowrap text-xs text-secondary transition-colors hover:text-accent">
+                            {h.text}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+    )
+}

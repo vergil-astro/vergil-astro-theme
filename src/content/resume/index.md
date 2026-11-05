@@ -1,12 +1,15 @@
 ---
 title: 个人简历
 name: 你的名字
+headline: 高级前端工程师
 avatar: /assets/site/avatar.jpg
 contact:
   email: you@example.com
   phone: +86 138 0000 0000
   location: 中国，上海
+  github: https://github.com/vergil-astro
   website: https://example.com
+blur: [phone]
 ---
 
 *这是一份示例简历，用来演示简历视图的排版。内容在 `src/content/resume/index.md`，换成你自己的即可。*
