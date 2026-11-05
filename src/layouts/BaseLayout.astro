@@ -1,8 +1,9 @@
 ---
 import { locale, t } from '../i18n';
-import { skin, defaultScheme } from '../utils/skin';
+import { defaultSkin } from '../utils/skin';
 import { ClientRouter } from 'astro:transitions';
 import BaseHead, { type Props as HeadProps } from '../components/base/BaseHead.astro';
+import ThemeInit from '../components/base/ThemeInit.astro';
 import Footer from '../components/base/Footer.astro';
 import LeftSidebar from '../components/base/LeftSidebar.astro';
 import RightSidebar from '../components/base/RightSidebar.astro';
@@ -20,7 +21,7 @@ const isArticle = head.pageType === 'article';
 ---
 
 <!doctype html>
-<html lang={locale} data-skin={skin} data-default-scheme={defaultScheme} class="wrap-break-words antialiased">
+<html lang={locale} data-skin={defaultSkin} class="wrap-break-words antialiased">
     <head>
         <BaseHead {...head} />
         <script is:inline>
@@ -32,18 +33,7 @@ const isArticle = head.pageType === 'article';
                 window.scrollTo(0, 0);
             })();
         </script>
-        <script is:inline>
-            (function() {
-                try {
-                    const scheme = localStorage.getItem('colorScheme') || document.documentElement.getAttribute('data-default-scheme') || 'C';
-                    const isDark = localStorage.getItem('darkMode');
-                    document.documentElement.setAttribute('data-theme', scheme);
-                    if (isDark === 'true' || (isDark === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                        document.documentElement.classList.add('dark');
-                    }
-                } catch(e) {}
-            })();
-        </script>
+        <ThemeInit />
         <ClientRouter />
         <script>
             import '../scripts/theme-toggle.js';

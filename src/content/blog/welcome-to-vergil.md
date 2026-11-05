@@ -87,29 +87,29 @@ tab: 简历页
 
 :button[用极简模式看这篇]{href="/views/minimal/blog/welcome-to-vergil/" color="accent" icon="lucide:book-open"} :button[打开简历页]{href="/views/resume/" color="blue" icon="lucide:user"}
 
-### 配色随手换，皮肤藏在配置里
+### 配色和皮肤，随手换
 
-**配色**有 12 套，每套都单独调过暗色模式。访客点右上角的主题图标就能切换，现在就可以试试。
+**配色**有好几套，每套都单独调过暗色模式。访客点右上角的主题图标就能切换，现在就可以试试。
 
-**皮肤**管的是形状和质感：圆角多大、按钮什么样、顶栏贴边还是悬浮。它没有给访客的切换入口，由你在配置里选定。除了默认皮肤，Vergil 还藏了一套「海岛」：大圆角、胶囊按钮、悬浮的顶栏、铺一层波点底纹，默认配一套暖奶油色。
+**皮肤**管的是形状和质感：圆角多大、按钮什么样、顶栏贴边还是悬浮。访客在同一个面板里就能切换，你在配置里定的是默认用哪一个。除了经典皮肤，Vergil 还自带两套：「海岛」是大圆角、胶囊按钮、悬浮的顶栏、铺一层波点底纹，默认配一套暖奶油色；「粗野」是报纸风的直角细框加硬投影，默认配纸白和荧光绿。
 
 ::::tabs
 tab: 海岛皮肤
 
 ![海岛皮肤](@img/blog/welcome-to-vergil/view-island.jpg)
 
-tab: 默认皮肤
+tab: 经典皮肤
 
-![默认皮肤](@img/blog/welcome-to-vergil/view-default.jpg)
+![经典皮肤](@img/blog/welcome-to-vergil/view-default.jpg)
 
 ::::
 
-换成海岛皮肤只要改一行：
+想让访客一进来看到的就是海岛皮肤，改一行配置：
 
 ```ts title="src/data/config/identity.ts"
 export const siteInfo = {
     // ...
-    skin: 'island',   // 默认是 'default'
+    skin: 'island',   // 默认是 'classic'
 };
 ```
 

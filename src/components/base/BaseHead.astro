@@ -5,6 +5,8 @@ import siteConfig from '../../data/site-config';
 import type { ImageInput } from '../../types';
 
 import '../../styles/global.css';
+// 启用的皮肤和配色的样式，按 identity.ts 的 skins、schemes 生成，见 src/appearance/integration.mjs
+import 'virtual:vergil/appearance-styles';
 
 const { fonts: fontsProp } = Astro.props as Props;
 const { display: displayCss, body: bodyCss, ui: uiCss, mono: monoCss, cdnFonts, fileFonts } =

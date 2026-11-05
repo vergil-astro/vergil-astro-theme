@@ -134,23 +134,10 @@ export default {
 
     theme: {
         toggleDark: '切换暗色模式',
-        pickScheme: '选择配色方案',
+        pickAppearance: '切换皮肤和配色',
+        skin: '皮肤',
         scheme: '配色方案',
         floatingPlayer: '浮动播放器',
-        schemes: {
-            A: '暖羊皮纸',
-            B: '石板蓝灰',
-            C: '暖墨橙红',
-            D: '乳油玫瑰',
-            E: '黄油琥珀',
-            F: '薄荷鼠尾',
-            G: '鸢尾紫藤',
-            H: '午夜海军',
-            I: '炭黑极简',
-            J: '奶油珊瑚',
-            K: '沙岩暖棕',
-            L: '暖奶油',
-        } as Record<string, string>,
     },
 
     search: {

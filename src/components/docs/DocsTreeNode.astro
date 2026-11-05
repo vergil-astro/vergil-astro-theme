@@ -83,6 +83,7 @@ function getLevelConfig(l: number) {
                     <a
                         href={getArticleHref(node.slug)}
                         class={`docs-tree-link ${cfg.textSize} ${active ? 'active' : ''}`}
+                        aria-current={active ? 'page' : undefined}
                         data-level={level}
                     >
                         <span class="active-indicator" aria-hidden="true" />

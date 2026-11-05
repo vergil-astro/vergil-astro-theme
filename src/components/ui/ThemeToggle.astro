@@ -2,28 +2,15 @@
 import { Sun, Moon, Palette } from '@lucide/astro';
 import siteConfig from '../../data/site-config';
 import { t } from '../../i18n';
-
-const schemes = [
-  { id: 'A', name: t.theme.schemes.A, color: '#4a7c59' },
-  { id: 'B', name: t.theme.schemes.B, color: '#4a6fa5' },
-  { id: 'C', name: t.theme.schemes.C, color: '#c0622a' },
-  { id: 'D', name: t.theme.schemes.D, color: '#c06070' },
-  { id: 'E', name: t.theme.schemes.E, color: '#c07818' },
-  { id: 'F', name: t.theme.schemes.F, color: '#2a8c62' },
-  { id: 'G', name: t.theme.schemes.G, color: '#7848cc' },
-  { id: 'H', name: t.theme.schemes.H, color: '#1848cc' },
-  { id: 'I', name: t.theme.schemes.I, color: '#141414' },
-  { id: 'J', name: t.theme.schemes.J, color: '#b54531' },
-  { id: 'K', name: t.theme.schemes.K, color: '#b86030' },
-  { id: 'L', name: t.theme.schemes.L, color: '#a9521f' },
-];
+import { skins, schemes, appearanceLabel } from '../../utils/skin';
 
 const floatingAudioEnabled = siteConfig.floatingAudio?.enabled === true;
 ---
 
 <!--
-  12-color scheme picker (popover) + dark mode toggle
-  JS in public/theme-toggle.js handles all logic.
+  Skin + color scheme picker (popover) + dark mode toggle.
+  Skins and schemes come from the appearance registry (src/utils/skin.ts);
+  JS in src/scripts/theme-toggle.js handles all logic.
 -->
 <div class="flex items-center gap-1">
   <!-- Scheme popover trigger -->
@@ -31,8 +18,8 @@ const floatingAudioEnabled = siteConfig.floatingAudio?.enabled === true;
     <button
       id="scheme-trigger"
       class="flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200 hover:bg-card hover:shadow-sm"
-      aria-label={t.theme.pickScheme}
-      title={t.theme.pickScheme}
+      aria-label={t.theme.pickAppearance}
+      title={t.theme.pickAppearance}
     >
       <span id="scheme-indicator-icon" class="text-accent transition-colors duration-200">
         <Palette class="h-4 w-4" />
@@ -45,6 +32,19 @@ const floatingAudioEnabled = siteConfig.floatingAudio?.enabled === true;
       class="absolute right-0 top-full mt-2 hidden z-50"
     >
       <div class="bg-card border border-light rounded-xl shadow-lg p-3 min-w-[200px]">
+        <p class="text-[11px] text-muted mb-2 px-1">{t.theme.skin}</p>
+        <div id="theme-skin-picker" class="grid grid-cols-3 gap-2 mb-3">
+          {skins.map((s) => (
+            <button
+              type="button"
+              data-skin-option={s.name}
+              class="rounded-lg border border-light px-2 py-1 text-xs text-secondary transition-all duration-150 hover:bg-hover aria-pressed:border-accent aria-pressed:text-accent"
+              aria-pressed="false"
+            >
+              {appearanceLabel(s.labels, s.name)}
+            </button>
+          ))}
+        </div>
         <p class="text-[11px] text-muted mb-2 px-1">{t.theme.scheme}</p>
         <div id="theme-scheme-picker" class="grid grid-cols-4 gap-2">
           {schemes.map((s) => (
@@ -52,15 +52,15 @@ const floatingAudioEnabled = siteConfig.floatingAudio?.enabled === true;
               id={`scheme-dot-${s.id}`}
               data-scheme={s.id}
               class="flex flex-col items-center gap-1 p-1.5 rounded-lg transition-all duration-150 hover:bg-hover"
-              aria-label={s.name}
+              aria-label={appearanceLabel(s.labels, s.id)}
               aria-pressed="false"
-              title={s.name}
+              title={appearanceLabel(s.labels, s.id)}
             >
               <span
                 class="w-5 h-5 rounded-full ring-2 ring-offset-1 ring-transparent transition-all duration-200"
-                style={`background-color: ${s.color};`}
+                style={`background-color: ${s.swatch};`}
               ></span>
-              <span class="text-[9px] text-muted leading-none">{s.id}</span>
+              <span class="text-[9px] text-muted leading-none">{s.short}</span>
             </button>
           ))}
         </div>

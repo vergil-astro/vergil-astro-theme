@@ -1,0 +1,130 @@
+/* ── 基础：token、焦点、容器、卡片、按钮 ── */
+
+html[data-skin="brutalism"] {
+    /* 全部直角。--radius-full 不动，头像和色点还是圆的 */
+    --radius-xs: 0;
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --radius-xl: 0;
+    --radius-2xl: 0;
+
+    /* 皮肤自己的派生色 */
+    --brut-ink: var(--text-main);
+    --brut-pop: var(--bg-pop, var(--accent-color));
+    --brut-pop-text: var(--pop-text, var(--accent-text));
+    --brut-border: 1px solid var(--brut-ink);
+
+    /* 投影一律是不模糊的硬投影，颜色同描边。可交互的元素用 4px，悬停抬起来是 6px */
+    --shadow-xs: 2px 2px 0 0 var(--brut-ink);
+    --shadow-sm: 4px 4px 0 0 var(--brut-ink);
+    --shadow-md: 4px 4px 0 0 var(--brut-ink);
+    --shadow-lg: 6px 6px 0 0 var(--brut-ink);
+    --shadow-xl: 8px 8px 0 0 var(--brut-ink);
+
+    /* 动作要干脆，不要回弹；进度条和弹跳单独用带一点过冲的曲线 */
+    --ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --brut-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 状态切换时弹一下：放大到 1.1 再回来 */
+@keyframes brut-pop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* ── 焦点：实线外框，不用柔和光晕 ── */
+html[data-skin="brutalism"] :where(a, button, summary, [tabindex], input, textarea, select):focus-visible {
+    outline: 2px solid var(--brut-ink);
+    outline-offset: 2px;
+}
+
+/* ── 容器（卡片、侧栏小组件）：只描边，不带投影 ── */
+html[data-skin="brutalism"] .card,
+html[data-skin="brutalism"] .ui-panel {
+    border: var(--brut-border);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* ── 可点击的卡片：描边加硬投影。悬停往左上抬，投影跟着拉长；按下沉进投影里 ── */
+html[data-skin="brutalism"] .card-interactive {
+    border: var(--brut-border);
+    border-radius: 0;
+    box-shadow: var(--shadow-md);
+}
+
+/* 卡片自己是直角，里面的封面图和图片容器原本带圆角，会在四角露出缝 */
+html[data-skin="brutalism"] .card-interactive :where(a, img, picture, video, div) {
+    border-radius: 0;
+}
+
+html[data-skin="brutalism"] .card-interactive:hover {
+    translate: -2px -2px;
+    box-shadow: var(--shadow-lg);
+}
+
+html[data-skin="brutalism"] .card-interactive:active {
+    translate: 4px 4px;
+    box-shadow: 0 0 0 0 var(--brut-ink);
+}
+
+/* ── 普通按钮：卡片底、细描边、硬投影、等宽大写；悬停铺上平涂色 ── */
+html[data-skin="brutalism"] .ui-btn {
+    border: var(--brut-border);
+    border-radius: 0;
+    background: var(--bg-card);
+    color: var(--brut-ink);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: var(--shadow-sm);
+    transition:
+        translate var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+}
+
+html[data-skin="brutalism"] .ui-btn:hover {
+    border-color: var(--brut-ink);
+    background: var(--brut-pop);
+    color: var(--brut-pop-text);
+    translate: -1px -1px;
+    box-shadow: 5px 5px 0 0 var(--brut-ink);
+}
+
+html[data-skin="brutalism"] .ui-btn:active {
+    translate: 4px 4px;
+    box-shadow: 0 0 0 0 var(--brut-ink);
+}
+
+/* ── 主按钮：直接是平涂色块 ── */
+html[data-skin="brutalism"] .ui-btn-primary {
+    border: var(--brut-border);
+    border-radius: 0;
+    background: var(--brut-pop);
+    color: var(--brut-pop-text);
+    font-family: var(--font-mono);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: var(--shadow-md);
+    backdrop-filter: none;
+    transition:
+        translate var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+}
+
+html[data-skin="brutalism"] .ui-btn-primary:hover {
+    border-color: var(--brut-ink);
+    background: var(--brut-pop);
+    color: var(--brut-pop-text);
+    translate: -2px -2px;
+    box-shadow: var(--shadow-lg);
+}
+
+html[data-skin="brutalism"] .ui-btn-primary:active {
+    translate: 4px 4px;
+    box-shadow: 0 0 0 0 var(--brut-ink);
+}

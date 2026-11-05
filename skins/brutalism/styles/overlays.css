@@ -1,0 +1,20 @@
+/* ── 浮层：搜索弹窗 ── */
+
+/* 搜索弹窗：细框加大号硬投影；遮罩是半透明的页面底色，不模糊 */
+html[data-skin="brutalism"] .ui-modal {
+    border: var(--brut-border);
+    border-radius: 0;
+    background-color: var(--bg-card);
+    box-shadow: var(--shadow-xl);
+}
+
+html[data-skin="brutalism"] .ui-modal::backdrop {
+    background: color-mix(in srgb, var(--bg-main) 75%, transparent);
+    backdrop-filter: none;
+}
+
+/* 搜索框：细框直角 */
+html[data-skin="brutalism"] .ui-input {
+    border: var(--brut-border);
+    border-radius: 0;
+}

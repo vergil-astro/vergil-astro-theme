@@ -1,0 +1,19 @@
+{
+    "contract": 1,
+    "labels": { "zh-CN": "海岛", "en": "Island" },
+    "recommendedScheme": "warm-cream",
+    "schemes": [
+        {
+            "id": "cream-coral",
+            "short": "J",
+            "labels": { "zh-CN": "奶油珊瑚", "en": "Cream Coral" },
+            "swatch": "#b54531"
+        },
+        {
+            "id": "warm-cream",
+            "short": "L",
+            "labels": { "zh-CN": "暖奶油", "en": "Warm Cream" },
+            "swatch": "#a9521f"
+        }
+    ]
+}

@@ -1,8 +1,9 @@
 ---
 import { locale, t } from '../../../i18n';
-import { skin, defaultScheme } from '../../../utils/skin';
+import { defaultSkin } from '../../../utils/skin';
 import { ClientRouter } from 'astro:transitions';
 import BaseHead, { type Props as HeadProps } from '../../../components/base/BaseHead.astro';
+import ThemeInit from '../../../components/base/ThemeInit.astro';
 import ResumeSidebar from '../components/ResumeSidebar.astro';
 import ThemeToggle from '../../../components/ui/ThemeToggle.astro';
 
@@ -15,21 +16,10 @@ const { resume, headings, ...head } = Astro.props;
 ---
 
 <!doctype html>
-<html lang={locale} data-skin={skin} data-default-scheme={defaultScheme} class="wrap-break-words antialiased">
+<html lang={locale} data-skin={defaultSkin} class="wrap-break-words antialiased">
     <head>
         <BaseHead {...head} />
-        <script is:inline>
-            (function() {
-                try {
-                    var scheme = localStorage.getItem('colorScheme') || document.documentElement.getAttribute('data-default-scheme') || 'C';
-                    var isDark = localStorage.getItem('darkMode');
-                    document.documentElement.setAttribute('data-theme', scheme);
-                    if (isDark === 'true' || (isDark === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                        document.documentElement.classList.add('dark');
-                    }
-                } catch(e) {}
-            })();
-        </script>
+        <ThemeInit />
         <ClientRouter />
         <script>
             import '../../../scripts/theme-toggle.js';

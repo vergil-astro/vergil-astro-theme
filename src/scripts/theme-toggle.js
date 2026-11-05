@@ -1,19 +1,44 @@
+// 有哪些皮肤、配色来自外观注册结果，见 src/appearance/integration.mjs
+import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtual:vergil/appearance';
+
 (function () {
     var root = document.documentElement;
-    var SCHEMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
-    var SCHEME_COLORS = {
-        A: '#4a7c59', B: '#4a6fa5', C: '#c0622a', D: '#c06070',
-        E: '#c07818', F: '#2a8c62', G: '#7848cc', H: '#1848cc',
-        I: '#141414', J: '#b54531', K: '#b86030', L: '#a9521f'
-    };
+    // 每个皮肤推荐哪套配色
+    var SKIN_SCHEMES = Object.create(null);
+    REGISTERED_SKINS.forEach(function (s) { SKIN_SCHEMES[s.name] = s.recommendedScheme; });
+    var SCHEMES = REGISTERED_SCHEMES.map(function (s) { return s.id; });
+    // 选中某套配色后调色盘图标的颜色
+    var SCHEME_COLORS = Object.create(null);
+    REGISTERED_SCHEMES.forEach(function (s) { SCHEME_COLORS[s.id] = s.icon; });
 
-    // 访客没选过配色时用当前皮肤推荐的那套，见 src/utils/skin.ts
+    // 访客没选过配色时用当前皮肤推荐的那套
     function getDefaultScheme() {
-        return root.getAttribute('data-default-scheme') || 'C';
+        return SKIN_SCHEMES[root.getAttribute('data-skin')] || 'C';
     }
 
+    // 访客选过的皮肤；没选过或者皮肤已经不存在就返回 null，用配置里的默认皮肤
+    function getStoredSkin() {
+        try {
+            var skin = localStorage.getItem('skin');
+            return skin && SKIN_SCHEMES[skin] ? skin : null;
+        } catch { return null; }
+    }
+
+    function storeSkin(skin) {
+        try { localStorage.setItem('skin', skin); } catch { }
+    }
+
+    function applyStoredSkin() {
+        var skin = getStoredSkin();
+        if (skin) root.setAttribute('data-skin', skin);
+    }
+
+    // 访客选过的配色；没选过或者那套配色已经不存在（比如站长停用了带它的皮肤）就用推荐的
     function getStoredScheme() {
-        try { return localStorage.getItem('colorScheme') || getDefaultScheme(); } catch { return getDefaultScheme(); }
+        try {
+            var scheme = localStorage.getItem('colorScheme');
+            return scheme && SCHEMES.indexOf(scheme) !== -1 ? scheme : getDefaultScheme();
+        } catch { return getDefaultScheme(); }
     }
 
     function storeScheme(scheme) {
@@ -58,6 +83,12 @@
         }
     }
 
+    function updateSkinOptions(skin) {
+        document.querySelectorAll('[data-skin-option]').forEach(function (btn) {
+            btn.setAttribute('aria-pressed', btn.getAttribute('data-skin-option') === skin ? 'true' : 'false');
+        });
+    }
+
     function updateDarkModeIcon(isDark) {
         var lightIcon = document.getElementById('dark-mode-icon-light');
         var darkIcon = document.getElementById('dark-mode-icon-dark');
@@ -68,6 +99,7 @@
     var _schemeTriggerHandler = null;
     var _schemeDocHandler = null;
     var _schemePickerHandler = null;
+    var _skinPickerHandler = null;
     var _darkModeHandler = null;
 
     function setupSchemePicker() {
@@ -114,6 +146,28 @@
         }
     }
 
+    // 切皮肤不关面板，访客接着就能挑配色
+    function setupSkinPicker() {
+        var picker = document.getElementById('theme-skin-picker');
+        if (!picker) return;
+        if (_skinPickerHandler) {
+            picker.removeEventListener('click', _skinPickerHandler);
+        }
+        _skinPickerHandler = function (e) {
+            var opt = e.target.closest('[data-skin-option]');
+            if (!opt) return;
+            var clicked = opt.getAttribute('data-skin-option');
+            storeSkin(clicked);
+            root.setAttribute('data-skin', clicked);
+            updateSkinOptions(clicked);
+            // 访客没选过配色时，配色跟着换成新皮肤推荐的那套；选过就不动
+            var scheme = getStoredScheme();
+            applyTheme(scheme, root.classList.contains('dark'));
+            updateSchemeDots(scheme);
+        };
+        picker.addEventListener('click', _skinPickerHandler);
+    }
+
     function setupDarkModeToggle() {
         var btn = document.getElementById('dark-mode-toggle');
         if (!btn) return;
@@ -132,15 +186,26 @@
     }
 
     function setup() {
+        applyStoredSkin();
         var scheme = getStoredScheme();
         var isDark = getStoredDark();
         applyTheme(scheme, isDark);
+        updateSkinOptions(root.getAttribute('data-skin'));
         updateSchemeDots(scheme);
         updateDarkModeIcon(isDark);
+        setupSkinPicker();
         setupSchemePicker();
         setupDarkModeToggle();
     }
 
-    applyTheme(getStoredScheme(), getStoredDark());
+    function restoreAppearance() {
+        applyStoredSkin();
+        applyTheme(getStoredScheme(), getStoredDark());
+    }
+
+    restoreAppearance();
+    // 换页时 ClientRouter 会把 <html> 的属性换成新页面服务端渲染的那份：data-skin 回到配置里的默认皮肤，
+    // data-theme 和 dark 类都没了。要在新页面画出来之前补回去，等到 page-load 再补，暗色模式下会先闪一下亮色
+    document.addEventListener('astro:after-swap', restoreAppearance);
     document.addEventListener('astro:page-load', setup);
 })();

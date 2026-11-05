@@ -1,9 +1,10 @@
 ---
 import { locale, t } from '../i18n';
-import { skin } from '../utils/skin';
+import { defaultSkin } from '../utils/skin';
 import type { CollectionEntry } from 'astro:content';
 import { ChevronLeft } from '@lucide/astro';
 import BaseHead from '../components/base/BaseHead.astro';
+import ThemeInit from '../components/base/ThemeInit.astro';
 import FormattedDate from '../components/ui/FormattedDate.astro';
 import AlbumCard from '../components/content/AlbumCard.astro';
 
@@ -55,9 +56,10 @@ const seoDesc = description || '';
 ---
 
 <!doctype html>
-<html lang={locale} data-skin={skin}>
+<html lang={locale} data-skin={defaultSkin}>
     <head>
         <BaseHead title={seoTitle} description={seoDesc} />
+        <ThemeInit skinOnly />
         {fontsUrl ? <link rel="stylesheet" href={fontsUrl} /> : null}
         <style is:inline set:html={`
             :root {

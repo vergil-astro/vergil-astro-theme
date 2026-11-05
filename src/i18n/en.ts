@@ -124,23 +124,10 @@ const en: typeof zhCN = {
 
     theme: {
         toggleDark: 'Toggle dark mode',
-        pickScheme: 'Choose a color scheme',
+        pickAppearance: 'Choose skin and color scheme',
+        skin: 'Skin',
         scheme: 'Color scheme',
         floatingPlayer: 'Floating player',
-        schemes: {
-            A: 'Warm Parchment',
-            B: 'Slate Blue',
-            C: 'Ink Orange',
-            D: 'Cream Rose',
-            E: 'Butter Amber',
-            F: 'Mint Sage',
-            G: 'Iris Wisteria',
-            H: 'Midnight Navy',
-            I: 'Charcoal',
-            J: 'Cream Coral',
-            K: 'Sandstone',
-            L: 'Warm Cream',
-        } as Record<string, string>,
     },
 
     search: {

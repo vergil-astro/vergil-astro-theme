@@ -62,6 +62,7 @@ function hasActiveChild(children?: { href: string }[]): boolean {
                             {hasChildren ? (
                                 <div class="relative">
                                     <button
+                                        aria-current={isItemActive ? 'true' : undefined}
                                         class={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                                             isItemActive
                                                 ? 'text-accent bg-accent/10'
@@ -83,6 +84,7 @@ function hasActiveChild(children?: { href: string }[]): boolean {
                                                 return (
                                                     <a
                                                         href={child.href}
+                                                        aria-current={isChildActive ? 'page' : undefined}
                                                         class={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
                                                             isChildActive
                                                                 ? 'text-accent bg-accent/10'
@@ -100,6 +102,7 @@ function hasActiveChild(children?: { href: string }[]): boolean {
                             ) : (
                                 <a
                                     href={item.href}
+                                    aria-current={isItemActive ? 'page' : undefined}
                                     class={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                                         isItemActive
                                             ? 'text-accent bg-accent/10'
@@ -202,6 +205,7 @@ function hasActiveChild(children?: { href: string }[]): boolean {
                                         return (
                                             <a
                                                 href={child.href}
+                                                aria-current={isChildActive ? 'page' : undefined}
                                                 class={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
                                                     isChildActive
                                                         ? 'text-accent bg-accent/10'
@@ -218,6 +222,7 @@ function hasActiveChild(children?: { href: string }[]): boolean {
                         ) : (
                             <a
                                 href={item.href}
+                                aria-current={isItemActive ? 'page' : undefined}
                                 class={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                                     isItemActive
                                         ? 'text-accent bg-accent/10'

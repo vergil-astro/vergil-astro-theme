@@ -1,0 +1,61 @@
+/* 粗野皮肤自带的配色：报纸荧绿（newsprint，面板上显示 M），也是粗野皮肤的推荐配色 */
+
+/* ── Palette M: Newsprint ──
+   和粗野皮肤搭配的报纸风配色：纸白、黑、荧光绿三种颜色。
+   文字、描边、硬投影一律纯黑，层级交给字号、字重和等宽字体，不用灰字；
+   强调色也是黑，链接靠下划线区分（见下面的规则），压在黑底上的字是白色；
+   荧光绿 #00ff41 只做大块平涂：主按钮、页面标题的高亮、悬停底、进度条、悬浮按钮，上面一律压黑字，15:1。
+   --bg-pop、--pop-text 是给粗野皮肤的平涂色和压在上面的字色，其他皮肤用不到。
+   暗色下底色是近黑，卡片、浅底和悬停底都带一点绿，文字和描边换成纸白，荧光绿不变 */
+html[data-theme="newsprint"] {
+    --text-main: #000000;
+    --text-secondary: #000000;
+    --text-muted: #000000;
+    --bg-main: #f9f9f7;
+    --bg-card: #ffffff;
+    --bg-muted: #e6ffeb;
+    --bg-hover: #c8ffd4;
+    --bg-pop: #00ff41;
+    --pop-text: #000000;
+    --border-main: #000000;
+    --border-light: #000000;
+    --accent-color: #000000;
+    --accent-hover: #000000;
+}
+html[data-theme="newsprint"].dark {
+    --text-main: #f9f9f7;
+    --text-secondary: #f9f9f7;
+    --text-muted: #f9f9f7;
+    --bg-main: #0a0a0a;
+    --bg-card: #0b120d;
+    --bg-muted: #0f2416;
+    --bg-hover: #123d1f;
+    --bg-pop: #00ff41;
+    --pop-text: #0a0a0a;
+    --border-main: #f9f9f7;
+    --border-light: #f9f9f7;
+    --accent-color: #f9f9f7;
+    --accent-hover: #f9f9f7;
+}
+/* 强调色和正文同色，链接只能靠下划线认出来。不管配哪个皮肤都要能认出，所以写在配色这边。
+   只管正文里写的普通链接（不带 class），指令组件里的链接、按钮、选项卡有自己的样式 */
+html[data-theme="newsprint"] .prose a:not([class]) {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+html[data-theme="newsprint"] .prose a:not([class]):hover {
+    background: var(--bg-pop);
+    color: var(--pop-text);
+}
+/* 热力图只用荧光绿：亮色从浅绿走到深绿，暗色从暗绿走到荧光绿 */
+html[data-theme="newsprint"] .heatmap-cell[data-level="0"] { background-color: var(--bg-card); }
+html[data-theme="newsprint"] .heatmap-cell[data-level="1"] { background-color: #c8ffd4; }
+html[data-theme="newsprint"] .heatmap-cell[data-level="2"] { background-color: #7dff9b; }
+html[data-theme="newsprint"] .heatmap-cell[data-level="3"] { background-color: #00ff41; }
+html[data-theme="newsprint"] .heatmap-cell[data-level="4"] { background-color: #00a82b; }
+html[data-theme="newsprint"].dark .heatmap-cell[data-level="0"] { background-color: var(--bg-muted); }
+html[data-theme="newsprint"].dark .heatmap-cell[data-level="1"] { background-color: #123d1f; }
+html[data-theme="newsprint"].dark .heatmap-cell[data-level="2"] { background-color: #12752e; }
+html[data-theme="newsprint"].dark .heatmap-cell[data-level="3"] { background-color: #00c935; }
+html[data-theme="newsprint"].dark .heatmap-cell[data-level="4"] { background-color: #00ff41; }

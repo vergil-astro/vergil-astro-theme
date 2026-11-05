@@ -1,0 +1,151 @@
+/* ── 导航与页面骨架：顶栏、选中态、阅读进度、侧栏小标题、页面标题、分页、悬浮按钮 ── */
+
+/* 顶栏：实色卡片底，底边一道细线，不要毛玻璃 */
+html[data-skin="brutalism"] .ui-topbar {
+    background: var(--bg-card);
+    border-bottom: var(--brut-border);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* ── 选中态：顶部导航、移动端菜单、左栏站内导航、文档目录里的当前项，统一成墨色实块。
+   它们原本是强调色混出来的淡底，按 aria-current 匹配，不依赖组件内部的类名 ── */
+html[data-skin="brutalism"] .ui-topbar [aria-current],
+html[data-skin="brutalism"] .mobile-menu-glass [aria-current],
+html[data-skin="brutalism"] .ui-panel nav [aria-current="page"],
+html[data-skin="brutalism"] #docs-sidebar [aria-current="page"] {
+    border-radius: 0;
+    background: var(--brut-ink);
+    color: var(--bg-card);
+}
+
+html[data-skin="brutalism"] .ui-topbar :is(a, button) {
+    border-radius: 0;
+}
+
+/* ── 阅读进度条：加粗一点，用平涂色，底下压一道细线 ── */
+html[data-skin="brutalism"] #reading-progress {
+    height: 4px;
+    background: var(--brut-pop);
+    box-shadow: 0 1px 0 0 var(--brut-ink);
+}
+
+/* ── 首页 Hero 的行动按钮：Hero 自己有一条规则把区域里的链接改成正文色加虚线下划线，
+   这里改回主按钮的样子：平涂色块、细框、硬投影、等宽大写 ── */
+html[data-skin="brutalism"] .hero a.bg-accent {
+    border: var(--brut-border);
+    border-radius: 0;
+    background: var(--brut-pop);
+    color: var(--brut-pop-text);
+    font-family: var(--font-mono);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+    transition:
+        translate var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+}
+
+html[data-skin="brutalism"] .hero a.bg-accent:hover {
+    color: var(--brut-pop-text);
+    translate: -2px -2px;
+    box-shadow: var(--shadow-lg);
+}
+
+html[data-skin="brutalism"] .hero a.bg-accent:active {
+    translate: 4px 4px;
+    box-shadow: 0 0 0 0 var(--brut-ink);
+}
+
+/* ── 侧栏小标题：墨色实底的小方签，10px 等宽大写 ── */
+html[data-skin="brutalism"] .ui-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    width: fit-content;
+    padding: 0.2em 0.5em;
+    background: var(--brut-ink);
+    color: var(--bg-card);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* 标签列表的小标题本身是链接，悬停换成平涂色，墨色底上不能再叠强调色的字 */
+html[data-skin="brutalism"] a.ui-label:hover {
+    background: var(--brut-pop);
+    color: var(--brut-pop-text);
+}
+
+/* ── 页面标题：报纸大标题，黑字加一道荧光笔似的平涂高亮 ── */
+html[data-skin="brutalism"] .ui-title {
+    width: fit-content;
+    padding: 0 0.15em;
+    color: var(--brut-ink);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(transparent 55%, var(--brut-pop) 55%, var(--brut-pop) 92%, transparent 92%);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+}
+
+/* ── 分页：当前页是墨色实块，前后翻页是带描边和硬投影的方钮 ── */
+html[data-skin="brutalism"] .ui-pagination [aria-current="page"] {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3em 0.9em;
+    border: var(--brut-border);
+    background: var(--brut-ink);
+    color: var(--bg-card);
+    font-family: var(--font-mono);
+    font-weight: 700;
+}
+
+html[data-skin="brutalism"] .ui-icon-btn {
+    border: var(--brut-border);
+    border-radius: 0;
+    background: var(--bg-card);
+    color: var(--brut-ink);
+    box-shadow: var(--shadow-sm);
+    transition:
+        translate var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+}
+
+html[data-skin="brutalism"] .ui-icon-btn:hover {
+    background: var(--brut-pop);
+    color: var(--brut-pop-text);
+}
+
+html[data-skin="brutalism"] .ui-icon-btn:active {
+    translate: 4px 4px;
+    box-shadow: 0 0 0 0 var(--brut-ink);
+}
+
+/* ── 悬浮按钮（回到顶部、目录）：平涂色方块，细框加硬投影 ── */
+html[data-skin="brutalism"] .ui-fab {
+    border: var(--brut-border);
+    border-radius: 0;
+    background: var(--brut-pop);
+    color: var(--brut-pop-text);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: none;
+}
+
+html[data-skin="brutalism"] .ui-fab:hover {
+    border-color: var(--brut-ink);
+    color: var(--brut-pop-text);
+    transform: none;
+    translate: -2px -2px;
+    box-shadow: var(--shadow-lg);
+}
+
+html[data-skin="brutalism"] .ui-fab:active {
+    transform: none;
+    translate: 4px 4px;
+    box-shadow: 0 0 0 0 var(--brut-ink);
+}

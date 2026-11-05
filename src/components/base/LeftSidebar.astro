@@ -78,7 +78,7 @@ function isActive(href: string): boolean {
 <aside id="main-sidebar" class="sidebar flex flex-col fixed lg:sticky lg:self-start left-0 lg:left-auto top-14 h-[calc(100vh-3.5rem)] w-72 lg:w-60 xl:w-64 2xl:w-72 bg-main overflow-y-auto z-40 transition-transform duration-300">
   <div class="flex-1 p-5">
     <!-- Profile Card -->
-    <div class="bg-card rounded-xl p-4 mb-3 text-center">
+    <div class="ui-panel bg-card rounded-xl p-4 mb-3 text-center">
       <a href="/" class="inline-block mb-3 group" transition:name="brand">
         <div class="w-16 h-16 mx-auto rounded-full overflow-hidden border border-light shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:scale-[1.03]">
           {siteConfig.avatar ? (
@@ -118,7 +118,7 @@ function isActive(href: string): boolean {
       </div>
     </div>
 
-    <div class="bg-card rounded-xl p-3">
+    <div class="ui-panel bg-card rounded-xl p-3">
       <div class="flex items-center gap-1.5 mb-3">
         <Flag class="w-3.5 h-3.5 text-red-500" />
         <h3 class="text-sm font-medium text-main">{t.sidebar.siteNav}</h3>
@@ -151,14 +151,14 @@ function isActive(href: string): boolean {
         if (componentId === 'siteInfo') return null;
         if (!Component) return null;
         return (
-            <div class="bg-card rounded-xl p-3 mt-3">
+            <div class="ui-panel bg-card rounded-xl p-3 mt-3">
                 <Component />
             </div>
         );
     })}
 
     {leftConfig.includes('siteInfo') && (
-    <div class="bg-card rounded-xl p-3 mt-3">
+    <div class="ui-panel bg-card rounded-xl p-3 mt-3">
       <div class="flex items-center gap-1.5 mb-2.5">
         <Info class="w-3.5 h-3.5 text-accent" />
         <h3 class="text-sm font-medium text-main">{t.sidebar.siteInfo}</h3>
@@ -182,7 +182,7 @@ function isActive(href: string): boolean {
           <span class="text-main">{getLastActive()}</span>
         </div>
           {icpRecords.length > 0 && (
-          <div class="bg-card rounded-xl mt-5">
+          <div class="ui-panel bg-card rounded-xl mt-5">
               <div class="flex items-center gap-1.5 mb-2.5">
                   <Award class="w-3.5 h-3.5 text-accent" />
                   <h3 class="text-sm font-medium text-main">{t.sidebar.icp}</h3>

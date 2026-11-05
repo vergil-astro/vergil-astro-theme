@@ -1,28 +1,32 @@
 import { siteInfo } from '../data/config/identity';
+import { locale } from '../i18n';
+import { skins as registeredSkins, schemes as registeredSchemes, type AppearanceLabels } from 'virtual:vergil/appearance';
 
 /**
- * 界面皮肤。每个皮肤对应 src/styles/skins/ 下的一份样式，挂在 <html data-skin> 上生效。
- * 皮肤只管形状和质感，颜色永远来自配色方案，两者可以任意组合。
+ * 界面皮肤和配色。皮肤挂在 <html data-skin> 上，只管形状和质感；配色挂在 <html data-theme> 上，只管颜色，两者可以任意组合。
+ * 经典皮肤和配色 A–I、K 是内置的；其他的放在站点根目录的 skins/、schemes/ 下，
+ * 在 identity.ts 的 skins、schemes 里按名字启用，注册过程见 src/appearance/integration.mjs。
+ * 访客可以在顶栏的外观面板里切换，配置里的 skin 只决定访客没选过时用哪一个。
  */
-export const skins = ['default', 'island'] as const;
+export const skins = registeredSkins;
+export const schemes = registeredSchemes;
 
-export type Skin = (typeof skins)[number];
+const skinNames = skins.map((s) => s.name);
 
-function isSkin(value: string | undefined): value is Skin {
-    return (skins as readonly string[]).includes(value ?? '');
+/** 访客没选过皮肤时用哪一个。填了没启用或没安装的皮肤就退回 classic，不让站点挂掉 */
+export const defaultSkin: string = siteInfo.skin && skinNames.includes(siteInfo.skin) ? siteInfo.skin : 'classic';
+
+if (siteInfo.skin && siteInfo.skin !== defaultSkin) {
+    console.warn(`[vergil 外观] identity.ts 的 skin 是 "${siteInfo.skin}"，但它没有启用或没有安装，已退回 classic`);
 }
 
-/** 配置里填了不认识的皮肤就退回默认，不让站点挂掉 */
-export const skin: Skin = isSkin(siteInfo.skin) ? siteInfo.skin : 'default';
-
 /**
- * 访客还没选过配色时用哪一套。每个皮肤推荐一套和它最搭的配色：
- * 默认皮肤用 C 暖墨橙红，海岛皮肤用 L 暖奶油。访客自己切过配色后以他的选择为准。
- * 布局把它写在 <html data-default-scheme> 上，页面脚本从那里读
+ * 每个皮肤推荐的配色。访客没选过配色时用当前皮肤推荐的那套，切皮肤时配色也跟着换；
+ * 访客自己切过配色后以他的选择为准
  */
-const defaultSchemes: Record<Skin, string> = {
-    default: 'C',
-    island: 'L',
-};
+export const defaultSchemes: Record<string, string> = Object.fromEntries(skins.map((s) => [s.name, s.recommendedScheme]));
 
-export const defaultScheme = defaultSchemes[skin];
+/** 按当前界面语言取显示名，没有就用英文，再没有就用名字本身 */
+export function appearanceLabel(labels: AppearanceLabels, fallback: string): string {
+    return labels[locale] ?? labels.en ?? fallback;
+}

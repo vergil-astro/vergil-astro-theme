@@ -1,0 +1,88 @@
+/* ── 正文：代码块、引用、分隔线、表格、标签、提示浮层 ── */
+
+/* 代码块：配色不动，还是 Shiki 的亮暗两套，只加细框和硬投影 */
+html[data-skin="brutalism"] .prose pre {
+    border: var(--brut-border);
+    border-radius: 0;
+    box-shadow: var(--shadow-md);
+}
+
+html[data-skin="brutalism"] .prose :where(code):not(pre code) {
+    padding: 0.1em 0.35em;
+    border-radius: 0;
+    background: var(--bg-muted);
+    color: var(--text-main);
+}
+
+/* 引用：左边一道粗竖线，底下铺配色的浅底 */
+html[data-skin="brutalism"] .prose :where(blockquote) {
+    border-left: 4px solid var(--brut-ink);
+    background: var(--bg-muted);
+    padding: 0.4em 1em;
+}
+
+/* 分隔线：报纸上的双线 */
+html[data-skin="brutalism"] .prose hr {
+    height: 0;
+    border: 0;
+    border-top: 4px double var(--brut-ink);
+    background: none;
+}
+
+/* 表格：整圈细框，表头墨色实底、等宽大写 */
+html[data-skin="brutalism"] .prose :where(table) {
+    border: var(--brut-border);
+    border-collapse: collapse;
+}
+
+html[data-skin="brutalism"] .prose :where(thead th) {
+    background: var(--brut-ink);
+    color: var(--bg-card);
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+html[data-skin="brutalism"] .prose :where(th, td) {
+    border: var(--brut-border);
+}
+
+html[data-skin="brutalism"] .prose :where(tbody tr:hover td) {
+    background: var(--bg-hover);
+}
+
+/* 标签：细框小方签，等宽大写，去掉原来的逗号分隔 */
+html[data-skin="brutalism"] .ui-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.45em;
+    border: var(--brut-border);
+    background: var(--bg-card);
+    color: var(--brut-ink);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.7;
+    text-decoration: none;
+}
+
+html[data-skin="brutalism"] .ui-tag:hover {
+    background: var(--brut-pop);
+    color: var(--brut-pop-text);
+    text-decoration: none;
+}
+
+html[data-skin="brutalism"] .ui-tag-sep {
+    display: none;
+}
+
+/* 提示浮层 */
+html[data-skin="brutalism"] .ui-tooltip {
+    border: var(--brut-border);
+    border-radius: 0;
+    box-shadow: var(--shadow-sm);
+}

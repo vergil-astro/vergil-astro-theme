@@ -11,7 +11,8 @@ html {
 }
 
 /* ══════════════════════════════════════════
-   12 Color Schemes  A–L
+   Built-in Color Schemes  A–I, K
+   其余配色跟着皮肤或单独的配色包提供，见 src/appearance/integration.mjs
    ══════════════════════════════════════════ */
 
 /* ── Palette A: Warm Parchment ── */
@@ -270,57 +271,6 @@ html[data-theme="I"].dark {
     --accent-hover: #ffffff;
 }
 
-/* ── Palette J: Cream Coral ──
-   香草奶油底配珊瑚色。和 L（暖奶油）同属奶油系，但刻意避开棕色：
-   底色、面板、卡片是低彩度的香草奶油（88–94°），文字是几乎不带彩度的暖炭灰，
-   强调色是珊瑚（32°），偏红粉而不偏棕，也没有冷色。数值先在 OKLCH 里定好再换算成 hex。
-   --bg-panel、--bg-dot 只有海岛皮肤会读，其他皮肤用不到。 */
-html[data-theme="J"] {
-    --text-main: #3b3129;
-    --text-secondary: #64594e;
-    --text-muted: #64594e;
-    --bg-main: #f6eed8;
-    --bg-panel: #fcf8e9;
-    --bg-card: #faf3e0;
-    --bg-muted: #f3ead3;
-    --bg-hover: #f7f0db;
-    --bg-dot: #e7dcbf;
-    --border-main: #3b3129;
-    --border-light: #e8dfc8;
-    --accent-color: #b54531;
-    --accent-hover: #9c3a29;
-}
-html[data-skin="island"][data-theme="J"]:not(.dark) {
-    --accent-color: #be4935;
-    --accent-hover: #a53e2d;
-}
-html[data-theme="J"].dark {
-    --text-main: #ece7dd;
-    --text-secondary: #beb6a9;
-    --text-muted: #a59d91;
-    --bg-main: #1e1a15;
-    --bg-panel: #25211b;
-    --bg-card: #302a24;
-    --bg-muted: #38322b;
-    --bg-hover: #3d372f;
-    --bg-dot: #2d2821;
-    --border-main: #ece7dd;
-    --border-light: #453e37;
-    --accent-color: #f18b71;
-    --accent-hover: #f5a08a;
-}
-/* 热力图：从浅桃到珊瑚，和强调色同一色系 */
-html[data-theme="J"] .heatmap-cell[data-level="0"] { background-color: var(--bg-card); }
-html[data-theme="J"] .heatmap-cell[data-level="1"] { background-color: #f9d6bf; }
-html[data-theme="J"] .heatmap-cell[data-level="2"] { background-color: #f1b499; }
-html[data-theme="J"] .heatmap-cell[data-level="3"] { background-color: #de8366; }
-html[data-theme="J"] .heatmap-cell[data-level="4"] { background-color: #c3513d; }
-html[data-theme="J"].dark .heatmap-cell[data-level="0"] { background-color: var(--bg-muted); }
-html[data-theme="J"].dark .heatmap-cell[data-level="1"] { background-color: #59392e; }
-html[data-theme="J"].dark .heatmap-cell[data-level="2"] { background-color: #8f4f3e; }
-html[data-theme="J"].dark .heatmap-cell[data-level="3"] { background-color: #c36954; }
-html[data-theme="J"].dark .heatmap-cell[data-level="4"] { background-color: #f18b71; }
-
 /* ── Palette K: Sandstone ── */
 html[data-theme="K"] {
     --text-main: #281808;
@@ -348,63 +298,6 @@ html[data-theme="K"].dark {
     --accent-color: #dc8050;
     --accent-hover: #ec9060;
 }
-
-/* ── Palette L: Warm Cream ──
-   和海岛皮肤搭配的暖奶油配色。所有值都先在 OKLCH 里定好亮度和彩度再换算成 hex，规则是：
-   页面底色、面板、卡片、描边、底纹都落在黄油奶油色相（83–90°），只靠亮度拉开层次，
-   面板也保留足够的彩度（C 0.028），不会亮成发冷的白；
-   文字是暖可可棕（55–60°），强调色是暖杏色（46°），整套配色里没有任何冷色和绿色；
-   文字和强调色在对应的底色上都过 AA，正文 6.7:1，次要文字和链接不低于 4.5:1。
-   --bg-panel 是给海岛皮肤的面板色，比卡片更浅一档；--bg-dot 是底纹波点的颜色，其他皮肤都用不到。 */
-html[data-theme="L"] {
-    --text-main: #70482b;
-    --text-secondary: #7f5e44;
-    --text-muted: #7f5e44;
-    --bg-main: #f5e7c6;
-    --bg-panel: #fcf4e0;
-    --bg-card: #f9eed4;
-    --bg-muted: #f2e4c6;
-    --bg-hover: #f6eacf;
-    --bg-dot: #e4d0a9;
-    --border-main: #70482b;
-    --border-light: #e8d8bb;
-    /* 默认皮肤下链接直接压在页面底色上，用深一档的杏色保证对比度 */
-    --accent-color: #99491e;
-    --accent-hover: #843d18;
-}
-/* 海岛皮肤会把文字都放进浅色面板，强调色可以亮一档 */
-html[data-skin="island"][data-theme="L"]:not(.dark) {
-    --accent-color: #a85021;
-    --accent-hover: #96461c;
-}
-html[data-theme="L"].dark {
-    --text-main: #f1e7d2;
-    --text-secondary: #cbbba1;
-    --text-muted: #b3a289;
-    --bg-main: #231a12;
-    --bg-panel: #2c241b;
-    --bg-card: #372d22;
-    --bg-muted: #403428;
-    --bg-hover: #45392d;
-    --bg-dot: #35291f;
-    --border-main: #f1e7d2;
-    --border-light: #4f4235;
-    --accent-color: #e9a26b;
-    --accent-hover: #f0b584;
-}
-/* 热力图原本是一套写死的绿色，和 L 的暖色调不搭。这里按同一套规则取一条暖色阶：
-   色相从奶油（82°）走到焦糖（56°），亮度一级级降低，彩度始终偏低，不会跳出来抢强调色。
-   暗色下反过来，越活跃越亮 */
-html[data-theme="L"] .heatmap-cell[data-level="0"] { background-color: var(--bg-card); }
-html[data-theme="L"] .heatmap-cell[data-level="1"] { background-color: #e9d1a8; }
-html[data-theme="L"] .heatmap-cell[data-level="2"] { background-color: #dab383; }
-html[data-theme="L"] .heatmap-cell[data-level="3"] { background-color: #be8d60; }
-html[data-theme="L"] .heatmap-cell[data-level="4"] { background-color: #97643e; }
-html[data-theme="L"].dark .heatmap-cell[data-level="0"] { background-color: var(--bg-muted); }
-html[data-theme="L"].dark .heatmap-cell[data-level="1"] { background-color: #5d492d; }
-html[data-theme="L"].dark .heatmap-cell[data-level="2"] { background-color: #84653e; }
-html[data-theme="L"].dark .heatmap-cell[data-level="3"] { background-color: #af8758; }
-html[data-theme="L"].dark .heatmap-cell[data-level="4"] { background-color: #d7b174; }
 
 html.dark {
     --accent-text: var(--bg-main);

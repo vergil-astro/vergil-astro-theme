@@ -15,6 +15,8 @@ import { remarkContentDirectives } from './src/plugins/directives/index.mjs';
 import { remarkImageDirectives } from './src/plugins/remark-image-directives.mjs';
 import { remarkPhotoDirectives } from './src/plugins/remark-photo-directives.mjs';
 import { remarkTerminal, transformerTerminal } from './src/plugins/shiki-terminal.mjs';
+import appearance from './src/appearance/integration.mjs';
+import { siteInfo } from './src/data/config/identity';
 
 export default defineConfig({
     site: siteConfig.website,
@@ -27,7 +29,8 @@ export default defineConfig({
             include: ['mermaid', 'echarts'],
         },
     },
-    integrations: [sitemap(), icon()],
+    // 皮肤和配色按 identity.ts 里的名字从 skins/、schemes/ 目录加载，见 src/appearance/integration.mjs
+    integrations: [sitemap(), icon(), appearance({ skins: siteInfo.skins, schemes: siteInfo.schemes })],
     markdown: {
         processor: unified({
             remarkPlugins: [remarkDirective, remarkMath, remarkImageDirectives, [remarkPhotoDirectives, { brands: t.directive.photo.brands }], [remarkContentDirectives, { links: siteConfig.links, screenshotService: siteConfig.screenshotService, locale, i18n: t.directive, time: t.time }], remarkTerminal],

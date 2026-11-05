@@ -1,0 +1,14 @@
+{
+    "contract": 1,
+    "labels": { "zh-CN": "粗野", "en": "Brutalism" },
+    "recommendedScheme": "newsprint",
+    "schemes": [
+        {
+            "id": "newsprint",
+            "short": "M",
+            "labels": { "zh-CN": "报纸荧绿", "en": "Newsprint" },
+            "swatch": "#00ff41",
+            "icon": "var(--text-main)"
+        }
+    ]
+}
