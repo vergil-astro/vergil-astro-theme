@@ -15,6 +15,25 @@ import { processCalendarDirective } from './calendar.mjs';
 import { processStoryDirective } from './story.mjs';
 import { processMindDirective } from './mind.mjs';
 import { getOgImage } from './og-image.mjs';
+import { DIRECTIVES } from './schema.mjs';
+
+/** schema 里 module 对应的容器指令渲染函数；image、photo、inline 由别的插件或 textDirective 处理 */
+const CONTAINER_PROCESSORS = {
+    blocks: processBlockDirective,
+    okr: processOkrDirective,
+    cards: processCardDirective,
+    media: processMediaDirective,
+    charts: processChartDirective,
+    calendar: processCalendarDirective,
+    private: processPrivateDirective,
+    story: processStoryDirective,
+    mind: processMindDirective,
+};
+
+/** 容器指令名 → 渲染函数，从 schema 生成；schema 里没登记的指令不会被渲染 */
+const containerHandlers = new Map(
+    DIRECTIVES.filter((d) => CONTAINER_PROCESSORS[d.module]).map((d) => [d.name, CONTAINER_PROCESSORS[d.module]]),
+);
 
 /** 本页 :::sites 里没填 cover 的站点，先在线查好 og:image，渲染时当默认封面 */
 async function resolveSiteCovers(tree, links) {
@@ -51,32 +70,7 @@ export function remarkContentDirectives(options = {}) {
         });
 
         visit(tree, 'containerDirective', (node) => {
-            const name = node.name;
-            const blockNames = ['callout', 'note', 'folding', 'folders', 'timeline', 'tabs', 'grid', 'blockquote', 'quot', 'title', 'poetry', 'copy', 'reel', 'paper', 'deadline', 'plan'];
-            const cardNames = ['ghcard', 'sites', 'posters', 'panel', 'yoicard'];
-            const mediaNames = ['video', 'audio'];
-            const chartNames = ['mermaid', 'echart'];
-            const planNames = ['calendar'];
-
-            if (blockNames.includes(name)) {
-                processBlockDirective(node, options);
-            } else if (name === 'okr') {
-                processOkrDirective(node, options);
-            } else if (cardNames.includes(name)) {
-                processCardDirective(node, options);
-            } else if (mediaNames.includes(name)) {
-                processMediaDirective(node, options);
-            } else if (chartNames.includes(name)) {
-                processChartDirective(node, options);
-            } else if (planNames.includes(name)) {
-                processCalendarDirective(node, options);
-            } else if (name === 'private') {
-                processPrivateDirective(node, options);
-            } else if (name === 'story') {
-                processStoryDirective(node, options);
-            } else if (name === 'mind') {
-                processMindDirective(node, options);
-            }
+            containerHandlers.get(node.name)?.(node, options);
         }, true);
     };
 }

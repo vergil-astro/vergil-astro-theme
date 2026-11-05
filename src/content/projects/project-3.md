@@ -11,7 +11,7 @@ seo:
 
 ![播客项目预览](@img/projects/project-3/cover.jpg)
 
-:::callout{type="note" title="示例项目"}
+:::callout{type="info" title="示例项目"}
 这是一个虚构的项目，用来演示项目列表里不同类型的条目。
 :::
 
@@ -23,7 +23,7 @@ seo:
 
 一开始想一步到位，买了声卡和电容麦，结果房间没做声学处理，录出来全是回声。后来换成动圈麦加桌面支架，反而干净了。
 
-:::callout{type="warning" title="踩过的坑"}
+:::callout{type="warn" title="踩过的坑"}
 先解决房间，再解决麦克风。在一个会反射的房间里，贵的设备只会把噪音录得更清楚。
 :::
 

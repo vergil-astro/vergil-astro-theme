@@ -200,6 +200,8 @@ export default defineConfig({
 | `pnpm images:organize` | 把内容引用的图片挪到 `src/assets/img/` 并改成 `@img/` 引用，见 [图片与静态资源](/docs/vergil-guide/03-基本创作/图片与静态资源/) |
 | `pnpm images:expand` | 把 `@img/` 展开成相对路径，方便在 Typora、VS Code 里预览，`build` 时会自动改回 |
 | `pnpm images:check` | 检查图片引用，报告失效引用、重复文件、大图，只读不写；有失效引用时返回失败，适合放进 CI |
+| `pnpm directives:check` | 检查内容指令的写法：未知指令、写错的属性、没闭合的容器等，只读不写；有错误时返回失败。后面可以跟文件名只查这几篇，见 [AI 写作](/docs/vergil-guide/03-基本创作/ai写作/) |
+| `pnpm directives:ref` | 输出内容指令参考，和当前主题版本一致；后面跟指令名只看这几个，如 `pnpm directives:ref callout` |
 | `pnpm fonts:subset` | 重新生成中文字体子集，见 [字体与主题](/docs/vergil-guide/02-站点配置/字体与主题/) |
 | `pnpm samples:dates` | 把主题示例文章的日期挪到最近八周内，让热力图有内容。只改示例文章，`reset` 之后不再有作用 |
 | `pnpm samples:dates:dry` | 只列出 `samples:dates` 会改哪些日期，不实际执行 |

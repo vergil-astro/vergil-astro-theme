@@ -11,7 +11,7 @@ seo:
 
 ![城市骑行地图预览](@img/projects/project-2/cover.jpg)
 
-:::callout{type="note" title="示例项目"}
+:::callout{type="info" title="示例项目"}
 这是一个虚构的项目，用来演示项目页面能承载什么样的内容。
 :::
 
