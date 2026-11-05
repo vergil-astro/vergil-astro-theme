@@ -6,7 +6,9 @@ Vergil 的治愈系海岛风皮肤：大圆角和胶囊按钮，页面铺一层�
 
 ## 安装
 
-把这个目录放到站点根目录的 `skins/island/`，再在 `src/data/config/identity.ts` 里启用：
+在站点目录里运行 `vg skin add island`，安装和启用一步完成，`vg skin use island` 设成默认皮肤。
+
+不用 vg 的话，把这个目录复制到站点根目录的 `skins/island/`，再在 `src/data/config/identity.ts` 里启用：
 
 ```ts
 skins: ['island'],

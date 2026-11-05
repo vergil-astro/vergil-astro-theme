@@ -8,9 +8,8 @@ export const siteInfo = {
      * 访客可以在顶栏的外观面板里自己切换。classic 是内置的，其他皮肤要先在下面的 skins 里启用 */
     skin: 'classic',
     /** 启用的皮肤，像 zsh 的 plugins 一样按名字写。每个皮肤要先放到站点根目录的 skins/<名字>/ 下，
-     * 没放的会跳过并在构建时警告。本仓库自带两个：
-     * island 是治愈系海岛风，参考动森风格的 animal-island-ui；
-     * brutalism 是报纸风的新粗野主义，规则照 Newsprint 设计规范，参考 superdesign 的 brutalism 和 BrutxUI */
+     * 没放的会跳过并在构建时警告。皮肤集中在 vergil-astro/vergil-skins 仓库，用 vg skin add <名字> 安装。
+     * 本仓库装好了两个：island 是治愈系海岛风，brutalism 是报纸风的新粗野主义 */
     skins: ['island', 'brutalism'] as string[],
     subtitle: 'Astro Framework for Content Creators',
     description: 'A content-driven Astro framework for building personal websites with Markdown',

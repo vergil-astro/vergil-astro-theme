@@ -36,7 +36,7 @@ html[data-skin="brutalism"] .md-tab-btn.md-tab-active {
 
 @media (prefers-reduced-motion: no-preference) {
     html[data-skin="brutalism"] .md-tab-btn.md-tab-active {
-        animation: brut-pop 0.3s var(--brut-spring);
+        animation: brutalism-pop 0.3s var(--brut-spring);
     }
 }
 

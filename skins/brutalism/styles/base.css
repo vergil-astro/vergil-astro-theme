@@ -28,7 +28,7 @@ html[data-skin="brutalism"] {
 }
 
 /* 状态切换时弹一下：放大到 1.1 再回来 */
-@keyframes brut-pop {
+@keyframes brutalism-pop {
     0% { transform: scale(1); }
     45% { transform: scale(1.1); }
     100% { transform: scale(1); }

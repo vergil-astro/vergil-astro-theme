@@ -6,7 +6,9 @@ Vergil 的报纸风新粗野主义皮肤：全部直角，纸面上只用 1px �
 
 ## 安装
 
-把这个目录放到站点根目录的 `skins/brutalism/`，再在 `src/data/config/identity.ts` 里启用：
+在站点目录里运行 `vg skin add brutalism`，安装和启用一步完成，`vg skin use brutalism` 设成默认皮肤。
+
+不用 vg 的话，把这个目录复制到站点根目录的 `skins/brutalism/`，再在 `src/data/config/identity.ts` 里启用：
 
 ```ts
 skins: ['brutalism'],

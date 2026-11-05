@@ -15,7 +15,7 @@
 
 一套基于 Astro 的内容站点框架。提示框、时间线、图表、相册、看板这些东西都做成了 Markdown 指令，不用写组件，不用碰 CSS。
 
-[![Astro](https://img.shields.io/badge/Astro-5.x-BC52EE?logo=astro&logoColor=white)](https://astro.build)
+[![Astro](https://img.shields.io/badge/Astro-7.x-BC52EE?logo=astro&logoColor=white)](https://astro.build)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -75,6 +75,7 @@ pnpm reset     # 确认后真正清理
 | **侧边栏** | 左右侧栏组件可插拔，热力图、标签云、目录、相关文章 |
 | **开箱即用** | 深色模式、全文搜索、评论、RSS、Sitemap、站点助理 |
 | **界面语言** | 主题文案支持中英切换，你写的内容不受影响 |
+| **皮肤与配色** | 经典、海岛、粗野三套皮肤和十几套配色，访客在页面上自己切换；更多皮肤在 vergil-skins |
 
 ![四种页面的实际效果](.github/features.jpg)
 
@@ -84,8 +85,9 @@ pnpm reset     # 确认后真正清理
 
 ## 生态工具
 
-- **[vergil-cli](https://github.com/vergil-astro/vergil-cli)** — 命令行工具 `vg`，初始化项目、新建文章相册动态、发布草稿
+- **[vergil-cli](https://github.com/vergil-astro/vergil-cli)** — 命令行工具 `vg`：初始化站点，新建文章、文档、相册和动态，发布草稿，本地预览、构建和部署，安装皮肤；带 `--json` 输出，agent 和脚本也能直接调用
 - **[vergil-skills](https://github.com/vergil-astro/vergil-skills)** — agent 插件：让助手用 Vergil 指令帮你写稿、排版，改完文章自动检查指令写法，见站内文档「AI 写作」
+- **[vergil-skins](https://github.com/vergil-astro/vergil-skins)** — 皮肤集合：官方皮肤和大家贡献的皮肤，用 `vg skin add <名字>` 安装，欢迎提 PR 贡献新皮肤
 
 ## 参与贡献
 
@@ -120,7 +122,7 @@ Vergil 基于极简主题 [Dante](https://github.com/JustGoodUI/dante-astro-them
 
 A content site framework built on Astro. Callouts, timelines, charts, galleries, and kanban boards are all available as Markdown directives—no components to write or CSS to touch.
 
-[![Astro](https://img.shields.io/badge/Astro-5.x-BC52EE?logo=astro&logoColor=white)](https://astro.build)
+[![Astro](https://img.shields.io/badge/Astro-7.x-BC52EE?logo=astro&logoColor=white)](https://astro.build)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -180,6 +182,7 @@ Beyond directives, Vergil also includes:
 | **Sidebars** | Pluggable components on both sides: heatmaps, tag clouds, table of contents, and related posts |
 | **Ready to use** | Dark mode, full-text search, comments, RSS, sitemap, and a site assistant |
 | **Interface language** | Switch theme text between English and Chinese without affecting your content |
+| **Skins and color schemes** | Classic, island and brutalism skins and over a dozen color schemes that visitors switch on the page; more skins in vergil-skins |
 
 ![Four page examples](.github/features.jpg)
 
@@ -189,8 +192,9 @@ For configuration and writing instructions, visit `/docs` after starting the sit
 
 ## Ecosystem Tools
 
-- **[vergil-cli](https://github.com/vergil-astro/vergil-cli)** — The `vg` command-line tool for initializing projects, creating posts, galleries, and updates, and publishing drafts
+- **[vergil-cli](https://github.com/vergil-astro/vergil-cli)** — The `vg` command-line tool: set up a site, create posts, docs, galleries and moments, publish drafts, preview, build and deploy, and install skins. With `--json` output, agents and scripts can call it directly
 - **[vergil-skills](https://github.com/vergil-astro/vergil-skills)** — An agent plugin that helps assistants draft and format posts with Vergil directives, and checks directive syntax after every edit. See "AI 写作" in the docs
+- **[vergil-skins](https://github.com/vergil-astro/vergil-skins)** — Skins for Vergil, official and contributed. Install one with `vg skin add <name>`; pull requests with new skins are welcome
 
 ## Contributing
 
