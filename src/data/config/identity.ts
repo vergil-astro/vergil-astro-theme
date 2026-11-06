@@ -4,13 +4,12 @@ export const siteInfo = {
     startDate: '',
     /** 主题界面文案的语言，也决定 <html lang> 和日期格式。可选 'zh-CN' | 'en' */
     locale: 'zh-CN',
-    /** 访客没选过时用哪个界面皮肤。皮肤决定圆角、按钮、投影、底纹这些形状质感，和配色互不影响，
+    /** 访客没选过时用哪个界面皮肤。皮肤决定圆角、按钮、投影、底纹这些形状质感，每个皮肤带着自己的几套配色，
      * 访客可以在顶栏的外观面板里自己切换。classic 是内置的，其他皮肤要先在下面的 skins 里启用 */
     skin: 'classic',
     /** 启用的皮肤，像 zsh 的 plugins 一样按名字写。每个皮肤要先放到站点根目录的 skins/<名字>/ 下，
-     * 没放的会跳过并在构建时警告。皮肤集中在 vergil-astro/vergil-skins 仓库，用 vg skin add <名字> 安装。
-     * 本仓库装好了两个：island 是治愈系海岛风，brutalism 是报纸风的新粗野主义 */
-    skins: ['island', 'brutalism'] as string[],
+     * 没放的会跳过并在构建时警告。皮肤集中在 vergil-astro/vergil-skins 仓库，用 vg skin add <名字> 安装并启用 */
+    skins: [] as string[],
     subtitle: 'Astro Framework for Content Creators',
     description: 'A content-driven Astro framework for building personal websites with Markdown',
     image: {

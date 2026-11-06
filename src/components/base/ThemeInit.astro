@@ -1,30 +1,30 @@
 ---
 /**
  * 页面绘制前把访客选过的皮肤、配色和暗色模式写到 <html> 上，免得先闪一下默认的样子。
- * 访客存的皮肤或配色如果已经不存在（比如站长停用了那个皮肤），就退回默认皮肤和它推荐的配色。
+ * 访客存的皮肤如果已经不存在（比如站长停用了那个皮肤）就退回默认皮肤；存的配色不属于当前皮肤，就用当前皮肤的默认配色。
  * 有哪些皮肤、配色从外观注册结果里取，见 src/utils/skin.ts；换页以后的同步由 src/scripts/theme-toggle.js 负责。
  *
  * 相册页有自己的一套颜色，只跟随皮肤，传 skinOnly。
  */
-import { defaultSchemes, schemes } from '../../utils/skin';
+import { defaultSchemes, skinSchemes } from '../../utils/skin';
 
 interface Props {
     skinOnly?: boolean;
 }
 
 const { skinOnly = false } = Astro.props;
-const skinSchemes = defaultSchemes;
-const schemeIds = schemes.map((s) => s.id);
 ---
 
-<script is:inline define:vars={{ skinOnly, skinSchemes, schemeIds }}>
+<script is:inline define:vars={{ skinOnly, defaultSchemes, skinSchemes }}>
     try {
         var root = document.documentElement;
         var skin = localStorage.getItem('skin');
         if (skin && Object.prototype.hasOwnProperty.call(skinSchemes, skin)) root.setAttribute('data-skin', skin);
         if (!skinOnly) {
+            var current = root.getAttribute('data-skin');
+            var allowed = skinSchemes[current] || [];
             var scheme = localStorage.getItem('colorScheme');
-            if (!scheme || schemeIds.indexOf(scheme) === -1) scheme = skinSchemes[root.getAttribute('data-skin')] || 'C';
+            if (!scheme || allowed.indexOf(scheme) === -1) scheme = defaultSchemes[current] || 'C';
             var isDark = localStorage.getItem('darkMode');
             root.setAttribute('data-theme', scheme);
             if (isDark === 'true' || (isDark === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {

@@ -47,12 +47,13 @@ src/content/blog/搭建你的第一个站点/
 
 ### 皮肤
 
-皮肤管的是形状和质感：圆角多大、按钮什么样、卡片靠投影还是描边。颜色仍然来自配色，所以任何皮肤都能配任何配色。访客可以在右上角的面板里自己切换皮肤，你在配置里定的是默认用哪一个：
+皮肤管的是形状和质感：圆角多大、按钮什么样、卡片靠投影还是描边，每个皮肤还带着自己的几套配色，切皮肤时配色会换成新皮肤的默认配色。主题自带经典皮肤，更多皮肤用 `vg skin add <名字>` 从 [vergil-skins](https://github.com/vergil-astro/vergil-skins) 安装。访客可以在右上角的面板里自己切换皮肤，你在配置里定的是默认用哪一个：
 
 ```ts title="src/data/config/identity.ts"
 export const siteInfo = {
     // ...
-    skin: 'island',   // 默认是 'classic'，'island' 是大圆角的海岛风
+    skin: 'island',     // 默认是 'classic'，'island' 是大圆角的海岛风
+    skins: ['island'],  // vg skin add island 会自动写上
 };
 ```
 

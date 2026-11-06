@@ -2,10 +2,11 @@
  * 外观注册：按名字找到启用的皮肤和配色，校验后交给页面使用。
  *
  * 用法像 zsh 的插件：把皮肤目录放进站点根目录的 skins/<名字>/，再在 identity.ts 的 skins 里写上名字；
- * 经典皮肤和配色 A–I、K 是内置的，不用写。内置之外的配色只能由皮肤自带，没有单独的配色包。
+ * 经典皮肤和它的配色 A–I、K 是内置的，不用写。每个皮肤至少自带一套配色，访客在一个皮肤下只能选它自己的配色，
+ * 没有单独的配色包。
  *
  * 皮肤目录里只有数据和样式，构建时只读不执行：
- *   skins/<名字>/skin.json         显示名、推荐配色、自带的配色列表
+ *   skins/<名字>/skin.json         显示名、默认配色、自带的配色列表
  *   skins/<名字>/skin.css          样式入口
  *   skins/<名字>/schemes/<id>.css  自带配色，每套一个文件，文件名就是配色 ID
  *
@@ -20,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import contract from './contract.json' with { type: 'json' };
-import { builtinSkins, builtinSchemes, fallbackScheme } from './builtin.mjs';
+import { builtinSkins, builtinSchemes } from './builtin.mjs';
 
 const DATA_ID = 'virtual:vergil/appearance';
 const STYLES_ID = 'virtual:vergil/appearance-styles';
@@ -81,7 +82,7 @@ function appearanceVitePlugin(registry) {
 }
 
 function buildRegistry(root, options, logger) {
-    const skins = builtinSkins.map(({ name, labels, recommendedScheme }) => ({ name, labels, recommendedScheme }));
+    const skins = builtinSkins.map(({ name, labels, recommendedScheme, schemes }) => ({ name, labels, recommendedScheme, schemes: [...schemes] }));
     const schemes = builtinSchemes.map(({ id, short, labels, swatch, icon }) => ({ id, short, labels, swatch, icon }));
     const styles = [];
     const watchFiles = [];
@@ -111,29 +112,34 @@ function buildRegistry(root, options, logger) {
         const skinCss = requireFile(dir, 'skin.css', `skins/${name}/skin.css`);
         styles.push(toRootPath(root, skinCss));
 
-        const ownSchemes = manifest.schemes ?? [];
-        if (!Array.isArray(ownSchemes)) throw new AppearanceError(`${where}：schemes 应该是数组`);
+        // 访客在这个皮肤下只能选它自带的配色，所以至少要有一套
+        const ownSchemes = manifest.schemes;
+        if (!Array.isArray(ownSchemes) || !ownSchemes.length) {
+            throw new AppearanceError(`${where}：schemes 至少要有一套配色，访客在这个皮肤下只能选它自带的配色`);
+        }
+        const ids = [];
         ownSchemes.forEach((entry, i) => {
             const at = `${where} 的 schemes[${i}]`;
             if (!entry || typeof entry !== 'object') throw new AppearanceError(`${at} 应该是一个对象`);
             if (typeof entry.id !== 'string' || !NAME_RE.test(entry.id)) {
                 throw new AppearanceError(`${at}.id 不合法：只能用小写字母、数字和短横，以字母开头`);
             }
-            addScheme(readSchemeFields(entry, at, entry.id), at);
+            const scheme = readSchemeFields(entry, at, entry.id);
+            if (schemes.some((s) => ids.includes(s.id) && s.short === scheme.short)) {
+                throw new AppearanceError(`${at}：short "${scheme.short}" 和这个皮肤的另一套配色重复了，面板上会分不清`);
+            }
+            addScheme(scheme, at);
+            ids.push(entry.id);
             const css = requireFile(dir, path.join('schemes', `${entry.id}.css`), `skins/${name}/schemes/${entry.id}.css`);
             styles.push(toRootPath(root, css));
         });
 
-        const recommendedScheme = manifest.recommendedScheme ?? fallbackScheme;
-        if (typeof recommendedScheme !== 'string') throw new AppearanceError(`${where}：recommendedScheme 应该是字符串`);
-        skins.push({ name, labels: readLabels(manifest.labels, where, name), recommendedScheme });
-    }
-
-    // 推荐配色可以是内置的、自己带的，也可以是另一个已启用的皮肤带的，所以等全部注册完再检查
-    for (const skin of skins) {
-        if (!schemes.some((s) => s.id === skin.recommendedScheme)) {
-            throw new AppearanceError(`皮肤 "${skin.name}" 推荐的配色 "${skin.recommendedScheme}" 没有注册`);
+        // 默认配色：访客切到这个皮肤时换成它，不写就是第一套
+        const recommendedScheme = manifest.recommendedScheme ?? ids[0];
+        if (typeof recommendedScheme !== 'string' || !ids.includes(recommendedScheme)) {
+            throw new AppearanceError(`${where}：recommendedScheme 要是这个皮肤自带的配色之一：${ids.join('、')}`);
         }
+        skins.push({ name, labels: readLabels(manifest.labels, where, name), recommendedScheme, schemes: ids });
     }
 
     return { skins, schemes, styles, watchFiles };

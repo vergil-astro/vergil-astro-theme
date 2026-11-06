@@ -2,14 +2,16 @@
 import { Sun, Moon, Palette } from '@lucide/astro';
 import siteConfig from '../../data/site-config';
 import { t } from '../../i18n';
-import { skins, schemes, appearanceLabel } from '../../utils/skin';
+import { skins, schemes, defaultSkin, appearanceLabel } from '../../utils/skin';
 
 const floatingAudioEnabled = siteConfig.floatingAudio?.enabled === true;
+const schemeById = new Map(schemes.map((s) => [s.id, s]));
 ---
 
 <!--
   Skin + color scheme picker (popover) + dark mode toggle.
-  Skins and schemes come from the appearance registry (src/utils/skin.ts);
+  Skins and schemes come from the appearance registry (src/utils/skin.ts).
+  Each skin only offers its own schemes, so the dots are grouped per skin and only the current skin's group shows;
   JS in src/scripts/theme-toggle.js handles all logic.
 -->
 <div class="flex items-center gap-1">
@@ -46,22 +48,28 @@ const floatingAudioEnabled = siteConfig.floatingAudio?.enabled === true;
           ))}
         </div>
         <p class="text-[11px] text-muted mb-2 px-1">{t.theme.scheme}</p>
-        <div id="theme-scheme-picker" class="grid grid-cols-4 gap-2">
-          {schemes.map((s) => (
-            <button
-              id={`scheme-dot-${s.id}`}
-              data-scheme={s.id}
-              class="flex flex-col items-center gap-1 p-1.5 rounded-lg transition-all duration-150 hover:bg-hover"
-              aria-label={appearanceLabel(s.labels, s.id)}
-              aria-pressed="false"
-              title={appearanceLabel(s.labels, s.id)}
-            >
-              <span
-                class="w-5 h-5 rounded-full ring-2 ring-offset-1 ring-transparent transition-all duration-200"
-                style={`background-color: ${s.swatch};`}
-              ></span>
-              <span class="text-[9px] text-muted leading-none">{s.short}</span>
-            </button>
+        <div id="theme-scheme-picker">
+          {skins.map((skin) => (
+            <div data-scheme-group={skin.name} hidden={skin.name !== defaultSkin}>
+              <div class="grid grid-cols-4 gap-2">
+                {skin.schemes.map((id) => schemeById.get(id)).filter((s) => s !== undefined).map((s) => (
+                  <button
+                    id={`scheme-dot-${s.id}`}
+                    data-scheme={s.id}
+                    class="flex flex-col items-center gap-1 p-1.5 rounded-lg transition-all duration-150 hover:bg-hover"
+                    aria-label={appearanceLabel(s.labels, s.id)}
+                    aria-pressed="false"
+                    title={appearanceLabel(s.labels, s.id)}
+                  >
+                    <span
+                      class="w-5 h-5 rounded-full ring-2 ring-offset-1 ring-transparent transition-all duration-200"
+                      style={`background-color: ${s.swatch};`}
+                    ></span>
+                    <span class="text-[9px] text-muted leading-none">{s.short}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

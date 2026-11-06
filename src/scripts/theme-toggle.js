@@ -3,17 +3,21 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
 
 (function () {
     var root = document.documentElement;
-    // 每个皮肤推荐哪套配色
+    // 每个皮肤的默认配色，和这个皮肤下能选的配色
+    var SKIN_DEFAULTS = Object.create(null);
     var SKIN_SCHEMES = Object.create(null);
-    REGISTERED_SKINS.forEach(function (s) { SKIN_SCHEMES[s.name] = s.recommendedScheme; });
+    REGISTERED_SKINS.forEach(function (s) {
+        SKIN_DEFAULTS[s.name] = s.recommendedScheme;
+        SKIN_SCHEMES[s.name] = s.schemes;
+    });
     var SCHEMES = REGISTERED_SCHEMES.map(function (s) { return s.id; });
     // 选中某套配色后调色盘图标的颜色
     var SCHEME_COLORS = Object.create(null);
     REGISTERED_SCHEMES.forEach(function (s) { SCHEME_COLORS[s.id] = s.icon; });
 
-    // 访客没选过配色时用当前皮肤推荐的那套
+    // 当前皮肤的默认配色
     function getDefaultScheme() {
-        return SKIN_SCHEMES[root.getAttribute('data-skin')] || 'C';
+        return SKIN_DEFAULTS[root.getAttribute('data-skin')] || 'C';
     }
 
     // 访客选过的皮肤；没选过或者皮肤已经不存在就返回 null，用配置里的默认皮肤
@@ -33,11 +37,12 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
         if (skin) root.setAttribute('data-skin', skin);
     }
 
-    // 访客选过的配色；没选过或者那套配色已经不存在（比如站长停用了带它的皮肤）就用推荐的
+    // 访客选过的配色；没选过或者不属于当前皮肤（比如站长停用了带它的皮肤）就用当前皮肤的默认配色
     function getStoredScheme() {
+        var allowed = SKIN_SCHEMES[root.getAttribute('data-skin')] || [];
         try {
             var scheme = localStorage.getItem('colorScheme');
-            return scheme && SCHEMES.indexOf(scheme) !== -1 ? scheme : getDefaultScheme();
+            return scheme && allowed.indexOf(scheme) !== -1 ? scheme : getDefaultScheme();
         } catch { return getDefaultScheme(); }
     }
 
@@ -83,9 +88,13 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
         }
     }
 
+    // 面板上只显示当前皮肤自己的配色
     function updateSkinOptions(skin) {
         document.querySelectorAll('[data-skin-option]').forEach(function (btn) {
             btn.setAttribute('aria-pressed', btn.getAttribute('data-skin-option') === skin ? 'true' : 'false');
+        });
+        document.querySelectorAll('[data-scheme-group]').forEach(function (group) {
+            group.hidden = group.getAttribute('data-scheme-group') !== skin;
         });
     }
 
@@ -160,8 +169,9 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
             storeSkin(clicked);
             root.setAttribute('data-skin', clicked);
             updateSkinOptions(clicked);
-            // 访客没选过配色时，配色跟着换成新皮肤推荐的那套；选过就不动
-            var scheme = getStoredScheme();
+            // 每个皮肤只能选自己的配色，切皮肤时配色换成新皮肤的默认配色
+            var scheme = getDefaultScheme();
+            storeScheme(scheme);
             applyTheme(scheme, root.classList.contains('dark'));
             updateSchemeDots(scheme);
         };

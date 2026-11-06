@@ -6,8 +6,10 @@ declare module 'virtual:vergil/appearance' {
     export interface SkinEntry {
         name: string;
         labels: AppearanceLabels;
-        /** 访客没选过配色时，这个皮肤用哪套 */
+        /** 默认配色：访客切到这个皮肤时换成这套 */
         recommendedScheme: string;
+        /** 这个皮肤下能选的配色 ID，经典皮肤是 A–I、K，其他皮肤是各自带的 */
+        schemes: string[];
     }
 
     export interface SchemeEntry {

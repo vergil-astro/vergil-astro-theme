@@ -75,7 +75,7 @@ pnpm reset     # 确认后真正清理
 | **侧边栏** | 左右侧栏组件可插拔，热力图、标签云、目录、相关文章 |
 | **开箱即用** | 深色模式、全文搜索、评论、RSS、Sitemap、站点助理 |
 | **界面语言** | 主题文案支持中英切换，你写的内容不受影响 |
-| **皮肤与配色** | 经典、海岛、粗野三套皮肤和十几套配色，访客在页面上自己切换；更多皮肤在 vergil-skins |
+| **皮肤与配色** | 内置经典皮肤和十套配色，访客在页面上自己切换；更多皮肤从 vergil-skins 安装，每个皮肤带着自己的配色 |
 
 ![四种页面的实际效果](.github/features.jpg)
 
@@ -182,7 +182,7 @@ Beyond directives, Vergil also includes:
 | **Sidebars** | Pluggable components on both sides: heatmaps, tag clouds, table of contents, and related posts |
 | **Ready to use** | Dark mode, full-text search, comments, RSS, sitemap, and a site assistant |
 | **Interface language** | Switch theme text between English and Chinese without affecting your content |
-| **Skins and color schemes** | Classic, island and brutalism skins and over a dozen color schemes that visitors switch on the page; more skins in vergil-skins |
+| **Skins and color schemes** | A built-in classic skin with ten color schemes that visitors switch on the page; install more skins from vergil-skins, each with its own schemes |
 
 ![Four page examples](.github/features.jpg)
 
