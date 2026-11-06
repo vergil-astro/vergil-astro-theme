@@ -7,7 +7,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import Button from '../../components/ui/Button.astro';
 import { Link, Check, ExternalLink } from '@lucide/astro';
-import { Icon } from 'astro-icon/components';
+import BrandIcon from '../../components/ui/BrandIcon.astro';
 import FormattedDate from '../../components/ui/FormattedDate.astro';
 import ReadingTime from '../../components/ui/ReadingTime.astro';
 import Comments from '../../components/widgets/Comments.astro';
@@ -17,7 +17,7 @@ import SidebarToc from '../../components/widgets/SidebarToc.astro';
 import RelatedPosts from '../../components/widgets/RelatedPosts.astro';
 import FeaturedPosts from '../../components/widgets/FeaturedPosts.astro';
 import SeriesNav from '../../components/widgets/SeriesNav.astro';
-import siteConfig from '../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 import { assertNoDuplicateSlugs, getPostSlug, resolvePostSeries, sortItemsByDateDesc } from '../../utils/data-utils';
 import { slugify } from '../../utils/common-utils';
 import QRCode from 'qrcode-svg';
@@ -210,7 +210,7 @@ const postBreadcrumbs = [
                         </button>
                         <div class="share-menu hidden absolute right-1 top-6 bg-card rounded-lg shadow-md p-2 z-10 min-w-[80px]">
                             <button class="share-wechat relative w-full flex items-center gap-2 px-2 py-1 text-sm text-secondary hover:text-[#07C160] hover:bg-muted/50 rounded transition-colors group">
-                                <Icon name="simple-icons:wechat" class="w-4 h-4" />
+                                <BrandIcon name="wechat" class="w-4 h-4" />
                                 <span>{t.post.wechat}</span>
                                 <div class="wechat-qrcode-tooltip hidden group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-2 bg-card rounded-lg shadow-md p-2 z-20 flex-col items-center gap-1 w-[180px]">
                                     <div class="wechat-qrcode-image w-[160px] h-[160px]" set:html={qrCodeSvg} />
@@ -218,7 +218,7 @@ const postBreadcrumbs = [
                                 </div>
                             </button>
                             <button class="share-weibo w-full flex items-center gap-2 px-2 py-1 text-sm text-secondary hover:text-[#E6162D] hover:bg-muted/50 rounded transition-colors">
-                                <Icon name="simple-icons:sinaweibo" class="w-4 h-4" />
+                                <BrandIcon name="sinaweibo" class="w-4 h-4" />
                                 <span>{t.post.weibo}</span>
                             </button>
                         </div>

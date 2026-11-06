@@ -5,7 +5,7 @@
 #   - 字体名.woff2         = GB2312 一级常用字 + ASCII（~1.5MB，后台补充）
 #
 # 用法:
-#   bash scripts/subset-fonts.sh
+#   pnpm fonts:subset（在框架仓库根目录运行；按示例站 starter/ 的内容取字，输出到框架自带的 src/fonts/）
 #
 # 添加新字体:
 #   1. 将 .ttf 文件放入 scripts/fonts-source/
@@ -15,7 +15,7 @@
 set -e
 
 FONTS_SOURCE="scripts/fonts-source"
-FONTS_OUTPUT="public/fonts"
+FONTS_OUTPUT="src/fonts"
 SUBSET_CHARS="/tmp/font_subset_chars.txt"
 FULL_CHARS="/tmp/font_full_chars.txt"
 
@@ -78,7 +78,7 @@ def get_gb2312_level2():
 
 # 全站用字（所有字符）
 result = subprocess.run(
-    ['grep', '-orh', '.', 'src/content/', 'public/'],
+    ['grep', '-orh', '.', 'starter/src/content/', 'starter/public/'],
     capture_output=True, text=True
 )
 site_chars = set()

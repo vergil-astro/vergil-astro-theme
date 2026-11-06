@@ -6,8 +6,9 @@
  * 预览版（masked）里列出的联系方式换成占位符再模糊，不带链接，页面里没有原文
  */
 import { t } from '../../../i18n';
-import { Mail, Phone, MapPin, Globe, Github } from '@lucide/astro';
-import siteConfig from '../../../data/site-config';
+import { Mail, Phone, MapPin, Globe } from '@lucide/astro';
+import { Github } from '../../../utils/lucide-icons';
+import siteConfig from '@vergil-site/data/site-config';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {

@@ -4,7 +4,7 @@ import { t } from '../../i18n';
 import SectionNav from '../../components/ui/SectionNav.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAllTags, getPostsByTag, sortItemsByDateDesc } from '../../utils/data-utils';
-import siteConfig from '../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
 const tags = getAllTags(posts);

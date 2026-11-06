@@ -11,7 +11,7 @@ import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
 import { getDocSets, getDocEntry, getAdjacentDocs, getDocGroup, getDocHomepageSlug, type DocTreeNode } from '../../../utils/docs-utils';
 import { ChevronRight } from '@lucide/astro';
 import Comments from '../../../components/widgets/Comments.astro';
-import siteConfig from '../../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 
 export async function getStaticPaths() {
     const entries = await getCollection('docs', ({ data }) => !data.draft);

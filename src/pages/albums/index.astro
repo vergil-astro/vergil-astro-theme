@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import { ChevronRight } from '@lucide/astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CustomImage from '../../components/ui/CustomImage.astro';
-import siteConfig from '../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 
 const albums = await getCollection('albums');
 const sortedAlbums = albums.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());

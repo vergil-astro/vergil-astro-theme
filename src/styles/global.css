@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+/* 框架代码作为 npm 包装在站点的 node_modules 里，Tailwind 默认不扫描那里，这里把框架自己的源码加进扫描范围 */
+@source '../';
+
 @import './base/tokens.css';
 @import './base/theme.css';
 @import './base/typography.css';

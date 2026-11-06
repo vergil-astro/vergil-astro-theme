@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/favicon.svg" width="96" alt="Vergil">
+<img src="starter/public/favicon.svg" width="96" alt="Vergil">
 
 # Vergil
 
@@ -16,22 +16,22 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/vergil-astro/vergil-astro-theme?style=social)](https://github.com/vergil-astro/vergil-astro-theme)
 
-![Vergil 深色文档页与浅色首页](public/assets/site/vergil-preview.jpg)
+![Vergil 深色文档页与浅色首页](starter/public/assets/site/vergil-preview.jpg)
 
 </div>
 
 ## 快速开始
 
-需要 Node.js 22（CI 上用的版本）和 pnpm。
+需要 Node.js 24 或更高版本（推荐最新的 LTS）、pnpm 和 Git。
 
 ```bash
-git clone https://github.com/vergil-astro/vergil-astro-theme.git
-cd vergil-astro-theme
-pnpm install
-pnpm dev
+npm install -g @vergil-astro/vergil-cli   # 装一次全局的 vg 命令
+vg init my-site                            # 新建 my-site 文件夹、放入示例站、安装依赖、启动开发服务器
 ```
 
-仓库自带的文章、相册、示例文档是演示内容。确认能跑起来之后，清掉它们：
+之后每次启动：`cd my-site`，然后 `pnpm dev`。
+
+站点自带的文章、相册、示例文档是演示内容。确认能跑起来之后，清掉它们：
 
 ```bash
 pnpm reset:dry # 先看会删什么
@@ -39,6 +39,20 @@ pnpm reset     # 确认后真正清理
 ```
 
 `pnpm reset` 会保留站内的 Vergil 使用文档，那是你之后要查的东西。想一起删掉用 `pnpm reset:all`。
+
+主题以 npm 包 `@vergil-astro/theme` 的形式装进站点，站点里只放内容和配置。主题发了新版本，在站点目录里运行 `vg upgrade`：它在新分支上更新主题、执行需要的迁移，并对比升级前后的每个页面。
+
+### 想改主题本身
+
+改组件、加指令、加界面语言，要在这个仓库里改：
+
+```bash
+git clone https://github.com/vergil-astro/vergil-astro-theme.git
+cd vergil-astro-theme
+pnpm install && pnpm dev
+```
+
+跑起来的是 `starter/` 里的示例站，它用的是仓库 `src/` 里的主题源码，改了立刻能看到。`starter/` 同时是 Vergil 官网和 `vg init` 的模板。改动合进主题后，所有站点升级就能用上，动手前先看下面的「参与贡献」。
 
 ## 它能做什么
 
@@ -76,7 +90,7 @@ pnpm reset     # 确认后真正清理
 
 四格分别是：文章里的折叠块与时间线指令、Golden 主题的影集、带侧边目录树的知识库、按分类筛选的极简模式。
 
-具体怎么配、怎么写，跑起来之后站内的 `/docs` 就是完整文档，源文件在 [`src/content/docs/vergil-guide/`](src/content/docs/vergil-guide)。
+具体怎么配、怎么写，跑起来之后站内的 `/docs` 就是完整文档，源文件在 [`starter/src/content/docs/vergil-guide/`](starter/src/content/docs/vergil-guide)。
 
 ## 生态工具
 

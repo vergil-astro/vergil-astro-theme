@@ -1,4 +1,4 @@
-import { siteInfo } from '../data/config/identity';
+import { siteInfo } from '@vergil-site/data/config/identity';
 import { locale } from '../i18n';
 import { skins as registeredSkins, schemes as registeredSchemes, type AppearanceLabels } from 'virtual:vergil/appearance';
 

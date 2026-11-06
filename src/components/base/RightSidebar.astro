@@ -3,7 +3,7 @@ import { locale, t } from '../../i18n';
 import { countWords } from '../../utils/word-count';
 import { type CollectionEntry, getCollection } from 'astro:content';
 import { getAllTags, getPostSlug, getPostsByTag, sortItemsByDateDesc } from '../../utils/data-utils';
-import siteConfig from '../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 import MemoCard from '../widgets/MemoCard.astro';
 import SidebarRecentPosts from '../widgets/SidebarRecentPosts.astro';
 import SidebarFeatured from '../widgets/SidebarFeatured.astro';

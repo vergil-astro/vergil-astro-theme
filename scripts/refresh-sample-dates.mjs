@@ -17,7 +17,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 const DRY = process.argv.includes('--dry');
-const BLOG = path.join(process.cwd(), 'src/content/blog');
+const BLOG = path.join(process.cwd(), 'starter/src/content/blog');
 
 /**
  * 距今天多少天。同一个数字出现两次，那天就有两篇，热力图会显示更深的颜色。

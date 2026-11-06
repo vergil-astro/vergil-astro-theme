@@ -85,16 +85,26 @@ function watchThemeChange(callback) {
 
 // ========== Mermaid ==========
 
+/**
+ * Mermaid 12 起默认用 ELK 布局和 neo 外观，图表会整体换个样子。固定成 classic + dagre，
+ * 和之前的图表保持一致（也省掉 ELK 那块代码的加载）；单个图表仍可在自己的 front matter 里改
+ */
+function mermaidConfig() {
+    return {
+        startOnLoad: false,
+        theme: isDarkMode() ? 'dark' : 'default',
+        securityLevel: 'strict',
+        look: 'classic',
+        layout: 'dagre',
+    };
+}
+
 async function loadMermaid() {
     if (mermaidLib) return mermaidLib;
     try {
         const mod = await import('mermaid');
         mermaidLib = mod.default || mod;
-        mermaidLib.initialize({
-            startOnLoad: false,
-            theme: isDarkMode() ? 'dark' : 'default',
-            securityLevel: 'strict',
-        });
+        mermaidLib.initialize(mermaidConfig());
         return mermaidLib;
     } catch (e) {
         console.error('[Charts] Mermaid init error:', e);
@@ -129,8 +139,11 @@ async function renderMermaid() {
                 outputEl.innerHTML = svg || '';
                 markLoaded(outputEl);
             } catch (err) {
-                outputEl.innerHTML =
-                    '<div class="md-echart-error-msg">Mermaid \u6e32\u67d3\u5931\u8d25: ' + err.message + '</div>';
+                // \u9519\u8bef\u4fe1\u606f\u91cc\u4f1a\u5e26\u4e0a\u56fe\u8868\u6e90\u7801\u7247\u6bb5\uff0c\u5f53\u6587\u672c\u653e\u8fdb\u53bb\uff0c\u4e0d\u5f53 HTML \u89e3\u6790
+                const msg = document.createElement('div');
+                msg.className = 'md-echart-error-msg';
+                msg.textContent = 'Mermaid \u6e32\u67d3\u5931\u8d25: ' + (err && err.message ? err.message : String(err));
+                outputEl.replaceChildren(msg);
                 markLoaded(outputEl);
             }
         });
@@ -240,11 +253,7 @@ function onThemeChange() {
     _themeDebounceTimer = setTimeout(() => {
         // Re-configure mermaid with new theme
         if (mermaidLib) {
-            mermaidLib.initialize({
-                startOnLoad: false,
-                theme: isDarkMode() ? 'dark' : 'default',
-                securityLevel: 'strict',
-            });
+            mermaidLib.initialize(mermaidConfig());
         }
 
         resetMermaid();

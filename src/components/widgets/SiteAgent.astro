@@ -1,6 +1,6 @@
 ---
 import { ChevronRight } from '@lucide/astro';
-import siteConfig from '../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 import { t } from '../../i18n';
 
 const agent = siteConfig.agent;
@@ -9,6 +9,12 @@ const agentName = agent?.name ?? 'Miki';
 const provider = agent?.provider ?? 'rive';
 const riveSrc = agent?.rive?.src ?? '';
 const live2dModelPath = agent?.live2d?.modelPath ?? '';
+// live2d-widget 只在站点启用 Live2D 时才加载，不作为主题的依赖安装：它停更多年，许可证是 GPL-2.0，
+// 安装时还会带上一串有安全漏洞、运行时也用不到的包。默认从 jsDelivr 加载固定版本并校验内容
+const LIVE2D_WIDGET_SRC = 'https://cdn.jsdelivr.net/npm/live2d-widget@3.1.4/lib/L2Dwidget.min.js';
+const LIVE2D_WIDGET_SRI = 'sha384-7juF1bX15+XBDE8gfqKx0FTkGHaS0AUiT14Pk3GhbHVsRgCl4mQTmL2Qm96bFSL9';
+const live2dWidgetSrc = agent?.live2d?.widgetSrc || LIVE2D_WIDGET_SRC;
+const live2dWidgetSri = live2dWidgetSrc === LIVE2D_WIDGET_SRC ? LIVE2D_WIDGET_SRI : '';
 const hasModel = (provider === 'rive' && !!riveSrc) || (provider === 'live2d' && !!live2dModelPath);
 const hasCharacter = hasModel;
 ---
@@ -22,6 +28,8 @@ const hasCharacter = hasModel;
         data-provider={provider}
         data-rive-src={riveSrc}
         data-live2d-model={live2dModelPath}
+        data-live2d-widget={provider === 'live2d' ? live2dWidgetSrc : undefined}
+        data-live2d-widget-sri={provider === 'live2d' && live2dWidgetSri ? live2dWidgetSri : undefined}
     >
         <div id="agent-bubble" class="agent-bubble pointer-events-auto rounded-2xl rounded-br-sm bg-card/30 border border-light/60 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12),0_2px_8px_-2px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4),0_2px_8px_-2px_rgba(0,0,0,0.2)] opacity-0 translate-y-2 transition-[opacity,transform] duration-200 scale-[0.98] origin-bottom-right backdrop-blur-lg overflow-hidden">
             <!-- 头部横条 -->
@@ -127,7 +135,7 @@ const hasCharacter = hasModel;
     </style>
 
     <script>
-        import { agentConfig, getDialogueForPath } from '../../data/agent-dialogue';
+        import { agentConfig, getDialogueForPath } from '@vergil-site/data/agent-dialogue';
 
         function getRoot() { return document.getElementById('agent-root'); }
         function getBubble() { return document.getElementById('agent-bubble'); }
@@ -151,8 +159,10 @@ const hasCharacter = hasModel;
             const provider = rootEl.dataset.provider as 'rive' | 'live2d';
             const riveSrc = rootEl.dataset.riveSrc || '';
             const live2dModelPath = rootEl.dataset.live2dModel || '';
+            const live2dWidgetSrc = rootEl.dataset.live2dWidget || '';
+            const live2dWidgetSri = rootEl.dataset.live2dWidgetSri || '';
 
-            type DialogueLine = import('../../data/agent-dialogue').DialogueLine;
+            type DialogueLine = import('@vergil-site/data/agent-dialogue').DialogueLine;
 
             interface AgentState {
                 isCollapsed: boolean;
@@ -519,11 +529,26 @@ const hasCharacter = hasModel;
                 }
             }
 
+            /** 加载 live2d-widget 脚本，它会挂到 window.L2Dwidget，分出去的模块从同一目录加载 */
+            function loadLive2dWidget(): Promise<{ init: (options: unknown) => void }> {
+                const w = window as unknown as { L2Dwidget?: { init: (options: unknown) => void } };
+                if (w.L2Dwidget) return Promise.resolve(w.L2Dwidget);
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = live2dWidgetSrc;
+                    script.crossOrigin = 'anonymous';
+                    if (live2dWidgetSri) script.integrity = live2dWidgetSri;
+                    script.onload = () => (w.L2Dwidget ? resolve(w.L2Dwidget) : reject(new Error('L2Dwidget is missing after loading the script')));
+                    script.onerror = () => reject(new Error(`Could not load ${live2dWidgetSrc}`));
+                    document.head.appendChild(script);
+                });
+            }
+
             async function initLive2d() {
-                if (!live2dModelPath) return;
+                if (!live2dModelPath || !live2dWidgetSrc) return;
 
                 try {
-                    const L2DWidget = await import('live2d-widget');
+                    const L2DWidget = await loadLive2dWidget();
                     L2DWidget.init({
                         model: {
                             jsonPath: live2dModelPath,

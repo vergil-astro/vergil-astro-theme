@@ -1,6 +1,6 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
-import siteConfig from '../data/site-config.ts';
+import siteConfig from '@vergil-site/data/site-config';
 import { sortItemsByDateDesc } from '../utils/data-utils.ts';
 
 export async function GET(context) {

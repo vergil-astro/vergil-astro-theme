@@ -6,7 +6,7 @@ import MinimalLayout from '../../../../views/minimal/layouts/MinimalLayout.astro
 import Breadcrumb from '../../../../components/ui/Breadcrumb.astro';
 import { getPostSlug, sortItemsByDateDesc } from '../../../../utils/data-utils';
 import { slugify } from '../../../../utils/common-utils';
-import siteConfig from '../../../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 
 export async function getStaticPaths() {
     if (siteConfig.views?.minimal?.enabled !== true) return [];

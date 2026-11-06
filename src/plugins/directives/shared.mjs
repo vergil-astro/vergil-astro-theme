@@ -31,12 +31,28 @@ export const NAMED_COLORS = {
     accent: 'var(--accent-color,#4a7c59)',
 };
 
+/**
+ * An icon's data by name. Icon sets rename icons over time and keep the old names as aliases
+ * (lucide's triangle-alert is now triangle-exclamation-point), so follow those to the icon itself;
+ * otherwise an icon written with an old name in someone's posts would silently disappear.
+ */
+function findIcon(iconSet, name) {
+    let key = name;
+    for (let hops = 0; iconSet && hops < 5; hops++) {
+        if (iconSet.icons?.[key]) return iconSet.icons[key];
+        const alias = iconSet.aliases?.[key];
+        if (!alias?.parent) return null;
+        key = alias.parent;
+    }
+    return null;
+}
+
 /** Get Iconify SVG string */
 export function getIconSvg(name, size = '1em') {
     const [rawSet, iconName] = name.split(':');
     const set = SET_ALIASES[rawSet] || rawSet;
     const prefixedName = (SET_PREFIXES[rawSet] || '') + iconName;
-    const data = ICON_SETS[set]?.icons?.[prefixedName] || ICON_SETS[set]?.icons?.[iconName];
+    const data = findIcon(ICON_SETS[set], prefixedName) || findIcon(ICON_SETS[set], iconName);
     if (!data) return '';
     const { body, width = 24, height = 24 } = data;
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${width} ${height}" fill="currentColor">${body}</svg>`;
