@@ -17,7 +17,7 @@ pnpm install
 pnpm dev
 ```
 
-需要 Node.js 22。仓库自带的内容是演示用的，`pnpm reset` 可以清掉。
+需要 Node.js 24 或更高版本和 pnpm。主题代码在根目录的 `src/`，`pnpm dev` 跑的是 `starter/` 里的示例站，它直接用仓库里的主题源码，改了立刻能看到。示例站也是官网和 `vg init` 的模板，里面的内容别清掉。
 
 ## 提交前
 
@@ -44,12 +44,12 @@ refactor: 抽出共享的上下篇导航组件
 
 这是硬性要求。以下任何一项变化，都要在同一个 PR 里带上文档改动：
 
-- `src/data/config/` 下字段的增删改名
-- `src/content.config.ts` 的 schema 变化
+- 站点配置字段的增删改名（类型在 `src/types.ts`，示例站的配置在 `starter/src/data/config/`）
+- `src/collections.ts` 的 schema 变化
 - 指令的名字、属性、默认值变化
 - 默认开关状态变化
 
-文档在 `src/content/docs/vergil-guide/`，写法约定见其中的 `DOCS-CONVENTIONS.md`。
+文档在 `starter/src/content/docs/vergil-guide/`，写法约定见其中的 `DOCS-CONVENTIONS.md`。
 
 文档和代码脱节过一次，补了很久。不想再来一遍。
 
@@ -57,7 +57,7 @@ refactor: 抽出共享的上下篇导航组件
 
 界面文案在 `src/i18n/`。`zh-CN.ts` 是基准，`en.ts` 声明成了 `typeof zhCN`，所以少写一个 key 就编译不过。
 
-想加一种语言，照着 `en.ts` 复制一份，在 `index.ts` 里注册。注意只翻译主题界面的文字，用户自己写的内容和配置不在 i18n 范围内。
+想加一种语言，照着 `en.ts` 复制一份，在 `index.ts` 和 `src/integration.ts` 两处的字典表里都注册上。注意只翻译主题界面的文字，用户自己写的内容和配置不在 i18n 范围内。
 
 ## License
 

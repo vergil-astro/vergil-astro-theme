@@ -222,6 +222,11 @@ export type AgentConfig = {
     };
     live2d?: {
         modelPath: string;
+        /**
+         * live2d-widget 脚本的地址，默认从 jsDelivr 加载固定版本（带完整性校验）。
+         * 想自己托管时，把 L2Dwidget.min.js 和 L2Dwidget.0.min.js 放进 public/ 的同一个目录，这里写前者的地址
+         */
+        widgetSrc?: string;
     };
 };
 

@@ -6,7 +6,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import Comments from '../components/widgets/Comments.astro';
 import Subscribe from '../components/widgets/Subscribe.astro';
-import siteConfig from '../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 
 export async function getStaticPaths() {
     const pages = await getCollection('pages');

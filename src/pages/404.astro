@@ -1,7 +1,7 @@
 ---
 import { t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { Home } from '@lucide/astro';
+import { House } from '@lucide/astro';
 ---
 
 <BaseLayout title={t.page.notFound.title} description={t.page.notFound.short} showSidebar={false} showRightSidebar={false} showTopNav={false}>
@@ -15,7 +15,7 @@ import { Home } from '@lucide/astro';
             href="/"
             class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
         >
-            <Home class="w-5 h-5" />
+            <House class="w-5 h-5" />
             {t.page.notFound.backHome}
         </a>
     </div>

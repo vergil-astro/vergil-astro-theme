@@ -1,0 +1,31 @@
+{
+    "name": "vergil-starter",
+    "private": true,
+    "type": "module",
+    "version": "0.1.0",
+    "engines": {
+        "node": ">=24.0.0"
+    },
+    "scripts": {
+        "dev": "astro dev",
+        "start": "astro dev",
+        "build": "vg images organize && astro build",
+        "preview": "astro preview",
+        "astro": "astro",
+        "new": "vg new",
+        "reset": "vg reset",
+        "reset:all": "vg reset --all",
+        "reset:dry": "vg reset --dry",
+        "images:organize": "vg images organize",
+        "images:expand": "vg images expand",
+        "images:check": "vg images check",
+        "directives:check": "vg directives check",
+        "directives:ref": "vg directives ref",
+        "theme:upgrade": "vg upgrade"
+    },
+    "dependencies": {
+        "@vergil-astro/theme": "workspace:*",
+        "astro": "^7.4.6",
+        "sharp": "^0.35.5"
+    }
+}

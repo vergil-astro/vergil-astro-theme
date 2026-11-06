@@ -1,7 +1,7 @@
 ---
 import { getImage } from 'astro:assets';
-import { getSiteFonts, resolveFontOverrides } from '../../utils/fonts';
-import siteConfig from '../../data/site-config';
+import { fullFamilyOf, getSiteFonts, resolveFontOverrides, subsetPathOf } from '../../utils/fonts';
+import siteConfig from '@vergil-site/data/site-config';
 import type { ImageInput } from '../../types';
 
 import '../../styles/global.css';
@@ -69,14 +69,17 @@ function formatCanonicalURL(url: string | URL) {
 ))}
 
 {fileFonts.map(f => {
-    const subsetPath = f.path.replace('.woff2', '-subset.woff2');
+    const subsetPath = subsetPathOf(f);
+    const fullFamily = fullFamilyOf(f);
     const format = f.format ?? 'woff2';
+    const faces = [`@font-face { font-family: "${f.cssName}"; src: url("${subsetPath}") format("${format}"); font-display: swap; }`];
+    if (fullFamily) faces.push(`@font-face { font-family: "${fullFamily}"; src: url("${f.path}") format("${format}"); font-display: swap; }`);
     return (
         <>
-            {/* Subset 版本：preload，首屏立即渲染 */}
+            {/* 子集：预加载，首屏立即渲染 */}
             <link rel="preload" href={subsetPath} as="font" type={`font/${format}`} crossorigin />
-            {/* Full 版本：后台加载，补充缺失字形 */}
-            <style set:html={`@font-face { font-family: "${f.cssName}"; src: url("${subsetPath}") format("${format}"), url("${f.path}") format("${format}"); font-display: swap; }`} />
+            {/* 完整文件是字体栈里的下一个字体，子集里缺字时浏览器才下载它，见 fullFamilyOf */}
+            <style set:html={faces.join(' ')} />
         </>
     );
 })}

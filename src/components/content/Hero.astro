@@ -5,12 +5,12 @@ import {
     Zap,
     Star,
     Heart,
-    Code2,
+    CodeXml,
     Coffee,
     Rocket,
-    Smile,
+    FaceSlightlySmiling,
     Sun,
-    Music,
+    EighthNotes,
     Camera,
     Gamepad2,
     Plane,
@@ -22,9 +22,10 @@ import {
     Globe
 } from '@lucide/astro';
 
+// key 是站点配置里写的名字；Lucide 改了名的图标（Code2、Smile、Music）保留旧 key
 const ICONS: Record<string, unknown> = {
-    Sparkles, Zap, Star, Heart, Code2, Coffee, Rocket, Smile, Sun,
-    Music, Camera, Gamepad2, Plane, Mountain, BookOpen, PenTool, Film, Dumbbell, Globe
+    Sparkles, Zap, Star, Heart, Code2: CodeXml, Coffee, Rocket, Smile: FaceSlightlySmiling, Sun,
+    Music: EighthNotes, Camera, Gamepad2, Plane, Mountain, BookOpen, PenTool, Film, Dumbbell, Globe
 };
 
 export interface Props {

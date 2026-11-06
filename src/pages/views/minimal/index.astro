@@ -2,7 +2,7 @@
 import { t } from '../../../i18n';
 import MinimalLayout from '../../../views/minimal/layouts/MinimalLayout.astro';
 import MinimalClientView from '../../../views/minimal/components/MinimalClientView.astro';
-import siteConfig from '../../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 
 export async function getStaticPaths() {
     if (siteConfig.views?.minimal?.enabled !== true) return [];

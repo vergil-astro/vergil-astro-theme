@@ -11,7 +11,7 @@ import SidebarToc from '../../../components/widgets/SidebarToc.astro';
 import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
 import HeroSplash from '../../../components/content/HeroSplash.astro';
 import Comments from '../../../components/widgets/Comments.astro';
-import siteConfig from '../../../data/site-config';
+import siteConfig from '@vergil-site/data/site-config';
 
 export const getStaticPaths = (async () => {
     const sets = await getDocSets();

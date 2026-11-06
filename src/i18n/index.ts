@@ -1,4 +1,4 @@
-import { siteInfo } from '../data/config/identity';
+import { siteInfo } from '@vergil-site/data/config/identity';
 import zhCN from './zh-CN';
 import en from './en';
 
