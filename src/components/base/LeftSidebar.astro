@@ -75,7 +75,7 @@ function isActive(href: string): boolean {
 }
 ---
 
-<aside id="main-sidebar" class="sidebar flex flex-col fixed lg:sticky lg:self-start left-0 lg:left-auto top-14 h-[calc(100vh-3.5rem)] w-72 lg:w-60 xl:w-64 2xl:w-72 bg-main overflow-y-auto z-40 transition-transform duration-300">
+<aside id="main-sidebar" class="sidebar flex flex-col fixed lg:sticky lg:self-start left-0 lg:left-auto top-14 h-[calc(100vh-3.5rem)] w-72 lg:w-60 xl:w-64 2xl:w-72 bg-main overflow-y-auto z-[45] transition-transform duration-300">
   <div class="flex-1 p-5">
     <!-- Profile Card -->
     <div class="ui-panel bg-card rounded-xl p-4 mb-3 text-center">
@@ -233,7 +233,7 @@ function isActive(href: string): boolean {
       isCollapsed = collapsed;
       var sb = getSidebar();
       var overlay = document.getElementById('sidebar-overlay');
-      var desktopToggle = document.getElementById('sidebar-desktop-toggle');
+      var desktopToggle = document.querySelector('[data-event="toggle-left-sidebar"]');
       var floatingTocBtn = document.getElementById('floating-toc-btn');
       var isMobile = window.innerWidth < 1024;
 

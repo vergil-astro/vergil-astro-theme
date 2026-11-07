@@ -6,3 +6,6 @@ packages:
 allowBuilds:
   esbuild: false
   sharp: false
+
+minimumReleaseAgeExclude:
+  - '@vergil-astro/vergil-cli@0.2.0'
