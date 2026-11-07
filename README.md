@@ -29,21 +29,40 @@
 
 需要 Node.js 24 或更高版本（推荐最新的 LTS）、pnpm 和 Git。
 
+**1. 安装并建站**
+
 ```bash
 npm install -g @vergil-astro/vergil-cli   # 装一次全局的 vg 命令
 vg init my-site                            # 新建 my-site 文件夹、放入示例站、安装依赖、启动开发服务器
+cd my-site
 ```
 
-之后每次启动：`cd my-site`，然后 `pnpm dev`。
+打开终端给出的地址（通常是 `http://localhost:4321/`）。你会看到一个完整的示例站：文章、相册、文档都在，先随便点点看。之后每次启动，在站点目录里运行 `vg serve`。
 
-站点自带的文章、相册、示例文档是演示内容。确认能跑起来之后，清掉它们：
+**2. 发布你的第一篇文章**
 
 ```bash
-pnpm reset:dry # 先看会删什么
-pnpm reset     # 确认后真正清理
+vg new post "我的第一篇"
 ```
 
-`pnpm reset` 会保留站内的 Vergil 使用文档，那是你之后要查的东西。想一起删掉用 `pnpm reset:all`。
+终端会给出新文件的路径。打开它写几句，保存，浏览器里就能看到。
+
+**3. 换成你自己的信息**
+
+站名、介绍、头像在 `src/data/config/identity.ts`，域名在 `src/data/site-config.ts` 的 `website` 字段——部署前记得改成真实域名，否则 RSS 和 sitemap 会用占位域名。逐项说明见站内文档的「站点配置」。
+
+**4. 可选：清掉示例内容**
+
+示例文章和相册可以留着当参考。等准备好做自己的站了：
+
+```bash
+vg reset --dry # 先看会删什么
+vg reset       # 清掉示例文章、相册等演示内容，保留站内使用文档
+```
+
+想连使用文档一起删掉用 `vg reset --all`。
+
+接下来想上线、换皮肤、配评论，看站内的使用文档 `/docs`（源文件在 [`starter/src/content/docs/vergil-guide/`](starter/src/content/docs/vergil-guide)）；`vg` 的全部命令见 [vergil-cli](https://github.com/vergil-astro/vergil-cli)。
 
 主题以 npm 包 `@vergil-astro/theme` 的形式装进站点，站点里只放内容和配置。主题发了新版本，在站点目录里运行 `vg upgrade`：它在新分支上更新主题、执行需要的迁移，并对比升级前后的每个页面。
 
@@ -150,21 +169,40 @@ A content site framework built on Astro. Callouts, timelines, charts, galleries,
 
 Requires Node.js 24 or later (the newest LTS is recommended), pnpm, and Git.
 
+**1. Install and create your site**
+
 ```bash
 npm install -g @vergil-astro/vergil-cli   # Install the vg command globally, once
 vg init my-site                            # Create my-site, copy in the starter, install dependencies, start the dev server
+cd my-site
 ```
 
-After that, start the site with `cd my-site` and `pnpm dev`.
+Open the address printed in your terminal (usually `http://localhost:4321/`). You'll see a complete demo site—posts, galleries, and docs are all there, so click around. Later, restart the dev server with `vg serve` from the site folder.
 
-The posts, galleries, and sample documents that come with the new site are demo content. Once the site is running, you can remove them:
+**2. Publish your first post**
 
 ```bash
-pnpm reset:dry # Preview what will be removed
-pnpm reset     # Remove it after reviewing the preview
+vg new post "Hello Vergil"
 ```
 
-`pnpm reset` keeps the built-in Vergil documentation for future reference. To remove it as well, use `pnpm reset:all`.
+The new file's path is printed in the terminal. Open it, write a few lines, save, and it shows up in the browser.
+
+**3. Make it yours**
+
+Site title, description, and avatar live in `src/data/config/identity.ts`; the production URL is the `website` field in `src/data/site-config.ts`—set it to your real domain before deploying, or RSS and sitemap links will use the placeholder domain. See "Site Configuration" in the built-in docs for each option.
+
+**4. Optional: clear the demo content**
+
+The sample posts and galleries can stay as references. When you're ready to make the site your own:
+
+```bash
+vg reset --dry # Preview what will be removed
+vg reset       # Clear the sample posts, galleries and other demo content, keeping the built-in docs
+```
+
+To remove the docs as well, use `vg reset --all`.
+
+Next steps—deploying, skins, comments—are in the built-in docs at `/docs` (source in [`starter/src/content/docs/vergil-guide/`](starter/src/content/docs/vergil-guide)). For every `vg` command, see [vergil-cli](https://github.com/vergil-astro/vergil-cli).
 
 The theme is installed into your site as the npm package `@vergil-astro/theme`, so the site itself holds only content and configuration. When a new theme version comes out, run `vg upgrade` in the site folder: it updates the theme on a new branch, runs any migrations needed, and compares every page before and after.
 
