@@ -1,56 +1,62 @@
 /**
- * 外观注册：按名字找到启用的皮肤和配色，校验后交给页面使用。
+ * Appearance registry: finds the enabled skins and schemes by name, validates them, and hands them to the pages.
  *
- * 用法像 zsh 的插件：把皮肤目录放进站点根目录的 skins/<名字>/，再在 identity.ts 的 skins 里写上名字；
- * 经典皮肤和它的配色 A–I、K 是内置的，不用写。每个皮肤至少自带一套配色，访客在一个皮肤下只能选它自己的配色，
- * 没有单独的配色包。
+ * Works like zsh plugins: put the skin directory at skins/<name>/ in the site root, then add its name to skins in identity.ts;
+ * the classic skin and its schemes A–I and K are built in and need no entry. Every skin ships with at least one scheme, under a skin visitors can only pick that skin's own schemes,
+ * and there are no standalone scheme packages.
  *
- * 皮肤目录里只有数据和样式，构建时只读不执行：
- *   skins/<名字>/skin.json         显示名、默认配色、自带的配色列表
- *   skins/<名字>/skin.css          样式入口
- *   skins/<名字>/schemes/<id>.css  自带配色，每套一个文件，文件名就是配色 ID
+ * A skin directory holds only data and styles, which the build reads but never executes:
+ *   skins/<name>/skin.json         display name, default scheme, list of bundled schemes
+ *   skins/<name>/skin.css          style entry point
+ *   skins/<name>/schemes/<id>.css  bundled schemes, one file each, named by scheme ID
  *
- * 注册结果通过两个虚拟模块提供：
- *   virtual:vergil/appearance         皮肤和配色的列表（纯数据），面板、切换脚本、首屏脚本都从这里读
- *   virtual:vergil/appearance-styles  依次引入启用的皮肤和配色的 CSS，没启用的不会进构建
+ * The registry is exposed through two virtual modules:
+ *   virtual:vergil/appearance         list of skins and schemes (plain data), read by the panel, the switcher script, and the first-paint script
+ *   virtual:vergil/appearance-styles  imports the CSS of the enabled skins and schemes in order; disabled ones stay out of the build
  *
- * 写了名字但目录不存在，跳过并警告，站点照常构建；目录存在但内容不对，构建直接失败并指出是哪个文件、哪个字段。
- * 格式和皮肤能依赖的挂钩、变量见文档「皮肤与配色接口」。
+ * A listed name whose directory does not exist is skipped with a warning and the site builds as usual; a directory with wrong contents fails the build, naming the file and field.
+ * For the format and the hooks and variables a skin can rely on, see the docs page on the skin and color scheme contract.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import contract from './contract.json' with { type: 'json' };
+import zhCN from '../i18n/zh-CN';
 import { builtinSkins, builtinSchemes } from './builtin.mjs';
 
 const DATA_ID = 'virtual:vergil/appearance';
 const STYLES_ID = 'virtual:vergil/appearance-styles';
 
-/** 皮肤名、配色 ID：会写进目录路径、CSS 选择器和 HTML 属性，只允许小写字母、数字和短横 */
+/** Skin names and scheme IDs end up in directory paths, CSS selectors, and HTML attributes, so only lowercase letters, digits, and hyphens are allowed */
 const NAME_RE = /^[a-z][a-z0-9-]{0,31}$/;
-/** 面板色点下面显示的短标记 */
+/** Short label shown under the color dot on the panel */
 const SHORT_RE = /^[A-Za-z0-9]{1,2}$/;
-/** 色点和图标的颜色会写进 style 属性，只接受十六进制色值或一个 CSS 变量 */
+/** Dot and icon colors are written into a style attribute, so only a hex color or a single CSS variable is accepted */
 const COLOR_RE = /^(#[0-9a-fA-F]{3,8}|var\(--[a-z0-9-]+\))$/;
 
 class AppearanceError extends Error {
-    constructor(message) {
-        super(`[vergil 外观] ${message}`);
+    /** @param {Messages} msg @param {string} message */
+    constructor(msg, message) {
+        super(`${msg.prefix} ${message}`);
         this.name = 'AppearanceError';
     }
 }
 
+/** @typedef {typeof zhCN.build.appearance} Messages */
+
 /**
- * @param {{ skins?: string[] }} options identity.ts 里启用的皮肤名
+ * @param {{ skins?: string[], messages?: Messages }} options the skin names enabled in identity.ts, and the build messages
+ *   in the site's UI language (src/integration.ts passes t.build.appearance; the Chinese base dictionary is the fallback)
  */
 export default function appearance(options = {}) {
+    const msg = options.messages ?? zhCN.build.appearance;
     return {
         name: 'vergil-appearance',
         hooks: {
             'astro:config:setup': ({ config, updateConfig, addWatchFile, logger }) => {
                 const root = fileURLToPath(config.root);
-                const registry = buildRegistry(root, options, logger);
-                // skin.json 改了要重启开发服务器才能重新注册；CSS 改了走正常的热更新
+                const registry = buildRegistry(root, options, logger, msg);
+                // Changes to skin.json need a dev server restart to re-register; CSS changes go through normal hot reload
                 for (const file of registry.watchFiles) addWatchFile(file);
                 updateConfig({ vite: { plugins: [appearanceVitePlugin(registry)] } });
             },
@@ -81,7 +87,7 @@ function appearanceVitePlugin(registry) {
     };
 }
 
-function buildRegistry(root, options, logger) {
+function buildRegistry(root, options, logger, msg) {
     const skins = builtinSkins.map(({ name, labels, recommendedScheme, schemes }) => ({ name, labels, recommendedScheme, schemes: [...schemes] }));
     const schemes = builtinSchemes.map(({ id, short, labels, swatch, icon }) => ({ id, short, labels, swatch, icon }));
     const styles = [];
@@ -89,73 +95,73 @@ function buildRegistry(root, options, logger) {
 
     const addScheme = (scheme, where) => {
         if (schemes.some((s) => s.id === scheme.id)) {
-            throw new AppearanceError(`${where}：配色 ID "${scheme.id}" 已经被别的皮肤或配色用了，换一个名字`);
+            throw new AppearanceError(msg, msg.duplicateScheme(where, scheme.id));
         }
         schemes.push(scheme);
     };
 
-    for (const name of readNameList(options.skins, 'skins', logger)) {
+    for (const name of readNameList(options.skins, 'skins', logger, msg)) {
         if (skins.some((s) => s.name === name)) {
-            logger.warn(name === 'classic' ? 'classic 是内置皮肤，不用写进 skins' : `skins 里 "${name}" 写了两遍`);
+            logger.warn(name === 'classic' ? msg.builtinSkinListed : msg.duplicateName('skins', name));
             continue;
         }
-        const dir = resolvePackageDir(root, 'skins', name);
+        const dir = resolvePackageDir(root, 'skins', name, msg);
         if (!dir) {
-            logger.warn(`皮肤 "${name}" 没有安装，已跳过：请把它放到 skins/${name}/`);
+            logger.warn(msg.skinNotInstalled(name));
             continue;
         }
         const where = `skins/${name}/skin.json`;
         const manifestPath = path.join(dir, 'skin.json');
-        const manifest = readManifest(manifestPath, where);
+        const manifest = readManifest(manifestPath, where, msg);
         watchFiles.push(manifestPath);
 
-        const skinCss = requireFile(dir, 'skin.css', `skins/${name}/skin.css`);
+        const skinCss = requireFile(dir, 'skin.css', `skins/${name}/skin.css`, msg);
         styles.push(toRootPath(root, skinCss));
 
-        // 访客在这个皮肤下只能选它自带的配色，所以至少要有一套
+        // Under this skin visitors can only pick its bundled schemes, so it needs at least one
         const ownSchemes = manifest.schemes;
         if (!Array.isArray(ownSchemes) || !ownSchemes.length) {
-            throw new AppearanceError(`${where}：schemes 至少要有一套配色，访客在这个皮肤下只能选它自带的配色`);
+            throw new AppearanceError(msg, msg.noSchemes(where));
         }
         const ids = [];
         ownSchemes.forEach((entry, i) => {
-            const at = `${where} 的 schemes[${i}]`;
-            if (!entry || typeof entry !== 'object') throw new AppearanceError(`${at} 应该是一个对象`);
+            const at = msg.schemeAt(where, i);
+            if (!entry || typeof entry !== 'object') throw new AppearanceError(msg, msg.notObject(at));
             if (typeof entry.id !== 'string' || !NAME_RE.test(entry.id)) {
-                throw new AppearanceError(`${at}.id 不合法：只能用小写字母、数字和短横，以字母开头`);
+                throw new AppearanceError(msg, msg.invalidSchemeId(at));
             }
-            const scheme = readSchemeFields(entry, at, entry.id);
+            const scheme = readSchemeFields(entry, at, entry.id, msg);
             if (schemes.some((s) => ids.includes(s.id) && s.short === scheme.short)) {
-                throw new AppearanceError(`${at}：short "${scheme.short}" 和这个皮肤的另一套配色重复了，面板上会分不清`);
+                throw new AppearanceError(msg, msg.duplicateShort(at, scheme.short));
             }
             addScheme(scheme, at);
             ids.push(entry.id);
-            const css = requireFile(dir, path.join('schemes', `${entry.id}.css`), `skins/${name}/schemes/${entry.id}.css`);
+            const css = requireFile(dir, path.join('schemes', `${entry.id}.css`), `skins/${name}/schemes/${entry.id}.css`, msg);
             styles.push(toRootPath(root, css));
         });
 
-        // 默认配色：访客切到这个皮肤时换成它，不写就是第一套
+        // Default scheme: applied when a visitor switches to this skin; the first one if omitted
         const recommendedScheme = manifest.recommendedScheme ?? ids[0];
         if (typeof recommendedScheme !== 'string' || !ids.includes(recommendedScheme)) {
-            throw new AppearanceError(`${where}：recommendedScheme 要是这个皮肤自带的配色之一：${ids.join('、')}`);
+            throw new AppearanceError(msg, msg.badRecommendedScheme(where, ids));
         }
-        skins.push({ name, labels: readLabels(manifest.labels, where, name), recommendedScheme, schemes: ids });
+        skins.push({ name, labels: readLabels(manifest.labels, where, name, msg), recommendedScheme, schemes: ids });
     }
 
     return { skins, schemes, styles, watchFiles };
 }
 
-/** identity.ts 里的名字列表：必须是数组，名字只能用安全字符，重复的只算一次 */
-function readNameList(list, field, logger) {
+/** Name list from identity.ts: must be an array, names may only use safe characters, and duplicates count once */
+function readNameList(list, field, logger, msg) {
     if (list === undefined) return [];
-    if (!Array.isArray(list)) throw new AppearanceError(`identity.ts 的 ${field} 应该是名字数组，比如 ['island']`);
+    if (!Array.isArray(list)) throw new AppearanceError(msg, msg.notNameArray(field));
     const names = [];
     for (const name of list) {
         if (typeof name !== 'string' || !NAME_RE.test(name)) {
-            throw new AppearanceError(`identity.ts 的 ${field} 里 ${JSON.stringify(name)} 不是合法的名字：只能用小写字母、数字和短横，以字母开头`);
+            throw new AppearanceError(msg, msg.invalidName(field, String(JSON.stringify(name))));
         }
         if (names.includes(name)) {
-            logger.warn(`${field} 里 "${name}" 写了两遍`);
+            logger.warn(msg.duplicateName(field, name));
             continue;
         }
         names.push(name);
@@ -163,58 +169,58 @@ function readNameList(list, field, logger) {
     return names;
 }
 
-/** skins/<名字>/。目录不存在返回 null；软链接指到外面去的一律拒绝 */
-function resolvePackageDir(root, kind, name) {
+/** skins/<name>/. Returns null if the directory does not exist; symlinks pointing outside are always rejected */
+function resolvePackageDir(root, kind, name, msg) {
     const base = path.join(root, kind);
     const dir = path.join(base, name);
     if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) return null;
     const realBase = fs.realpathSync(base);
     const realDir = fs.realpathSync(dir);
     if (!realDir.startsWith(realBase + path.sep)) {
-        throw new AppearanceError(`${kind}/${name} 指向了 ${kind}/ 以外的位置，出于安全考虑不加载`);
+        throw new AppearanceError(msg, msg.outsideDir(kind, name));
     }
     return realDir;
 }
 
-function readManifest(file, where) {
-    if (!fs.existsSync(file)) throw new AppearanceError(`缺少 ${where}`);
+function readManifest(file, where, msg) {
+    if (!fs.existsSync(file)) throw new AppearanceError(msg, msg.missingFile(where));
     let data;
     try {
         data = JSON.parse(fs.readFileSync(file, 'utf8'));
     } catch (error) {
-        throw new AppearanceError(`${where} 不是合法的 JSON：${error.message}`);
+        throw new AppearanceError(msg, msg.invalidJson(where, error.message));
     }
-    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new AppearanceError(`${where} 应该是一个对象`);
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new AppearanceError(msg, msg.notObject(where));
     if (data.contract !== contract.version) {
-        throw new AppearanceError(`${where} 的 contract 是 ${JSON.stringify(data.contract)}，当前 Vergil 的外观接口版本是 ${contract.version}，两边要一致`);
+        throw new AppearanceError(msg, msg.contractMismatch(where, String(JSON.stringify(data.contract)), contract.version));
     }
     return data;
 }
 
-function readSchemeFields(entry, where, id) {
+function readSchemeFields(entry, where, id, msg) {
     if (typeof entry.short !== 'string' || !SHORT_RE.test(entry.short)) {
-        throw new AppearanceError(`${where}：short 是色点下面显示的 1～2 个字母或数字`);
+        throw new AppearanceError(msg, msg.invalidShort(where));
     }
     if (typeof entry.swatch !== 'string' || !COLOR_RE.test(entry.swatch)) {
-        throw new AppearanceError(`${where}：swatch 只接受十六进制色值（如 #a9521f）或一个 CSS 变量（如 var(--text-main)）`);
+        throw new AppearanceError(msg, msg.invalidSwatch(where));
     }
     const icon = entry.icon ?? entry.swatch;
     if (typeof icon !== 'string' || !COLOR_RE.test(icon)) {
-        throw new AppearanceError(`${where}：icon 只接受十六进制色值或一个 CSS 变量`);
+        throw new AppearanceError(msg, msg.invalidIcon(where));
     }
-    return { id, short: entry.short, labels: readLabels(entry.labels, where, id), swatch: entry.swatch, icon };
+    return { id, short: entry.short, labels: readLabels(entry.labels, where, id, msg), swatch: entry.swatch, icon };
 }
 
-/** 显示名：{ "zh-CN": "...", "en": "..." }，至少写一种语言 */
-function readLabels(labels, where, fallback) {
+/** Display names: { "zh-CN": "...", "en": "..." }, with at least one language */
+function readLabels(labels, where, fallback, msg) {
     if (labels === undefined) return { en: fallback };
     if (!labels || typeof labels !== 'object' || Array.isArray(labels)) {
-        throw new AppearanceError(`${where}：labels 应该是 { "zh-CN": "...", "en": "..." } 这样的对象`);
+        throw new AppearanceError(msg, msg.invalidLabels(where));
     }
     const out = {};
     for (const [lang, text] of Object.entries(labels)) {
         if (typeof text !== 'string' || !text.trim() || text.length > 40) {
-            throw new AppearanceError(`${where}：labels.${lang} 应该是 1～40 个字的字符串`);
+            throw new AppearanceError(msg, msg.invalidLabel(where, lang));
         }
         out[lang] = text.trim();
     }
@@ -222,13 +228,13 @@ function readLabels(labels, where, fallback) {
     return out;
 }
 
-function requireFile(dir, relative, where) {
+function requireFile(dir, relative, where, msg) {
     const file = path.join(dir, relative);
-    if (!fs.existsSync(file) || !fs.statSync(file).isFile()) throw new AppearanceError(`缺少 ${where}`);
+    if (!fs.existsSync(file) || !fs.statSync(file).isFile()) throw new AppearanceError(msg, msg.missingFile(where));
     return file;
 }
 
-/** 交给 Vite 的路径写成相对站点根目录的 /skins/... 形式 */
+/** Paths handed to Vite are written as /skins/... relative to the site root */
 function toRootPath(root, file) {
     const relative = path.relative(fs.realpathSync(root), file);
     return '/' + relative.split(path.sep).join('/');

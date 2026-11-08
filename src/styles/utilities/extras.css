@@ -1,7 +1,7 @@
-/* ── 全站滚动条：平时透明，哪个区域在滚动才显示它的滚动条，停下 0.8 秒后隐藏 ──
-   is-scrolling 由 BaseHead 里的脚本加在正在滚动的元素上。
-   原来是鼠标一进页面就显示，页面里所有可滚动区域（代码块、表格、侧栏）的横竖滚动条会一起冒出来。
-   宽度始终保留 6px，只切换颜色，滚动条出现、消失时区域内容不会挪动 */
+/* ── Site-wide scrollbars: transparent by default; a region shows its scrollbar only while it is scrolling and hides it 0.8s after it stops ──
+   The script in BaseHead adds is-scrolling to the element being scrolled.
+   Previously they showed as soon as the mouse entered the page, so the horizontal and vertical scrollbars of every scrollable region (code blocks, tables, sidebar) popped up at once.
+   The 6px width is always reserved and only the color changes, so the region's content does not shift when the scrollbar appears or disappears */
 * {
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;
@@ -11,8 +11,8 @@
     scrollbar-color: color-mix(in srgb, var(--text-muted) 45%, transparent) transparent;
 }
 
-/* 页面本身的原生滚动条完全隐藏：它会占掉页面宽度，全宽的开屏图旁边会露出一道底色。
-   用 BaseHead 里的浮动滑块代替 */
+/* Fully hide the page's own native scrollbar: it takes up page width and leaves a strip of background color beside the full-width splash image.
+   The floating thumb in BaseHead replaces it */
 html {
     scrollbar-width: none;
 }
@@ -40,14 +40,14 @@ html::-webkit-scrollbar {
     pointer-events: auto;
 }
 
-/* 鼠标放上去或拖动时稍微变粗、变深，方便抓住 */
+/* Slightly thicker and darker on hover or drag, so it is easier to grab */
 #vergil-scroll-thumb.is-visible:hover,
 #vergil-scroll-thumb.is-dragging {
     width: 8px;
     background: color-mix(in srgb, var(--text-muted) 70%, transparent);
 }
 
-/* Safari 还不支持 scrollbar-color，走 webkit 伪元素；Chrome、Firefox 用上面的标准属性 */
+/* Safari does not support scrollbar-color yet, so it uses the webkit pseudo-elements; Chrome and Firefox use the standard properties above */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;

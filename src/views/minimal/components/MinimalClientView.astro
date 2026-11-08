@@ -9,18 +9,18 @@ const posts = await getCollection('blog', ({ data }) => !data.draft);
 const categories = getAllCategories(posts);
 const sets = await getDocSets();
 
-// 序列化博客数据
+// Serialize blog data
 const blogItems = posts.map((p) => ({
     id: p.id,
     title: p.data.title,
     date: p.data.publishDate.toISOString(),
     href: `/views/minimal/blog/${getPostSlug(p)}/`,
-    // 站点其他地方按「任意一级分类匹配」筛选，极简模式以前只取最后一级，
-    // 导致「技术」「前端」这类上级分类的标签点进去永远是空的
+    // Elsewhere the site filters by "match any category level", but minimal mode used to take only the last level,
+    // so tags for parent categories such as "Tech" or "Frontend" always opened an empty list
     categoryIds: (p.data.categories || []).map((c) => slugify(c))
 }));
 
-// 序列化文档树数据（保留层级结构）
+// Serialize doc tree data (keeping the hierarchy)
 function serializeTree(nodes: DocTreeNode[], setId: string): Record<string, unknown>[] {
     return nodes.map((n) => {
         if (n.type === 'article') {
@@ -73,19 +73,19 @@ const docSetsMeta = sets.map((s) => ({ id: s.id, title: s.meta.data.title }));
                 this.tabsEl = this.querySelector('#mc-tabs');
                 this.listEl = this.querySelector('#mc-list');
 
-                // 事件委托
+                // Event delegation
                 this._onClick = this._handleClick.bind(this);
                 this.tabsEl.addEventListener('click', this._onClick);
 
-                // 浏览器前进/后退
+                // Browser back/forward
                 this._onPopState = this.render.bind(this);
                 window.addEventListener('popstate', this._onPopState);
 
-                // ViewTransitions 页面切换完成后重新渲染（URL 此时已更新）
+                // Re-render after a ViewTransitions page swap completes (the URL is already updated by then)
                 this._onAfterSwap = this.render.bind(this);
                 document.addEventListener('astro:after-swap', this._onAfterSwap);
 
-                // 直接加载时立即渲染；ViewTransitions 导航时先预渲染，after-swap 后再校正
+                // Render immediately on direct load; during ViewTransitions navigation, pre-render first and correct it after after-swap
                 this.render();
             }
 
@@ -151,7 +151,7 @@ const docSetsMeta = sets.map((s) => ({ id: s.id, title: s.meta.data.title }));
                 if (type === 'blog') {
                     filterTabs += '<button data-cat="all" class="px-3 py-1 rounded-lg text-xs transition-all ' + (cat === 'all' ? 'bg-accent/10 text-accent font-medium' : 'text-muted hover:text-accent hover:bg-hover') + '">' + i18n.all + '</button>';
                     var blog = this.blog;
-                    // 即使数据形状以后再变，也不要渲染出点进去是空的标签
+                    // Even if the data shape changes later, never render a tag that opens an empty list
                     var nonEmpty = this.categories.filter(function(c) {
                         return blog.some(function(p) { return (p.categoryIds || []).indexOf(c.id) !== -1; });
                     });

@@ -11,8 +11,8 @@ function getDocUrl(id: string): string {
 }
 
 /**
- * 正文里的 Markdown 和指令语法对搜索没有价值，还会稀释匹配。
- * 这里把它们剥掉，只留可读的文字，索引因此也小一些。
+ * Markdown and directive syntax in the body is useless for search and dilutes matches.
+ * Strip it here and keep only readable text, which also keeps the index smaller.
  */
 function toPlainText(body: string): string {
     return body
@@ -28,9 +28,9 @@ function toPlainText(body: string): string {
 }
 
 /**
- * 单条正文的上限。不做截断的话，个别超长示例文章会把索引撑大；
- * 但上限必须远高于正文的常见长度，否则文章中后段的内容就搜不到——
- * 之前这里是 2000，等于只索引了开头一小段。
+ * Body length cap per entry. Without truncation, a few very long sample posts would bloat the index;
+ * but the cap must sit well above typical body length, or the middle and end of posts become unsearchable.
+ * It used to be 2000, which indexed only a short opening chunk.
  */
 const MAX_CONTENT = 20000;
 
@@ -45,7 +45,7 @@ export const GET: APIRoute = async () => {
     const series = await getCollection('series');
     const pages = await getCollection('pages');
 
-    // 动态是散落的 JSON 文件，不是内容集合，只能直接读目录
+    // Moments are loose JSON files, not a content collection, so the directory has to be read directly
     const momentsDir = path.join(process.cwd(), 'src', 'content', 'moments');
     const moments: { date: string; content: string; tags?: string[] }[] = [];
     if (fs.existsSync(momentsDir)) {
@@ -53,7 +53,7 @@ export const GET: APIRoute = async () => {
             try {
                 moments.push(JSON.parse(fs.readFileSync(path.join(momentsDir, file), 'utf-8')));
             } catch {
-                /* 坏掉的单条不该让整个索引构建失败 */
+                /* A single broken entry should not fail the whole index build */
             }
         }
     }
@@ -62,7 +62,7 @@ export const GET: APIRoute = async () => {
         ...posts.map((post) =>
             entry({
                 id: post.id,
-                // 文章可能放在专栏目录里，目录不进 URL，所以地址要算出来给前端
+                // Posts may sit in a series directory, which is not part of the URL, so compute the URL for the frontend
                 url: `/blog/${post.id.split('/').pop()}/`,
                 title: post.data.title,
                 description: post.data.excerpt || '',
@@ -95,7 +95,7 @@ export const GET: APIRoute = async () => {
                     tags: doc.data.tags || []
                 })
             ),
-        // 想法和动态都只有列表页，没有独立路由，所以统一指向列表页
+        // Thoughts and moments only have list pages, no individual routes, so they all point to the list page
         ...thoughts.map((thought) =>
             entry({
                 id: thought.id,

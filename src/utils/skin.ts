@@ -1,32 +1,32 @@
 import { siteInfo } from '@vergil-site/data/config/identity';
-import { locale } from '../i18n';
+import { locale, t } from '../i18n';
 import { skins as registeredSkins, schemes as registeredSchemes, type AppearanceLabels } from 'virtual:vergil/appearance';
 
 /**
- * 界面皮肤和配色。皮肤挂在 <html data-skin> 上，只管形状和质感；配色挂在 <html data-theme> 上，只管颜色。
- * 每个皮肤只能选自己的配色：经典皮肤和它的配色 A–I、K 是内置的；其他皮肤放在站点根目录的 skins/ 下，
- * 在 identity.ts 的 skins 里按名字启用，各自带着自己的配色，注册过程见 src/appearance/integration.mjs。
- * 访客可以在顶栏的外观面板里切换，配置里的 skin 只决定访客没选过时用哪一个。
+ * UI skins and color schemes. The skin lives on <html data-skin> and controls only shape and texture; the color scheme lives on <html data-theme> and controls only color.
+ * Each skin can only use its own schemes: the classic skin and its schemes A–I and K are built in; other skins live under skins/ in the site root,
+ * are enabled by name in skins in identity.ts, and bring their own schemes; see src/appearance/integration.mjs for how they are registered.
+ * Visitors can switch in the appearance panel in the top bar; skin in the config only decides which one to use when the visitor has not picked one.
  */
 export const skins = registeredSkins;
 export const schemes = registeredSchemes;
 
 const skinNames = skins.map((s) => s.name);
 
-/** 访客没选过皮肤时用哪一个。填了没启用或没安装的皮肤就退回 classic，不让站点挂掉 */
+/** Skin to use when the visitor has not picked one. A skin that is not enabled or installed falls back to classic instead of breaking the site */
 export const defaultSkin: string = siteInfo.skin && skinNames.includes(siteInfo.skin) ? siteInfo.skin : 'classic';
 
 if (siteInfo.skin && siteInfo.skin !== defaultSkin) {
-    console.warn(`[vergil 外观] identity.ts 的 skin 是 "${siteInfo.skin}"，但它没有启用或没有安装，已退回 classic`);
+    console.warn(`${t.build.appearance.prefix} ${t.build.appearance.skinFallback(siteInfo.skin)}`);
 }
 
-/** 每个皮肤的默认配色。访客切皮肤时配色换成新皮肤的默认配色，之后可以在这个皮肤自己的配色里再挑 */
+/** Each skin's default color scheme. When a visitor switches skins, the scheme resets to the new skin's default, and they can then pick from that skin's own schemes */
 export const defaultSchemes: Record<string, string> = Object.fromEntries(skins.map((s) => [s.name, s.recommendedScheme]));
 
-/** 每个皮肤下能选的配色 ID */
+/** Color scheme IDs available under each skin */
 export const skinSchemes: Record<string, string[]> = Object.fromEntries(skins.map((s) => [s.name, s.schemes]));
 
-/** 按当前界面语言取显示名，没有就用英文，再没有就用名字本身 */
+/** Get the display name for the current UI language, falling back to English, then to the name itself */
 export function appearanceLabel(labels: AppearanceLabels, fallback: string): string {
     return labels[locale] ?? labels.en ?? fallback;
 }

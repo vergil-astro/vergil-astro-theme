@@ -17,7 +17,7 @@ export async function getStaticPaths() {
     const entries = await getCollection('docs', ({ data }) => !data.draft);
     const nonMeta = entries.filter((e) => !(e.id.endsWith('/_meta') || e.id === '_meta'));
 
-    // 获取每个文档集的 homepage slug，排除不生成独立页面
+    // Get each doc set's homepage slug; those are excluded and get no standalone page
     const sets = await getDocSets();
     const homepages = new Map<string, string>();
     for (const set of sets) {
@@ -55,11 +55,11 @@ const metaTitle = (currentSet?.meta.data.title as string) ?? docId;
 
 const bannerUrl = await resolveImageUrl(entry.data.banner, 1600);
 
-// 判断是否开启自动渲染子目录
-// Astro glob loader 中 index.md 的 entry.id 格式为 docId/slug（不带 /index 后缀）
-// 判断方法：slug 是否对应一个已注册的目录
+// Check whether auto-rendering of subdirectories is enabled
+// In the Astro glob loader, index.md's entry.id has the form docId/slug (without the /index suffix)
+// How to check: whether the slug matches a registered directory
 const group = await getDocGroup(docId, slug);
-// 被 _meta.md 的 homepage 指定的那篇渲染在知识库根路径，原路径不生成，链接要指向根路径
+// The doc named by homepage in _meta.md renders at the knowledge base root; its original path is not generated, so links must point to the root
 const homepageSlug = (await getDocHomepageSlug(docId))?.replace(/\/index$/, '').toLowerCase();
 const childHref = (path: string) =>
     homepageSlug && path.replace(/\/index$/, '').toLowerCase() === homepageSlug ? `/docs/${docId}/` : `/docs/${docId}/${path}/`;
@@ -69,7 +69,7 @@ let groupChildren: DocTreeNode[] = [];
 if (isIndexPage && autoRender && group) {
     groupChildren = group.children;
 }
-// 开启了 autoRender 但无子目录时，回退到正常渲染用户内容
+// When autoRender is enabled but there are no subdirectories, fall back to rendering the user's content normally
 const showAutoRender = autoRender && groupChildren.length > 0;
 ---
 

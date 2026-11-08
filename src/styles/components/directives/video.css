@@ -28,7 +28,7 @@
     line-height: 0;
 }
 
-/* 电影遮幅 - 上下黑边 */
+/* Cinematic letterbox - black bars at top and bottom */
 .md-video-wrap::after {
     content: '';
     position: absolute;
@@ -41,13 +41,13 @@
     transition: box-shadow 0.5s ease;
 }
 
-/* 暗角效果 */
+/* Vignette effect */
 .md-video-wrap .md-video-element,
 .md-video-wrap .md-video-poster-img {
     filter: contrast(1.05) saturate(1.1);
 }
 
-/* 胶片颗粒纹理 */
+/* Film grain texture */
 .md-video-wrap .md-video-element::after,
 .md-video-wrap .md-video-poster-img::after {
     content: '';
@@ -61,7 +61,7 @@
     background-size: 128px 128px;
 }
 
-/* 用 padding-top 维持宽高比 */
+/* Keep the aspect ratio with padding-top */
 .md-video-wrap::before {
     content: '';
     display: block;
@@ -120,19 +120,19 @@
     z-index: 1;
 }
 
-/* 默认占位背景：poster 加载中或加载失败时显示 */
+/* Default placeholder background: shown while the poster is loading or if it fails to load */
 .md-video-has-poster .md-video-wrap {
     background:
         radial-gradient(circle at center, color-mix(in srgb, var(--accent-color, #4a7c59) 12%, transparent) 0%, transparent 70%),
         linear-gradient(135deg, #0c0c0c 0%, #141414 50%, #0c0c0c 100%);
 }
 
-/* poster 加载失败隐藏后，overlay 按钮仍然可见 */
+/* After a poster that failed to load is hidden, the overlay button stays visible */
 .md-video-poster-img[src=""] {
     display: none;
 }
 
-/* 有 poster 时 video 初始隐藏，点击后显示 */
+/* When there is a poster, the video starts hidden and shows after a click */
 .md-video-has-poster .md-video-element {
     opacity: 0;
     z-index: 0;
@@ -165,7 +165,7 @@
     pointer-events: none;
 }
 
-/* Play button - 电影感设计 */
+/* Play button - cinematic design */
 .md-video-play-btn {
     position: relative;
     z-index: 6;
@@ -190,7 +190,7 @@
     backdrop-filter: blur(12px);
 }
 
-/* 外圈光环 */
+/* Outer halo */
 .md-video-play-btn::before {
     content: '';
     position: absolute;
@@ -202,7 +202,7 @@
                 border-color 0.5s ease;
 }
 
-/* 内圈 */
+/* Inner ring */
 .md-video-play-btn::after {
     content: '';
     position: absolute;

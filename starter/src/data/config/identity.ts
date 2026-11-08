@@ -4,6 +4,9 @@ export const siteInfo = {
     startDate: '',
     /** 主题界面文案的语言，也决定 <html lang> 和日期格式。可选 'zh-CN' | 'en' */
     locale: 'zh-CN',
+    /** 想改几句主题界面文案时加 uiText，只写要改的，没写的照用主题的。比如「动态」页侧栏的签名：
+     *   uiText: { page: { moments: { signature: '……' } } },
+     * 能改哪些、怎么找到位置，见文档「界面语言」 */
     /** 访客没选过时用哪个界面皮肤。皮肤决定圆角、按钮、投影、底纹这些形状质感，每个皮肤带着自己的几套配色，
      * 访客可以在顶栏的外观面板里自己切换。classic 是内置的，其他皮肤要先在下面的 skins 里启用 */
     skin: 'classic',

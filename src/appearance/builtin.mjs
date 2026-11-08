@@ -1,15 +1,15 @@
 /**
- * 核心自带的外观：经典皮肤和它的配色 A–I、K。
- * 它们的样式在 src/styles/ 里，跟着 global.css 一起加载。
+ * Appearance bundled with the core: the classic skin and its schemes A–I and K.
+ * Their styles live in src/styles/ and load together with global.css.
  *
- * 每个皮肤只能选自己的配色：经典皮肤是这里的十套，其他皮肤是各自带的。
- * 其他皮肤是独立的包，放在站点根目录的 skins/ 下，在 src/data/config/identity.ts 的 skins 里按名字启用，见 integration.mjs。
+ * Each skin can only use its own schemes: the ten here for the classic skin, and their own bundled ones for other skins.
+ * Other skins are standalone packages under skins/ in the site root, enabled by name in skins in src/data/config/identity.ts; see integration.mjs.
  */
 
 export const fallbackSkin = 'classic';
 export const fallbackScheme = 'C';
 
-/** 面板上的色点颜色（swatch）同时也是选中后调色盘图标的颜色（icon） */
+/** The color of the dot on the panel (swatch) is also the color of the palette icon once selected (icon) */
 export const builtinSchemes = [
     { id: 'A', short: 'A', labels: { 'zh-CN': '暖羊皮纸', en: 'Warm Parchment' }, swatch: '#4a7c59' },
     { id: 'B', short: 'B', labels: { 'zh-CN': '石板蓝灰', en: 'Slate Blue' }, swatch: '#4a6fa5' },

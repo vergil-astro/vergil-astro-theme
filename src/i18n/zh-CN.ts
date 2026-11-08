@@ -1,11 +1,11 @@
 /**
- * 主题界面文案，中文基准。
+ * Theme UI text, Chinese base.
  *
- * 只放主题自己渲染的文字：导航、目录、搜索、分页、播放器、工具页、指令的提示语。
- * 用户写的内容和 src/data/config 里的配置不在这里，那是用户自己的语言。
- * 所有 key 以这个文件为准，其他语言的字典类型从它推导。
+ * Holds only text the theme renders itself: navigation, table of contents, search, pagination, players, tool pages, directive prompts,
+ * plus the build messages shown to site authors. Content the user writes and the config in src/data/config are not here; they stay in the user's own language.
+ * This file defines every key; the dictionary types of the other languages are derived from it.
  *
- * 带参数的直接写成函数，调用处 t.time.daysAgo(3)。
+ * Text that takes parameters is written as a function, called as t.time.daysAgo(3).
  */
 export default {
     common: {
@@ -38,6 +38,8 @@ export default {
         unknownTitle: '未知标题',
         uncategorized: '未分类',
         result: '结果',
+        /** Colon after a label, e.g. the site-info rows in the left sidebar */
+        colon: '：',
     },
 
     time: {
@@ -57,9 +59,9 @@ export default {
         ymd: (y: number | string, m: number | string, d: number | string) => `${y}年${m}月${d}日`,
         md: (m: number | string, d: number | string) => `${m}月${d}日`,
         ym: (y: number | string, m: number | string) => `${y}年${m}月`,
-        /** 周一开头，热力图用 */
+        /** Starts on Monday; used by the heatmap */
         weekdaysMonFirst: ['一', '二', '三', '四', '五', '六', '日'],
-        /** 周日开头，日历用 */
+        /** Starts on Sunday; used by the calendar */
         weekdaysSunFirst: ['日', '一', '二', '三', '四', '五', '六'],
         unit: { day: '天', hour: '时', minute: '分', second: '秒' },
     },
@@ -77,7 +79,7 @@ export default {
         fromSeries: (series: string) => `来自专栏「${series}」`,
         series: '专栏',
         backToTop: '回到顶部',
-        /** 博客区块顶部那排切换：近期发布 / 分类 / 标签 / 专栏 / 归档 */
+        /** The switcher row at the top of the blog section: recent / categories / tags / series / archives */
         recent: '近期发布',
         categories: '分类',
         tags: '标签',
@@ -107,7 +109,7 @@ export default {
         runningDays: (n: number) => `${n} 天`,
         runningYears: (n: string) => `${n} 年`,
         lastActive: '最后活动时间',
-        /** LeftSidebar 专用：原文是「N 天前」，带空格，和 time.daysAgo 的紧排写法不同 */
+        /** LeftSidebar only: keeps a space between the number and the unit, unlike the tight spacing of time.daysAgo */
         daysAgo: (n: number) => `${n} 天前`,
         totalWords: '本站总字数',
         words: (n: string) => `${n} 字`,
@@ -224,11 +226,16 @@ export default {
         seasonsHeader: '作品集 · Selected',
         seasons: { spring: '春', summer: '夏', autumn: '秋', winter: '冬' },
         seasonLabel: { spring: '春 Spring', summer: '夏 Summer', autumn: '秋 Autumn', winter: '冬 Winter' },
-        /** 四季主题时间控制台的时段标签。诗句是装饰内容，不进字典。 */
+        /** Time-of-day labels for the seasons theme's time console. The poems are decorative content and stay out of the dictionary. */
         timeOfDay: {
             dawn: '黎明', morning: '朝', forenoon: '午前', noon: '正午',
             afternoon: '午後', dusk: '黄昏', night: '夜', lateNight: '深夜',
         },
+    },
+
+    hero: {
+        /** Home hero title when the site config sets none; **text** is bold */
+        defaultTitle: 'Hello，我是 **Ethan**!',
     },
 
     page: {
@@ -467,6 +474,8 @@ export default {
             holiday: '休',
             lunarFirst: '初一',
             lunarMonthFirst: (month: string) => `${month}月初一`,
+            /** Holiday name followed by its work/off tag in full-width parentheses */
+            holidayTag: (name: string, tag: string) => `${name}（${tag}）`,
         },
         okr: {
             overall: '整体完成度',
@@ -499,12 +508,26 @@ export default {
             nthReview: (n: number) => `第 ${n} 次复习`,
             reviewToday: '今天该复习',
             reviewPending: '待复习',
+            /** Labels of the view tabs */
+            views: {
+                board: '看板',
+                list: '列表',
+                table: '表格',
+                timeline: '时间轴',
+                milestone: '里程碑',
+                progress: '进度',
+                ebbinghaus: '复习',
+            },
         },
         story: { empty: '暂无分镜内容' },
         mind: { empty: '思维导图内容为空' },
-        charts: { echartParseError: 'ECharts 配置解析失败' },
+        charts: {
+            echartParseError: 'ECharts 配置解析失败',
+            /** Prefix of the error shown in place of a diagram that Mermaid could not render; the error message follows after ": " */
+            mermaidRenderError: 'Mermaid 渲染失败',
+        },
         photo: {
-            /** EXIF 里的厂商名到显示名 */
+            /** Maker name from EXIF to display name */
             brands: {
                 Canon: '佳能',
                 Nikon: '尼康',
@@ -523,6 +546,46 @@ export default {
                 Realme: '真我',
                 Meizu: '魅族',
             } as Record<string, string>,
+        },
+    },
+
+    /** Build-time errors and warnings for site authors; shown in the terminal, never on pages */
+    build: {
+        duplicateSlug: (slug: string, first: string, second: string) =>
+            `[Vergil] 两篇文章会生成同一个地址 /blog/${slug}/：\n` +
+            `  src/content/blog/${first}.md\n` +
+            `  src/content/blog/${second}.md\n` +
+            `目录名不参与 URL，所以不同目录下也不能重名。请把其中一篇改名。`,
+        imageNotFound: (src: string) => `找不到图片 ${src}，请确认文件在 src/assets/img/ 下`,
+        seriesDirNested: 'dir 只能填一级目录，不要带斜杠',
+        /** Skin and color scheme registration (src/appearance/integration.mjs, src/utils/skin.ts) */
+        appearance: {
+            prefix: '[vergil 外观]',
+            skinFallback: (skin: string) => `identity.ts 的 skin 是 "${skin}"，但它没有启用或没有安装，已退回 classic`,
+            builtinSkinListed: 'classic 是内置皮肤，不用写进 skins',
+            duplicateName: (field: string, name: string) => `${field} 里 "${name}" 写了两遍`,
+            skinNotInstalled: (name: string) => `皮肤 "${name}" 没有安装，已跳过：请把它放到 skins/${name}/`,
+            /** Location of one scheme entry inside skin.json, used as `where` in the messages below */
+            schemeAt: (where: string, index: number) => `${where} 的 schemes[${index}]`,
+            duplicateScheme: (where: string, id: string) => `${where}：配色 ID "${id}" 已经被别的皮肤或配色用了，换一个名字`,
+            noSchemes: (where: string) => `${where}：schemes 至少要有一套配色，访客在这个皮肤下只能选它自带的配色`,
+            notObject: (where: string) => `${where} 应该是一个对象`,
+            invalidSchemeId: (where: string) => `${where}.id 不合法：只能用小写字母、数字和短横，以字母开头`,
+            duplicateShort: (where: string, short: string) => `${where}：short "${short}" 和这个皮肤的另一套配色重复了，面板上会分不清`,
+            badRecommendedScheme: (where: string, ids: string[]) => `${where}：recommendedScheme 要是这个皮肤自带的配色之一：${ids.join('、')}`,
+            notNameArray: (field: string) => `identity.ts 的 ${field} 应该是名字数组，比如 ['island']`,
+            /** `name` arrives already JSON-encoded, so strings show with their quotes */
+            invalidName: (field: string, name: string) => `identity.ts 的 ${field} 里 ${name} 不是合法的名字：只能用小写字母、数字和短横，以字母开头`,
+            outsideDir: (kind: string, name: string) => `${kind}/${name} 指向了 ${kind}/ 以外的位置，出于安全考虑不加载`,
+            missingFile: (where: string) => `缺少 ${where}`,
+            invalidJson: (where: string, error: string) => `${where} 不是合法的 JSON：${error}`,
+            contractMismatch: (where: string, found: string, expected: string | number) =>
+                `${where} 的 contract 是 ${found}，当前 Vergil 的外观接口版本是 ${expected}，两边要一致`,
+            invalidShort: (where: string) => `${where}：short 是色点下面显示的 1～2 个字母或数字`,
+            invalidSwatch: (where: string) => `${where}：swatch 只接受十六进制色值（如 #a9521f）或一个 CSS 变量（如 var(--text-main)）`,
+            invalidIcon: (where: string) => `${where}：icon 只接受十六进制色值或一个 CSS 变量`,
+            invalidLabels: (where: string) => `${where}：labels 应该是 { "zh-CN": "...", "en": "..." } 这样的对象`,
+            invalidLabel: (where: string, lang: string) => `${where}：labels.${lang} 应该是 1～40 个字的字符串`,
         },
     },
 };

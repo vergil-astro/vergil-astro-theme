@@ -1,8 +1,8 @@
 ---
 /**
- * 分享简历：手机上调起系统分享面板，电脑上复制链接并把链接显示出来，复制不了就让访客手动复制。
- * 加密简历分享的链接带着由密码派生的口令（/views/resume/#口令），对方打开就能直接看，链接里看不出密码；锁着的时候整排按钮都不显示。
- * 逻辑在 src/views/resume/scripts/resume-vault.ts
+ * Share the resume: opens the system share sheet on phones; on desktop, copies the link and shows it, and if copying fails the visitor copies it manually.
+ * For an encrypted resume, the shared link carries a token derived from the password (/views/resume/#token), so the recipient can view it right away without the password showing in the link; the whole button row is hidden while locked.
+ * Logic lives in src/views/resume/scripts/resume-vault.ts
  */
 import { Share2 } from '@lucide/astro';
 import { t } from '../../../i18n';

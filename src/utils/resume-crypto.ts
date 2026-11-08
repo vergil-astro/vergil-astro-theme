@@ -1,17 +1,17 @@
 /**
- * 简历加密，构建时运行。简历 frontmatter 写了 password 时，页面里不放明文，只放加密后的密文，
- * 浏览器解开的逻辑在 src/views/resume/scripts/resume-vault.ts。
+ * Resume encryption, run at build time. When the resume frontmatter sets password, the page holds no plaintext, only the encrypted ciphertext;
+ * the browser-side decryption lives in src/views/resume/scripts/resume-vault.ts.
  *
- * 密钥 = PBKDF2-SHA256(密码, 固定盐, 60 万次) 派生出的 128 位，再用 AES-GCM 加密。
- * 分享链接里放的是这个密钥的 base64url（22 个字符），不是密码：
- * 拿到链接能直接看，但看不出密码；密码只在锁屏上手动输入时用。
- * 盐是固定的，所以只要密码不变，每次重新构建链接都不变；换了密码，旧链接就失效。
- * 两边的算法和参数必须一致，改一边要同时改另一边。
+ * Key = 128 bits derived with PBKDF2-SHA256(password, fixed salt, 600,000 iterations), then used for AES-GCM encryption.
+ * Share links carry this key's base64url (22 characters), not the password:
+ * anyone with the link can view the resume but cannot learn the password; the password is only used when typed on the lock screen.
+ * The salt is fixed, so as long as the password is unchanged, the link stays the same on every rebuild; changing the password invalidates old links.
+ * Both sides must use the same algorithm and parameters; changing one means changing the other.
  */
 
-/** PBKDF2 迭代次数，按 OWASP 对 PBKDF2-SHA256 的建议取值。越大越难暴力猜，手动输入密码解锁也越慢 */
+/** PBKDF2 iteration count, following OWASP's recommendation for PBKDF2-SHA256. Higher is harder to brute-force, but also slower to unlock with a typed password */
 const KDF_ITERATIONS = 600_000;
-/** 固定的盐，保证同一个密码每次构建得到同一个链接口令 */
+/** Fixed salt, so the same password yields the same link token on every build */
 const KDF_SALT = 'vergil:resume:link-key:v1';
 
 export interface SealedData {
@@ -43,7 +43,7 @@ function deriveKey(password: string): Promise<CryptoKey> {
     return key;
 }
 
-/** 用密码加密一段 HTML，返回放进页面的密文和手动输入密码时派生密钥需要的参数 */
+/** Encrypt a piece of HTML with a password, returning the ciphertext for the page and the parameters needed to derive the key from a typed password */
 export async function seal(plaintext: string, password: string): Promise<SealedData> {
     const iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
     const key = await deriveKey(password);

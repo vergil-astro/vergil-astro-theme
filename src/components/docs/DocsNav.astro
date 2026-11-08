@@ -12,8 +12,8 @@ interface Props {
 const { docId, prev, next } = Astro.props;
 
 /**
- * 知识库的首篇文档被渲染在知识库根路径上，它自己的那个路径不会生成页面。
- * 所以这里必须和左侧目录树用同一套规则，否则上下篇会指向一个 404。
+ * A knowledge base's first doc is rendered at the knowledge base root path; its own path gets no page.
+ * So this must follow the same rules as the left directory tree, or prev/next would point to a 404.
  */
 const homepageSlug = await getDocHomepageSlug(docId);
 

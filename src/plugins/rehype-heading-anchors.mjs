@@ -1,11 +1,11 @@
 import { visit } from 'unist-util-visit';
 
 /**
- * 给文章标题加可点击的锚点链接。
+ * Add clickable anchor links to post headings.
  *
- * Astro 自己会给 h2-h4 生成 id，但没有可点的链接，读者没法复制某一节的地址。
- * 这里在标题末尾补一个 <a>，默认透明，hover 或键盘聚焦时才显现。
- * 不引入 rehype-autolink-headings，避免为一个小功能多一个依赖。
+ * Astro generates ids for h2-h4 itself, but with no clickable link readers can't copy the URL of a section.
+ * This appends an <a> to the end of the heading, transparent by default and shown only on hover or keyboard focus.
+ * rehype-autolink-headings is not used, to avoid an extra dependency for a small feature.
  */
 const LINK_ICON = {
     type: 'element',
@@ -46,7 +46,7 @@ export function rehypeHeadingAnchors(options = {}) {
             const id = node.properties?.id;
             if (!id) return;
 
-            // 已经加过就跳过，避免重复运行时叠加
+            // Skip if already added, so repeated runs don't stack anchors
             if (node.children?.some((c) => c.type === 'element' && c.properties?.className?.includes?.('heading-anchor'))) {
                 return;
             }

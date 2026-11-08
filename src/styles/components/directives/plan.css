@@ -379,7 +379,7 @@
     scrollbar-color: transparent transparent;
 }
 
-/* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
+/* The scrollbar only shows while scrolling; see BaseHead for is-scrolling */
 .md-plan-board__cards.is-scrolling {
     scrollbar-color: var(--border-light) transparent;
 }
@@ -593,7 +593,7 @@
     width: 100%;
 }
 
-/* 去掉的是鼠标点击的轮廓，键盘聚焦仍要看得见 */
+/* This removes the outline on mouse click only; keyboard focus must stay visible */
 .md-plan-search__input:focus-visible {
     outline: 2px solid var(--accent-color);
     outline-offset: 2px;
@@ -790,7 +790,7 @@
     padding: 0.5rem 0;
 }
 
-/* 统一行结构：label(108px) + gap(12px) + axis(flex:1) */
+/* Shared row structure: label(108px) + gap(12px) + axis(flex:1) */
 .md-plan-timeline__row {
     display: flex;
     align-items: center;
@@ -807,7 +807,7 @@
     position: relative;
 }
 
-/* 月份行 */
+/* Month row */
 .md-plan-timeline__row--months {
     margin-bottom: 4px;
     border-bottom: 1px solid var(--border-light);
@@ -827,7 +827,7 @@
     padding-bottom: 6px;
 }
 
-/* 刻度行 */
+/* Tick row */
 .md-plan-timeline__row--ticks {
     margin-bottom: 12px;
     height: 18px;

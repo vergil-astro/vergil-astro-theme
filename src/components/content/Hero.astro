@@ -21,8 +21,9 @@ import {
     Dumbbell,
     Globe
 } from '@lucide/astro';
+import { t } from '../../i18n';
 
-// key 是站点配置里写的名字；Lucide 改了名的图标（Code2、Smile、Music）保留旧 key
+// Keys are the names used in the site config; icons that Lucide renamed (Code2, Smile, Music) keep their old keys
 const ICONS: Record<string, unknown> = {
     Sparkles, Zap, Star, Heart, Code2: CodeXml, Coffee, Rocket, Smile: FaceSlightlySmiling, Sun,
     Music: EighthNotes, Camera, Gamepad2, Plane, Mountain, BookOpen, PenTool, Film, Dumbbell, Globe
@@ -44,7 +45,7 @@ export interface Props {
 }
 
 const {
-    title = 'Hello，我是 **Ethan**!',
+    title = t.hero.defaultTitle,
     text = 'A passionate web developer exploring the digital world.',
     titleIcon = 'Sparkles',
     textIcon = 'Zap',
@@ -89,7 +90,7 @@ const paragraphs = text.split(/\n\n+/).map(p => p.replace(/\*\*(.+?)\*\*/g, '<st
 </div>
 
 <style>
-    /* 只管介绍文字里的链接，下面的按钮有自己的颜色 */
+    /* Only links in the intro text; the buttons below have their own colors */
     .hero .prose :global(a) {
         color: var(--text-main);
         text-decoration: underline;

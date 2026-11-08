@@ -6,11 +6,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ThoughtCard from '../../components/content/ThoughtCard.astro';
 import DirectiveStyles from '../../components/base/DirectiveStyles.astro';
 
-// 获取所有想法，按日期降序排列
+// Get all thoughts, sorted by date descending
 const allThoughts = await getCollection('thoughts');
 allThoughts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 
-// 提取所有唯一标签，按使用频率排序
+// Collect all unique tags, sorted by usage frequency
 const tagCounts = new Map<string, number>();
 allThoughts.forEach((thought) => {
     thought.data.tags.forEach((tag) => {
@@ -21,10 +21,10 @@ const allTags = Array.from(tagCounts.entries())
     .sort((a, b) => b[1] - a[1])
     .map(([tag]) => tag);
 
-// 所有想法都在构建时渲染好，前端只控制显示多少条
+// All thoughts are rendered at build time; the frontend only controls how many are shown
 const PAGE_SIZE = 10;
 
-// 标签展示：默认显示前8个，超出可展开
+// Tag display: show the first 8 by default; the rest can be expanded
 const VISIBLE_TAG_COUNT = 8;
 const hasMoreTags = allTags.length > VISIBLE_TAG_COUNT;
 const visibleTags = hasMoreTags ? allTags.slice(0, VISIBLE_TAG_COUNT) : allTags;
@@ -37,7 +37,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
     description={t.page.thoughts.description}
     showRightSidebar={false}
 >
-    <!-- 标签筛选器 -->
+    <!-- Tag filter -->
     {allTags.length > 0 && (
         <div class="mb-6">
             <div class="flex flex-wrap gap-2" id="thought-tags-filter">
@@ -92,7 +92,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         </div>
     )}
 
-    <!-- 想法卡片流 -->
+    <!-- Thought card feed -->
     <DirectiveStyles content={allThoughts.map((thought) => thought.body || '').join('\n')} />
     <div id="thoughts-feed" class="space-y-4" data-page-size={PAGE_SIZE}>
         {allThoughts.map((thought, index) => (
@@ -102,7 +102,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         ))}
     </div>
 
-    <!-- 加载更多 -->
+    <!-- Load more -->
     <div id="thoughts-load-more" class="py-6 text-center">
         <button
             id="thoughts-load-btn"
@@ -117,7 +117,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         </div>
         <div id="thoughts-no-more" class="hidden text-sm text-[var(--text-muted)]">{t.page.thoughts.noMore}</div>
 
-        <!-- 骨架屏 -->
+        <!-- Skeleton screen -->
         <div id="thoughts-skeleton" class="hidden space-y-4 mt-4">
             <div class="rounded-xl bg-[var(--bg-card)] p-5">
                 <div class="skeleton h-3 w-20 rounded mb-3"></div>
@@ -132,7 +132,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         </div>
     </div>
 
-    <!-- 空状态 -->
+    <!-- Empty state -->
     {allThoughts.length === 0 && (
         <div class="text-center py-12 text-[var(--text-muted)]">
             <p>{t.page.thoughts.empty}</p>
@@ -154,7 +154,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
 
     if (!feed) return;
 
-    // 所有想法都已在构建时渲染，这里只负责显示多少条、显示哪些
+    // All thoughts are already rendered at build time; this only controls how many and which ones are shown
     var items = Array.prototype.slice.call(feed.querySelectorAll('.thought-item'));
     var pageSize = parseInt(feed.dataset.pageSize || '10', 10);
     var shownCount = Math.min(pageSize, items.length);
@@ -169,7 +169,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         });
     }
 
-    // 显示筛选结果里的前 shownCount 条，其余隐藏
+    // Show the first shownCount filtered items and hide the rest
     function render() {
         var filtered = getFilteredItems();
         items.forEach(function(item) {
@@ -184,7 +184,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         if (noMore) noMore.classList.toggle('hidden', hasMore);
     }
 
-    // 加载更多：保留加载动画和骨架屏的过渡
+    // Load more: keep the loading animation and skeleton transition
     function loadMore() {
         if (loadingLock || shownCount >= getFilteredItems().length) return;
         loadingLock = true;
@@ -205,7 +205,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         loadBtn.addEventListener('click', loadMore);
     }
 
-    // 无限滚动
+    // Infinite scroll
     var scrollHandler = function() {
         if (shownCount >= getFilteredItems().length) return;
         var scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -217,7 +217,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
     };
     window.addEventListener('scroll', scrollHandler, { passive: true });
 
-    // 标签筛选
+    // Tag filter
     function setupTagFilter(container) {
         if (!container) return;
         container.addEventListener('click', function(e) {
@@ -239,12 +239,12 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         });
     }
 
-    // 「更多」展开区里的标签在另一个容器里，也要绑上，否则使用次数少的标签点了没反应
+    // Tags in the "More" expanded area live in a separate container and need binding too, or clicking the less-used tags does nothing
     setupTagFilter(tagFilterContainer);
     setupTagFilter(document.getElementById('thought-tags-hidden'));
     render();
 
-    // 标签更多/收起
+    // Expand/collapse extra tags
     var tagsMoreBtn = document.getElementById('thought-tags-more-btn');
     var tagsHidden = document.getElementById('thought-tags-hidden');
     var tagsLessBtn = document.getElementById('thought-tags-less-btn');
@@ -262,7 +262,7 @@ const hiddenTags = hasMoreTags ? allTags.slice(VISIBLE_TAG_COUNT) : [];
         });
     }
 
-    // 监听卡片内标签点击事件
+    // Listen for tag clicks inside cards
     document.addEventListener('thought:filterByTag', function(e) {
         var tag = e.detail && e.detail.tag;
         if (!tag || !tagFilterContainer) return;

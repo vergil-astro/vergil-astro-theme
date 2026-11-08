@@ -49,9 +49,9 @@ const {
 } = Astro.props;
 
 /**
- * 标签页只由博客文章生成。动态上的标签如果博客里没人用过，
- * 链到 /tags/xxx/ 就是个 404，所以这里先判断有没有对应的标签页，
- * 没有的话只显示成普通文字。
+ * Tag pages are generated only from blog posts. If a tag on a moment isn't used by any blog post,
+ * linking to /tags/xxx/ would be a 404, so first check whether the tag page exists;
+ * if it doesn't, render the tag as plain text.
  */
 const blogTagIds = new Set(
     getAllTags(await getCollection('blog', ({ data }) => !data.draft)).map((tg) => tg.id)
@@ -65,7 +65,7 @@ const renderMarkdown = async (text: string) => {
     return marked.parse(await resolveImgAliasInMarkdown(text), { async: false }) as string;
 };
 
-// 图片支持 @img/ 别名，其他写法原样使用
+// Images support the @img/ alias; other forms are used as-is
 const resolveImg = async (src: string | undefined) => (await resolveImageUrl(src, 800)) ?? src;
 const imageSrcs = await Promise.all(images.map(resolveImg));
 const forwardImageSrcs = await Promise.all((forward?.images ?? []).map(resolveImg));
@@ -77,8 +77,8 @@ const processedForwardContent = forward?.content ? await renderMarkdown(forward.
 
 const imageCount = images.length;
 
-// 微信朋友圈风格九宫格：
-// 1张→单列大图；2,4张→2列；3,5-9张→3列
+// WeChat Moments-style nine-grid:
+// 1 image → single large image; 2 or 4 → 2 columns; 3 or 5-9 → 3 columns
 let imageGridCols = '';
 let imageGridMaxW = '';
 if (imageCount === 1) {
@@ -106,7 +106,7 @@ const isLongContent = plainTextLength > 300;
 
 <article class="moment-post" data-href={href || undefined}>
     <div class="flex gap-3">
-        <!-- 左侧头像 -->
+        <!-- Avatar on the left -->
         {avatar && (
             <div class="flex-shrink-0">
                 <img
@@ -118,14 +118,14 @@ const isLongContent = plainTextLength > 300;
             </div>
         )}
 
-        <!-- 右侧内容区 -->
+        <!-- Content area on the right -->
         <div class="flex-1 min-w-0">
-            <!-- 用户名 -->
+            <!-- Username -->
             {name && (
                 <div class="font-semibold text-[13px] text-[var(--text-main)] mb-1.5">{name}</div>
             )}
 
-            <!-- 文本气泡 -->
+            <!-- Text bubble -->
             {hasBubbleContent && (
                 <div class="moment-bubble relative inline-block max-w-full">
                     <div class="moment-bubble-inner rounded-2xl rounded-tl-sm bg-[var(--bg-card)] border border-[var(--border-light)] px-4 py-3">
@@ -142,7 +142,7 @@ const isLongContent = plainTextLength > 300;
                 </div>
             )}
 
-            <!-- 图片网格（文字下方，微信朋友圈九宫格） -->
+            <!-- Image grid (below the text, WeChat Moments nine-grid) -->
             {images.length > 0 && (
                 <div class={`mt-2 ${imageGridMaxW}`}>
                     <div class={`grid gap-1 ${imageGridCols}`}>
@@ -165,7 +165,7 @@ const isLongContent = plainTextLength > 300;
                 </div>
             )}
 
-            <!-- 转发内容 -->
+            <!-- Forwarded content -->
             {forward && (
                 <div class="rounded-xl border border-[var(--border-light)] bg-[var(--bg-muted)]/40 p-3 mt-2">
                     <div class="flex items-center gap-1.5 mb-1.5 text-[14px]">
@@ -230,7 +230,7 @@ const isLongContent = plainTextLength > 300;
                 </div>
             )}
 
-            <!-- 链接卡片 -->
+            <!-- Link card -->
             {linkCard && (
                 <a
                     href={linkCard.url || '#'}
@@ -254,7 +254,7 @@ const isLongContent = plainTextLength > 300;
                 </a>
             )}
 
-            <!-- 标签 -->
+            <!-- Tags -->
             {tags.length > 0 && (
                 <div class="flex flex-wrap gap-2 mt-2">
                     {tags.map((tag) => (
@@ -267,7 +267,7 @@ const isLongContent = plainTextLength > 300;
                 </div>
             )}
 
-            <!-- 时间 -->
+            <!-- Time -->
             <div class="text-[12px] text-[var(--text-muted)] mt-2">{date}</div>
         </div>
     </div>
@@ -345,7 +345,7 @@ const isLongContent = plainTextLength > 300;
         }
     });
 
-    // 点击整个 Moment 跳转（如果不是点击内部链接或按钮）
+    // Clicking anywhere on a Moment navigates (unless the click is on an inner link or button)
     document.addEventListener('click', function(e) {
         var post = e.target.closest('.moment-post[data-href]');
         if (!post) return;

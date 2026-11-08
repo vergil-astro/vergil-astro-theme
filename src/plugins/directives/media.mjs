@@ -4,7 +4,7 @@ import { createDirectiveImages } from '../directive-images.mjs';
 export function processMediaDirective(node) {
     const name = node.name;
     const attrs = node.attributes || {};
-    // 封面图可以是本地图片（@img/ 或相对路径），交给 Astro 处理
+    // Cover images can be local images (@img/ or a relative path), processed by Astro
     const images = createDirectiveImages();
 
     if (name === 'video') {

@@ -13,7 +13,7 @@
     position: relative;
 }
 
-/* 外层灰色竖线装饰 */
+/* Outer gray vertical line decoration */
 .md-directive-poetry .md-poetry-content::before {
     content: '';
     position: absolute;
@@ -34,7 +34,7 @@
     position: relative;
 }
 
-/* 标题区域强调竖线 */
+/* Accent vertical line in the title area */
 .md-directive-poetry .md-poetry-title::before {
     content: '';
     position: absolute;

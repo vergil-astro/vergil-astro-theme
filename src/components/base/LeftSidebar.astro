@@ -166,19 +166,19 @@ function isActive(href: string): boolean {
 
       <div class="space-y-1.5 text-xs">
         <div class="flex justify-between">
-          <span class="text-muted">{t.sidebar.postCount}：</span>
+          <span class="text-muted">{t.sidebar.postCount}{t.common.colon}</span>
           <span class="text-main">{t.sidebar.posts(totalPosts)}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-muted">{t.sidebar.running}：</span>
+          <span class="text-muted">{t.sidebar.running}{t.common.colon}</span>
           <span class="text-main">{getRunningTime()}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-muted">{t.sidebar.totalWords}：</span>
+          <span class="text-muted">{t.sidebar.totalWords}{t.common.colon}</span>
           <span class="text-main">{formatNumber(totalWords)}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-muted">{t.sidebar.lastActive}：</span>
+          <span class="text-muted">{t.sidebar.lastActive}{t.common.colon}</span>
           <span class="text-main">{getLastActive()}</span>
         </div>
           {icpRecords.length > 0 && (
@@ -313,7 +313,7 @@ function isActive(href: string): boolean {
     overflow: hidden !important;
   }
 
-  /* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
+  /* Scrollbar shows only while scrolling; see BaseHead for is-scrolling */
   .sidebar {
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;

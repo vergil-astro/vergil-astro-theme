@@ -26,14 +26,14 @@ export async function getStaticPaths() {
     const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
     assertNoDuplicateSlugs(posts);
     const postCount = posts.length;
-    // 专栏可以用 dir 认领一整个目录，所以归属不能只看 frontmatter
+    // A series can claim a whole directory through dir, so membership cannot rely on frontmatter alone
     const seriesDefs = (await getCollection('series')).map((s) => ({
         id: s.id,
         name: s.data.name,
         dir: s.data.dir
     }));
 
-    // 预计算每个专栏的文章列表（按发布时间正序）
+    // Precompute each series' post list (ascending by publish date)
     const seriesMap = new Map<string, CollectionEntry<'blog'>[]>();
     posts.forEach((post) => {
         const def = resolvePostSeries(post, seriesDefs);
@@ -49,11 +49,11 @@ export async function getStaticPaths() {
     });
 
     return posts.map((post, index) => {
-        // 全站 prev/next
+        // Site-wide prev/next
         const prevPost = index + 1 !== postCount ? posts[index + 1] : null;
         const nextPost = index !== 0 ? posts[index - 1] : null;
 
-        // 专栏内 prev/next
+        // Prev/next within the series
         let seriesPrev: CollectionEntry<'blog'> | null = null;
         let seriesNext: CollectionEntry<'blog'> | null = null;
         let seriesRecommend: CollectionEntry<'blog'> | null = null;
@@ -64,7 +64,7 @@ export async function getStaticPaths() {
             seriesPrev = sIndex > 0 ? seriesPosts[sIndex - 1] : null;
             seriesNext = sIndex < seriesPosts.length - 1 ? seriesPosts[sIndex + 1] : null;
 
-            // 当前专栏没有下一篇时，推荐其他专栏的最新文章
+            // When the current series has no next post, recommend the latest post from other series
             if (!seriesNext) {
                 const otherSeriesPosts = posts
                     .filter((p) => {
@@ -96,7 +96,7 @@ type Props = {
 const { href } = Astro.url;
 const { post, prevPost, nextPost, seriesPrev, seriesNext, seriesRecommend, seriesName } = Astro.props;
 const { title, publishDate, updatedDate, excerpt, tags = [], seo, categories, fonts, banner } = post.data;
-// 专栏可能来自 frontmatter，也可能来自文章所在目录，统一用解析结果
+// The series may come from frontmatter or from the post's directory; always use the resolved result
 const series = seriesName;
 
 const navPrev = series ? seriesPrev : prevPost;
@@ -108,7 +108,7 @@ const hasNav = !!(navPrev || navNext || recommendNext);
 const bannerUrl = await resolveImageUrl(banner, 1600);
 const { Content, headings } = await render(post);
 
-// 生成微信分享二维码
+// Generate the WeChat share QR code
 const pageUrl = new URL(`/blog/${getPostSlug(post)}/`, siteConfig.website).toString();
 const qrCode = new QRCode({ content: pageUrl, width: 160, height: 160 });
 const qrCodeSvg = qrCode.svg();
@@ -271,7 +271,7 @@ const postBreadcrumbs = [
 
     {siteConfig.comments?.enabled && <Comments pageId={`/blog/${getPostSlug(post)}/`} pageTitle={title} />}
 
-    <!-- 微信分享二维码弹窗 -->
+    <!-- WeChat share QR code modal -->
     <div class="wechat-qrcode-modal hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" data-url={pageUrl}>
         <div class="wechat-qrcode-card bg-card rounded-xl shadow-xl p-5 w-[200px] mx-4 text-center relative">
             <button class="wechat-qrcode-close absolute top-2 right-2 text-muted hover:text-main transition-colors" aria-label={t.post.close}>
@@ -287,7 +287,7 @@ const postBreadcrumbs = [
 
 <script>
     document.addEventListener('astro:page-load', () => {
-        // 复制链接
+        // Copy link
         const copyUrlButton = document.querySelector('.copy-url-button') as HTMLButtonElement;
         copyUrlButton?.addEventListener('click', async () => {
             await copyUrl(copyUrlButton);
@@ -318,7 +318,7 @@ const postBreadcrumbs = [
             }, 2500);
         }
 
-        // 分享菜单
+        // Share menu
         const shareTrigger = document.querySelector('.share-menu-trigger') as HTMLButtonElement;
         const shareMenu = document.querySelector('.share-menu') as HTMLDivElement;
 
@@ -335,7 +335,7 @@ const postBreadcrumbs = [
             e.stopPropagation();
         });
 
-        // 微信分享 - 显示二维码弹窗
+        // WeChat share - show the QR code modal
         const wechatModal = document.querySelector('.wechat-qrcode-modal') as HTMLDivElement;
         const wechatClose = document.querySelector('.wechat-qrcode-close') as HTMLButtonElement;
 
@@ -354,7 +354,7 @@ const postBreadcrumbs = [
             wechatModal?.classList.add('hidden');
         });
 
-        // 微博分享 - 跳转分享页
+        // Weibo share - go to the share page
         document.querySelector('.share-weibo')?.addEventListener('click', () => {
             const url = encodeURIComponent(window.location.href);
             const title = encodeURIComponent(document.title);

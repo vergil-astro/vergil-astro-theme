@@ -8,7 +8,7 @@
     border-radius: var(--md-radius-lg);
     text-align: center;
     position: relative;
-    /* 数字块高度放在外层，冒号也读得到，才能按数字块的高度居中 */
+    /* The digit block height is set on the outer element so the colon can read it too and center itself against the digit block height */
     --panel-h: 58px;
     box-shadow:
         0 1px 3px rgba(0,0,0,0.06),
@@ -276,7 +276,7 @@
     letter-spacing: 0.08em;
 }
 
-/* 说明文字紧跟在标题下面当副标题，先交代在倒数什么再看数字 */
+/* The description sits right under the title as a subtitle, so it says what is being counted down before the numbers */
 .md-deadline-title:has(+ .md-deadline-desc) {
     margin-bottom: 0.25rem;
 }
@@ -289,7 +289,7 @@
     margin: 0 auto 0.9rem;
 }
 
-/* 目标日期是补充信息，放在最底下当脚注 */
+/* The target date is supplementary, so it goes at the very bottom as a footnote */
 .md-deadline-meta {
     font-size: 0.8rem;
     color: var(--text-muted);

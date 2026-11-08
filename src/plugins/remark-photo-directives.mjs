@@ -36,7 +36,7 @@ const BRAND_LOGOS = {
     meizu: `<svg class="md-photo-logo" viewBox="0 0 85 22" xmlns="http://www.w3.org/2000/svg"><text x="0" y="17" font-family="system-ui, -apple-system, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="0.5" fill="currentColor">MEIZU</text></svg>`,
 };
 
-// 中文兜底：厂商名 → 显示名。通过 options.brands 传入字典时按同样结构合并进别名表。
+// Chinese fallback: maker name → display name. A dictionary passed via options.brands is merged into the alias map with the same structure.
 const BRANDS_FALLBACK = {
     Canon: '佳能',
     Nikon: '尼康',
@@ -58,7 +58,7 @@ const BRANDS_FALLBACK = {
 
 function buildAliasMap(brands) {
     const aliasMap = { 'fuji': 'fujifilm' };
-    // 先铺中文兜底，再叠加传入的字典，保证既有中文写法照旧可用
+    // Lay down the Chinese fallback first, then the passed dictionary on top, so existing Chinese spellings keep working
     for (const dict of [BRANDS_FALLBACK, brands || {}]) {
         for (const [key, name] of Object.entries(dict)) {
             const alias = String(name || '').toLowerCase().trim();
@@ -127,7 +127,7 @@ function renderPhotoDirective(attrs, aliasMap, images) {
     if (type === 'blur') {
         // Blur: blurred background + clear centered image + bottom info bar
         let html = `<div class="md-directive md-directive-photo md-photo-blur">`;
-        // 模糊背景用铺满的 <img>（object-fit: cover），而不是 CSS 背景图，这样本地图片也能被 Astro 优化
+        // The blurred background is a full-bleed <img> (object-fit: cover) rather than a CSS background image, so local images can also be optimized by Astro
         html += images.img(src, { class: 'md-photo-bg', alt: '', 'aria-hidden': 'true', loading: 'lazy', decoding: 'async' });
         html += `<div class="md-photo-img-wrap">`;
         html += photoImg();
@@ -146,7 +146,7 @@ function renderPhotoDirective(attrs, aliasMap, images) {
         return html;
     }
 
-    // Watermark: simple image + info bar (三栏：左品牌型号 / 中Logo / 右EXIF时间)
+    // Watermark: simple image + info bar (three columns: brand and model on the left / logo in the middle / EXIF and time on the right)
     let html = `<div class="md-directive md-directive-photo md-photo-watermark">`;
     html += `<div class="md-photo-img-wrap">`;
     html += photoImg();

@@ -19,7 +19,7 @@
     transition: background 0.2s ease;
 }
 
-/* hover 时竖线退为灰色，只高亮节点 */
+/* On hover the vertical line fades back to gray and only the node is highlighted */
 .md-directive-timeline:has(.md-timeline-node:hover)::before {
     background: var(--border-light);
 }
@@ -93,13 +93,13 @@
     z-index: 1;
 }
 
-/* 当 timeline 中有任意节点被 hover 时，将默认红点降级为灰点 */
+/* When any node in the timeline is hovered, downgrade the default red dots to gray dots */
 :where(.md-directive-timeline:has(.md-timeline-node:hover)) .md-timeline-dot-first {
     background: var(--text-muted);
     box-shadow: 0 0 0 3px var(--bg-main);
 }
 
-/* 被 hover 的节点变为红点（保持圆形，不形变） */
+/* The hovered node turns into a red dot (stays round, no deformation) */
 .md-directive-timeline .md-timeline-node:hover .md-timeline-dot {
     background: var(--accent-color);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent);

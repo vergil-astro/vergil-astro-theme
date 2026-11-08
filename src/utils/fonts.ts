@@ -5,17 +5,18 @@ import maokenZhuyuanTi from '../fonts/maoken-zhuyuan-ti.woff2?url';
 import maokenZhuyuanTiSubset from '../fonts/maoken-zhuyuan-ti-subset.woff2?url';
 
 /**
- * path 是完整字体；subset 是只含常用字的子集，首屏先加载它，完整字体在后台补齐缺的字。
- * 不写 subset 时按 path 推出同目录下的 <文件名>-subset.woff2。
+ * path is the full font; subset holds only common characters and loads first for the initial screen. The full font is downloaded
+ * only when the page has characters the subset lacks (see fullFamilyOf).
+ * Without subset, it is derived from path as <filename>-subset.woff2 in the same directory.
  */
 type FontDef = { cssName: string; family: string; path?: string; subset?: string; cdn?: string; format?: string };
 type FileFont = FontDef & { path: string };
 type CdnFont = FontDef & { cdn: string };
 
 /**
- * 框架自带的字体，字体文件随包发布，站点不用在 public/ 里放任何字体文件。
- * 站点在 src/data/config/fonts.ts 的 fontsRegistry 里登记的字体会和这里合并，同名时以站点的为准，
- * 比如换成自己按内容生成的子集字体
+ * Fonts bundled with the framework. The font files ship with the package, so sites do not need any font files in public/.
+ * Fonts a site registers in fontsRegistry in src/data/config/fonts.ts are merged with these, and the site's entry wins on a name clash,
+ * for example to swap in a subset font generated from its own content
  */
 const builtinFonts: Record<string, FontDef> = {
     inter: {
@@ -54,16 +55,16 @@ function isFileFont(font: FontDef): font is FileFont {
     return typeof font.path === 'string' && font.path.length > 0;
 }
 
-/** 子集文件：没写 subset 时按 path 推出同目录下的 <文件名>-subset.woff2 */
+/** Subset file: without subset, derived from path as <filename>-subset.woff2 in the same directory */
 export function subsetPathOf(font: FileFont): string {
     return font.subset ?? font.path.replace('.woff2', '-subset.woff2');
 }
 
 /**
- * 子集和完整文件登记成两个字体：子集用 cssName，完整文件用「cssName Full」，字体栈里子集在前。
- * 子集里缺的字，浏览器顺着字体栈去用完整文件，用到时才下载它。两个地址不能写进同一条 @font-face 的 src：
- * 那只是加载失败时的备选，子集能加载，浏览器就不会再看完整文件，缺的字只能显示成系统字体。
- * 子集和完整文件是同一个文件时，只登记一个。
+ * The subset and the full file are registered as two fonts: the subset as cssName and the full file as "cssName Full", with the subset first in the font stack.
+ * For characters missing from the subset, the browser falls through the font stack to the full file and downloads it only when needed. The two URLs cannot share one @font-face src:
+ * that is only a fallback for load failures, so if the subset loads, the browser never looks at the full file and missing characters render in a system font.
+ * When the subset and the full file are the same file, only one is registered.
  */
 export function fullFamilyOf(font: FileFont): string | null {
     return subsetPathOf(font) === font.path ? null : `${font.cssName} Full`;

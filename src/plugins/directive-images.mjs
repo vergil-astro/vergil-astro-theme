@@ -1,14 +1,14 @@
 /**
- * 让内容指令里的本地图片也交给 Astro 处理。
+ * Let Astro process local images inside content directives too.
  *
- * 指令插件把组件拼成 HTML 字符串，Astro 看不到里面的 <img>，路径原样输出。
- * 这里的做法：拼 HTML 时，本地图片（@img/ 或相对路径）先留一个占位标记，
- * 最后把 HTML 在标记处切开，换成真正的 Markdown 图片节点。Astro 会像处理
- * ![](...) 一样解析路径、压缩成 WebP、写入宽高，<img> 上的其他属性原样保留。
+ * Directive plugins build components as HTML strings, so Astro can't see the <img> tags inside and outputs their paths as-is.
+ * The approach here: while building the HTML, leave a placeholder marker for each local image (@img/ or a relative path),
+ * then split the HTML at the markers and swap in real Markdown image nodes. Astro then handles them like
+ * ![](...): it resolves the path, compresses to WebP and writes width and height, keeping other <img> attributes as-is.
  *
- * 外链和 / 开头的站点路径不需要处理，照旧输出 <img> 字符串，并经过 safeUrl 过滤掉 javascript: 这类地址。
+ * External links and site paths starting with / need no processing; they are still output as <img> strings, with safeUrl filtering out addresses like javascript:.
  *
- * 用法：
+ * Usage:
  *   const images = createDirectiveImages();
  *   html += images.img(src, { class: 'md-image-img', alt, loading: 'lazy' });
  *   node.children = images.toNodes(html);
@@ -20,11 +20,11 @@ function escapeAttr(value) {
     return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/** 需要交给 Astro 处理的本地图片：@img/ 别名或相对路径 */
+/** Local images that Astro should process: the @img/ alias or a relative path */
 export function isLocalImage(src) {
     if (!src) return false;
     if (src.startsWith('@img/')) return true;
-    // 带协议的（http:、data:、javascript: 等）、/ 开头的站点路径、# 锚点都不是本地文件
+    // URLs with a scheme (http:, data:, javascript:, etc.), site paths starting with /, and # anchors are not local files
     if (/^[a-z][a-z0-9+.-]*:/i.test(src) || src.startsWith('/') || src.startsWith('#')) return false;
     return true;
 }
@@ -32,8 +32,8 @@ export function isLocalImage(src) {
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|svg|avif)$/i;
 
 /**
- * 图标一类的属性（按钮、引用块、标题的 icon）既可能是图片路径，也可能是图标名或文字，
- * 只有 @img/ 开头，或 ./ ../ 开头且是图片扩展名的才当本地图片
+ * Icon-like attributes (the icon of buttons, quote blocks and titles) may be an image path, an icon name or text,
+ * so only values starting with @img/, or starting with ./ or ../ and having an image extension, count as local images
  */
 export function isLocalImageFile(value) {
     if (!value) return false;
@@ -46,7 +46,7 @@ export function createDirectiveImages() {
     const marker = (i) => `\u0000vergil-img:${i}\u0000`;
 
     return {
-        /** 生成一个 <img>。attrs 里的 alt 单独处理，其余属性原样写到 <img> 上 */
+        /** Generate an <img>. alt in attrs is handled separately; the other attributes are written to the <img> as-is */
         img(src, attrs = {}) {
             const { alt = '', ...rest } = attrs;
             if (!isLocalImage(src)) {
@@ -60,7 +60,7 @@ export function createDirectiveImages() {
             return marker(pending.length - 1);
         },
 
-        /** 把 HTML 切成节点：占位标记处换成图片节点，其余部分保持 HTML */
+        /** Split the HTML into nodes: placeholder markers become image nodes, the rest stays HTML */
         toNodes(html) {
             if (pending.length === 0) return [{ type: 'html', value: html }];
             const nodes = [];

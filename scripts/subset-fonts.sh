@@ -1,16 +1,16 @@
 #!/bin/bash
-# 字体子集化脚本
-# 为每种字体生成两个文件：
-#   - 字体名-subset.woff2  = 全站精确用字 + ASCII（~100KB，首屏加载）
-#   - 字体名.woff2         = GB2312 一级常用字 + ASCII（~1.5MB，后台补充）
+# Font subsetting script
+# Generates two files for each font:
+#   - <font>-subset.woff2  = exact characters used across the site + ASCII (~100KB, loaded on first paint)
+#   - <font>.woff2         = GB2312 level-1 common characters + ASCII (~1.5MB, filled in in the background)
 #
-# 用法:
-#   pnpm fonts:subset（在框架仓库根目录运行；按示例站 starter/ 的内容取字，输出到框架自带的 src/fonts/）
+# Usage:
+#   pnpm fonts:subset (run from the framework repo root; takes characters from the content of the starter/ demo site and writes to the framework's own src/fonts/)
 #
-# 添加新字体:
-#   1. 将 .ttf 文件放入 scripts/fonts-source/
-#   2. 运行 bash scripts/subset-fonts.sh
-#   3. 在 src/data/config/fonts.ts 中注册新字体
+# Adding a new font:
+#   1. Put the .ttf file in scripts/fonts-source/
+#   2. Run bash scripts/subset-fonts.sh
+#   3. Register the new font in src/data/config/fonts.ts
 
 set -e
 
@@ -22,7 +22,7 @@ FULL_CHARS="/tmp/font_full_chars.txt"
 echo "=== 字体子集化 ==="
 echo ""
 
-# 检查依赖
+# Check dependencies
 if ! python3 -c "import fontTools" 2>/dev/null; then
     echo "错误: 缺少 fontTools，请先安装:"
     echo "  pip3 install fonttools brotli"
@@ -46,14 +46,14 @@ if [ "$FONT_COUNT" -eq 0 ]; then
     exit 1
 fi
 
-# 生成两个字符集
+# Generate the two character sets
 echo "[1/2] 生成字符集..."
 python3 << 'PYEOF'
 import subprocess
 import string
 
 def get_gb2312_level1():
-    """GB2312 一级常用字（3755字）"""
+    """GB2312 level-1 common characters (3755 characters)"""
     chars = []
     for high in range(0xB0, 0xD8):
         for low in range(0xA1, 0xFF):
@@ -66,7 +66,7 @@ def get_gb2312_level1():
     return chars
 
 def get_gb2312_level2():
-    """GB2312 二级汉字（3008字）"""
+    """GB2312 level-2 Chinese characters (3008 characters)"""
     chars = []
     for high in range(0xD8, 0xF8):
         for low in range(0xA1, 0xFF):
@@ -76,7 +76,7 @@ def get_gb2312_level2():
                 pass
     return chars
 
-# 全站用字（所有字符）
+# Characters used across the site (all characters)
 result = subprocess.run(
     ['grep', '-orh', '.', 'starter/src/content/', 'starter/public/'],
     capture_output=True, text=True
@@ -90,16 +90,16 @@ for c in result.stdout:
 # ASCII
 ascii_chars = set(string.ascii_letters + string.digits + string.punctuation + string.whitespace)
 
-# GB2312 一级
+# GB2312 level 1
 level1 = set(get_gb2312_level1())
 
-# 子集字符集 = 全站用字 + ASCII
+# Subset character set = characters used across the site + ASCII
 subset_chars = site_chars | ascii_chars
 
-# 完整字符集 = 子集 + GB2312 一级
+# Full character set = subset + GB2312 level 1
 full_chars = subset_chars | level1
 
-# 输出统计
+# Print stats
 subset_han = len([c for c in subset_chars if '\u4e00' <= c <= '\u9fff'])
 full_han = len([c for c in full_chars if '\u4e00' <= c <= '\u9fff'])
 
@@ -115,7 +115,7 @@ with open('/tmp/font_full_chars.txt', 'w', encoding='utf-8') as f:
     f.write(''.join(sorted(full_chars)))
 PYEOF
 
-# 子集化
+# Subset the fonts
 echo ""
 echo "[2/2] 子集化字体..."
 
@@ -130,7 +130,7 @@ for font in "$FONTS_SOURCE"/*.ttf; do
 
     echo "  $filename.ttf"
 
-    # Subset 文件（全站用字 + ASCII）
+    # Subset file (characters used across the site + ASCII)
     echo "    → ${filename}-subset.woff2"
     python3 -m fontTools.subset "$font" \
         --text-file="$SUBSET_CHARS" \
@@ -146,7 +146,7 @@ for font in "$FONTS_SOURCE"/*.ttf; do
         --name-IDs='*' \
         2>/dev/null
 
-    # Full 文件（GB2312 一级 + ASCII）
+    # Full file (GB2312 level 1 + ASCII)
     echo "    → ${filename}.woff2"
     python3 -m fontTools.subset "$font" \
         --text-file="$FULL_CHARS" \

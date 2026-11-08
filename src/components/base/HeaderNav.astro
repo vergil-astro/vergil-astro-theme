@@ -301,7 +301,7 @@ function hasActiveChild(children?: { href: string }[]): boolean {
             };
             window._navScrollHandler = scrollHandler;
             window.addEventListener('scroll', scrollHandler, { passive: true });
-            // 延迟判断：ViewTransitions 页面切换时 scroll position 可能还没 reset
+            // Defer the check: during a ViewTransitions page swap the scroll position may not be reset yet
             requestAnimationFrame(function() {
                 requestAnimationFrame(updateNav);
             });

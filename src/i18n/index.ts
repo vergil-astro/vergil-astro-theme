@@ -1,6 +1,7 @@
 import { siteInfo } from '@vergil-site/data/config/identity';
 import zhCN from './zh-CN';
 import en from './en';
+import { mergeText, type DeepPartial } from './merge';
 
 const dictionaries = { 'zh-CN': zhCN, en } as const;
 
@@ -13,14 +14,14 @@ function isLocale(value: string): value is Locale {
     return value in dictionaries;
 }
 
-/** 配置里选的语言；配了字典里没有的值就退回默认，不让站点挂掉 */
+/** The language chosen in the config; a value with no matching dictionary falls back to the default instead of breaking the site */
 export const locale: Locale = isLocale(siteInfo.locale) ? siteInfo.locale : defaultLocale;
 
 /**
- * 当前语言的界面文案。直接按对象取值，有完整类型提示：
- *   t.nav.prev            -> '上一篇'
- *   t.nav.fromSeries('x') -> '来自专栏「x」'
+ * UI text for the current language. Read values straight off the object, with full type hints:
+ *   t.nav.prev            -> the previous-post label
+ *   t.nav.fromSeries('x') -> the from-series note for x
  *
- * 构建期就确定，没有运行时开销。
+ * Resolved at build time, with no runtime cost. Text the site overrides in uiText in identity.ts is applied on top; see merge.ts.
  */
-export const t: Dictionary = dictionaries[locale];
+export const t: Dictionary = mergeText(dictionaries[locale], (siteInfo as { uiText?: DeepPartial<Dictionary> }).uiText);

@@ -1,7 +1,7 @@
 ---
 /**
- * 简历里需要加密的一块。传了 password 就把里面的内容先渲染成 HTML 再加密，页面里只留密文，
- * 解锁后由 src/views/resume/scripts/resume-vault.ts 原样换回去；没传就直接输出内容
+ * A block of the resume that needs encryption. With password, its content is rendered to HTML and then encrypted, leaving only ciphertext in the page;
+ * after unlocking, src/views/resume/scripts/resume-vault.ts swaps it back as-is. Without password, the content is output directly
  */
 import { seal } from '../../../utils/resume-crypto';
 

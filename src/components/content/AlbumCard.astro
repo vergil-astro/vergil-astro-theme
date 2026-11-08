@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import CustomImage from '../ui/CustomImage.astro';
+import { locale } from '../../i18n';
 
 interface Props {
     album: CollectionEntry<'albums'>;
@@ -45,7 +46,7 @@ const imageCount = images?.length || 0;
         {description && <p class="mt-1 line-clamp-2 text-sm text-secondary">{description}</p>}
         
         <div class="mt-3 flex items-center gap-3 text-xs text-secondary">
-            <time>{new Date(date).toLocaleDateString()}</time>
+            <time>{new Date(date).toLocaleDateString(locale)}</time>
             <span>{imageCount} photos</span>
             {tags && tags.length > 0 && (
                 <span class="rounded-full bg-secondary px-2 py-0.5">{tags[0]}</span>

@@ -2,7 +2,7 @@
     "name": "vergil-starter",
     "private": true,
     "type": "module",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "engines": {
         "node": ">=24.0.0"
     },
@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "@vergil-astro/theme": "workspace:*",
-        "astro": "^7.4.6",
+        "astro": "^7.4.7",
         "sharp": "^0.35.5"
     }
 }

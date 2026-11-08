@@ -1,5 +1,6 @@
 import { type CollectionEntry } from 'astro:content';
 import { slugify } from './common-utils';
+import { t } from '../i18n';
 
 export function sortItemsByDateDesc(itemA: CollectionEntry<'blog' | 'projects'>, itemB: CollectionEntry<'blog' | 'projects'>) {
     return new Date(itemB.data.publishDate).getTime() - new Date(itemA.data.publishDate).getTime();
@@ -45,7 +46,7 @@ export function getPostsByCategory(posts: CollectionEntry<'blog'>[], categoryId:
     });
 }
 
-// 分类树节点
+// Category tree node
 export type CategoryNode = {
     name: string;
     id: string;
@@ -96,14 +97,14 @@ export function getAllSeries(posts: CollectionEntry<'blog'>[]) {
     return series.map((s) => ({ name: s, id: slugify(s) }));
 }
 
-/** 专栏定义，来自 src/content/series/ 下的 md 文件 */
+/** Series definition, from the md files under src/content/series/ */
 export type SeriesDef = { id: string; name: string; dir?: string };
 
 /**
- * 文章放在 src/content/blog/ 的子目录里时，目录名不进 URL。
+ * When a post sits in a subdirectory of src/content/blog/, the directory name is not part of the URL.
  *
- * 这样把散落的文章归拢进专栏目录，不会改变任何已经发布的链接。
- * 代价是不同目录下的同名文件会撞同一个地址，由 assertNoDuplicateSlugs 拦下。
+ * That way, gathering loose posts into a series directory does not change any published links.
+ * The cost is that same-named files in different directories collide on one URL, which assertNoDuplicateSlugs catches.
  */
 export function getPostSlug(post: CollectionEntry<'blog'>) {
     return post.id.split('/').pop() as string;
@@ -113,16 +114,16 @@ export function getPostUrl(post: CollectionEntry<'blog'>, prefix = '/blog') {
     return `${prefix}/${getPostSlug(post)}/`;
 }
 
-/** 文章所在的一级目录，没有则为 null */
+/** The post's top-level directory, or null if there is none */
 export function getPostDir(post: CollectionEntry<'blog'>) {
     const parts = post.id.split('/');
     return parts.length > 1 ? parts[0] : null;
 }
 
 /**
- * 目录名不进 URL，所以 blog/a.md 和 blog/某专栏/a.md 会生成同一个地址。
- * 这种情况必须在构建期报错：悄悄覆盖会让其中一篇永远打不开，
- * 而自动加后缀又会让 URL 随着文件增减而变化。
+ * Directory names are not part of the URL, so blog/a.md and blog/some-series/a.md produce the same URL.
+ * This must fail the build: silently overwriting would leave one of the posts permanently unreachable,
+ * and auto-adding a suffix would make URLs change as files are added or removed.
  */
 export function assertNoDuplicateSlugs(posts: CollectionEntry<'blog'>[]) {
     const seen = new Map<string, string>();
@@ -130,22 +131,17 @@ export function assertNoDuplicateSlugs(posts: CollectionEntry<'blog'>[]) {
         const slug = getPostSlug(post).toLowerCase();
         const previous = seen.get(slug);
         if (previous) {
-            throw new Error(
-                `[Vergil] 两篇文章会生成同一个地址 /blog/${getPostSlug(post)}/：\n` +
-                    `  src/content/blog/${previous}.md\n` +
-                    `  src/content/blog/${post.id}.md\n` +
-                    `目录名不参与 URL，所以不同目录下也不能重名。请把其中一篇改名。`
-            );
+            throw new Error(t.build.duplicateSlug(getPostSlug(post), previous, post.id));
         }
         seen.set(slug, post.id);
     }
 }
 
 /**
- * 判断文章属于哪个专栏。
+ * Determine which series a post belongs to.
  *
- * 优先看 frontmatter 里的 series；没写的话，看它所在目录有没有被某个专栏用 dir 认领。
- * 这样同一个专栏的文章可以直接丢进一个文件夹，不必每篇都重复写 series。
+ * series in the frontmatter takes priority; if it is not set, check whether a series claims the post's directory via dir.
+ * That way, posts of one series can simply go into one folder without repeating series in every post.
  */
 export function resolvePostSeries(post: CollectionEntry<'blog'>, defs: SeriesDef[]): SeriesDef | undefined {
     if (post.data.series) {
@@ -158,9 +154,9 @@ export function resolvePostSeries(post: CollectionEntry<'blog'>, defs: SeriesDef
 }
 
 /**
- * 专栏是一个有顺序的阅读序列，所以按发布时间正序返回，第一篇在最前。
- * 博客列表那种「最新在前」的排法用在这里会让教程倒着读，
- * 连带专栏导航里的「第几篇 / 共几篇」也会反过来。
+ * A series is an ordered reading sequence, so posts are returned in ascending publish order, first post first.
+ * The blog list's newest-first order would make tutorials read backwards here,
+ * and would also reverse the "part N of M" position in the series navigation.
  */
 export function getPostsBySeries(posts: CollectionEntry<'blog'>[], seriesId: string, defs: SeriesDef[] = []) {
     return posts

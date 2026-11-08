@@ -30,7 +30,7 @@ const filterUrl = (type: string, filter: string) => {
 ---
 
 <div class="mb-8">
-    <!-- 第一层 Tab：内容类型 -->
+    <!-- First-level tabs: content type -->
     <div class="flex items-center gap-1 mb-4">
         <a
             href={typeUrl('blog')}
@@ -54,7 +54,7 @@ const filterUrl = (type: string, filter: string) => {
         </a>
     </div>
 
-    <!-- 第二层 Tab：分类/目录 -->
+    <!-- Second-level tabs: category/directory -->
     <div class="flex items-center gap-1 flex-wrap">
         {activeType === 'blog' ? (
             <>

@@ -69,12 +69,12 @@ export function processBlockDirective(node, options = {}) {
         }
 
         case 'folders': {
-            // 全局展开策略：first（默认第一个展开）| none（全部折叠）| all（全部展开）
+            // Global expand policy: first (default, expand the first one) | none (collapse all) | all (expand all)
             const expand = attrs.expand || 'first';
             const folders = [];
             let currentFolder = null;
             let currentContent = [];
-            let currentOpen = null; // null = 未指定，使用全局默认
+            let currentOpen = null; // null = not specified, use the global default
 
             for (const child of node.children) {
                 if (child.type === 'paragraph') {
@@ -82,7 +82,7 @@ export function processBlockDirective(node, options = {}) {
                     if (text.startsWith('folder:')) {
                         if (currentFolder !== null) folders.push({ title: currentFolder, children: currentContent, open: currentOpen });
                         const raw = text.slice(7).trim();
-                        // 解析 folder 级别的 {open} 或 {closed} 标记
+                        // Parse the folder-level {open} or {closed} marker
                         const m = raw.match(/^(.*?)\s*\{(open|closed)\}\s*$/);
                         currentFolder = m ? m[1].trim() : raw;
                         currentOpen = m ? (m[2] === 'open') : null;
@@ -99,7 +99,7 @@ export function processBlockDirective(node, options = {}) {
             const result = [];
             for (let i = 0; i < folders.length; i++) {
                 const f = folders[i];
-                // 优先级：folder 级别 > 全局 expand
+                // Priority: folder level > global expand
                 const isOpen = f.open !== null ? f.open
                     : expand === 'all' ? true
                     : expand === 'none' ? false
@@ -303,7 +303,7 @@ export function processBlockDirective(node, options = {}) {
             function renderIcon(value) {
                 if (!value) return '';
                 if (/^https?:\/\//i.test(value) || isLocalImageFile(value)) {
-                    // 本地图片返回图片节点交给 Astro 处理，外链返回 HTML
+                    // Local images return an image node for Astro to process; external links return HTML
                     const images = createDirectiveImages();
                     return images.toNodes(images.img(value, { class: 'md-title-icon-img', alt: '' }))[0];
                 }

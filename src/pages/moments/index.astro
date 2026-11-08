@@ -7,7 +7,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Moment from '../../components/content/Moment.astro';
 import siteConfig from '@vergil-site/data/site-config';
 
-// 头像可以写 public/ 下的路径字符串，也可以在 site-config.ts 里 import 成图片对象
+// The avatar can be a path string under public/, or an image object imported in site-config.ts
 const avatarSrc = typeof siteConfig.avatar?.src === 'string' ? siteConfig.avatar.src : siteConfig.avatar?.src.src;
 const signature = t.page.moments.signature;
 const bannerUrl = '/assets/defaults/banner-moments.webp';
@@ -27,7 +27,7 @@ let allPosts: MomentPost[] = [];
 if (fs.existsSync(momentsDir)) {
     const files = fs.readdirSync(momentsDir)
         .filter(f => f.endsWith('.json'))
-        .sort((a, b) => b.localeCompare(a)); // 文件名倒序，确保时间倒序
+        .sort((a, b) => b.localeCompare(a)); // Sort file names descending so entries are newest first
 
     for (const file of files) {
         const filePath = path.join(momentsDir, file);
@@ -77,7 +77,7 @@ function formatRelativeTime(dateStr: string) {
     showHeader={false}
     showRightSidebar={false}
 >
-    <!-- 朋友圈封面与个人信息 -->
+    <!-- Moments cover and profile info -->
     <div class="relative mb-20">
         <div class="w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden">
             <img
@@ -107,7 +107,7 @@ function formatRelativeTime(dateStr: string) {
         </div>
     </div>
 
-    <!-- 动态列表 -->
+    <!-- Moments list -->
     <div id="moments-feed" class="mt-12" data-page-size={PAGE_SIZE}>
         {allPosts.length === 0 && (
             <div class="text-center py-12 text-[var(--text-muted)]">
@@ -143,7 +143,7 @@ function formatRelativeTime(dateStr: string) {
         })}
     </div>
 
-    <!-- 加载更多 -->
+    <!-- Load more -->
     <div id="moments-load-more" class="py-6 text-center">
         <button
             id="moments-load-btn"
@@ -155,16 +155,16 @@ function formatRelativeTime(dateStr: string) {
         <div id="moments-no-more" class="hidden text-sm text-[var(--text-muted)]">{t.page.moments.noMore}</div>
     </div>
 
-    <!-- 关于动态 -->
+    <!-- About moments -->
     <div class="mt-12 prose max-w-none">
         <h2 class="font-display text-xl mb-4">{t.page.moments.aboutTitle}</h2>
         <p>{t.page.moments.aboutText}</p>
     </div>
 
     <script is:inline>
-        // 所有动态都在服务端渲染好了，这里只负责把多出来的那些显示出来。
-        // 之前是用 JS 再实现一遍渲染逻辑，两份实现很快就长歪了：
-        // 后面加载出来的条目没有 hover 效果、正文不走 Markdown、标签链接也没跟上改动。
+        // All moments are already rendered on the server; this only reveals the extra ones.
+        // Rendering used to be reimplemented in JS, and the two implementations quickly drifted apart:
+        // entries loaded later had no hover effect, their body skipped Markdown, and tag links missed updates.
         (function () {
             var feed = document.getElementById('moments-feed');
             var loadBtn = document.getElementById('moments-load-btn');
@@ -201,23 +201,23 @@ function formatRelativeTime(dateStr: string) {
         })();
     </script>
 
-    <!-- 透传站点数据给 JS -->
+    <!-- Pass site data through to JS -->
     <div data-site-title={siteConfig.title || 'Vergil'} data-avatar-src={avatarSrc} class="hidden" />
 </BaseLayout>
 
 <style>
-    /* 超出首屏的条目先藏起来，「加载更多」把它们放出来 */
+    /* Entries beyond the first screen start hidden; "Load more" reveals them */
     .moment-entry.is-hidden {
         display: none;
     }
-    /* 原来条目之间没有任何分隔，一条接一条看不出边界。
-       用一条淡分隔线把它们断开，比整条做成卡片轻一些。 */
+    /* Entries used to have no separator at all, so you could not tell where one ended.
+       A faint divider separates them, lighter than turning each into a card. */
     .moment-entry + .moment-entry {
         border-top: 1px solid var(--border-light);
         margin-top: 0.5rem;
         padding-top: 0.5rem;
     }
-    /* 年份分隔线自带留白，上面就不用再叠一条线了 */
+    /* The year divider has its own spacing, so no extra line is needed above it */
     .moment-entry:has(.moment-year-divider) {
         border-top: none;
     }

@@ -104,8 +104,8 @@ const minimalEnabled = siteConfig.views?.minimal?.enabled === true;
 
 <script is:inline>
     (function() {
-        // 无刷新切换页面后会重新初始化。上一次绑定的监听记在 window 上，先解绑再绑，
-        // 否则每切换一次就多一个监听，还会拽着上一页的 DOM
+        // Re-initializes after client-side page navigation. The previously bound listener is kept on window; unbind it before binding again,
+        // otherwise each navigation adds another listener that also holds on to the previous page's DOM
         function initToolbarScroll() {
             if (window.__vergilToolbarScroll) {
                 window.removeEventListener('scroll', window.__vergilToolbarScroll);

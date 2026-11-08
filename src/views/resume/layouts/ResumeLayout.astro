@@ -19,9 +19,9 @@ export type Props = HeadProps & {
 };
 
 const { resume, headings, ...head } = Astro.props;
-// 简历写了 password 就加密：个人信息、目录和正文都只输出密文，先显示锁屏
+// If the resume sets password, encrypt it: the profile, table of contents and body are output only as ciphertext, and the lock screen shows first
 const { password } = resume.data;
-// 加密时还配置了 preview，就另外生成一份删减版：遮住的内容在构建时就删掉了，没有密码的访客可以先看这一份
+// If preview is also configured when encrypted, generate a separate redacted version: hidden content is removed at build time, and visitors without the password can view this version first
 const preview = password ? resume.data.preview : undefined;
 const previewHtml = preview ? redactSections(await Astro.slots.render('default'), preview.redact, t.page.resume.redacted) : null;
 ---
@@ -38,11 +38,11 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
         </script>
         <meta name="robots" content="noindex" />
     </head>
-    {/* 加密的简历锁着时只显示锁屏，工具栏和纸面都藏起来，解锁后由 resume-vault.ts 去掉 data-resume-locked */}
+    {/* While an encrypted resume is locked, only the lock screen shows and the toolbar and paper are hidden; resume-vault.ts removes data-resume-locked after unlocking */}
     <body class="bg-main text-main" data-resume-locked={password ? '' : undefined}>
         <a class="skip-link" href="#main-content">{t.a11y.skipToContent}</a>
 
-        {/* 顶部细工具栏：左边返回站点，中间目录，右边分享、打印和外观 */}
+        {/* Thin top toolbar: back to site on the left, table of contents in the middle, share, print and appearance on the right */}
         <div class="resume-toolbar sticky top-0 z-40 border-b border-light bg-main/85 backdrop-blur print:hidden">
             <div class="mx-auto flex h-12 max-w-[68rem] items-center justify-between gap-6 px-4 sm:px-6">
                 <a href="/" class="inline-flex shrink-0 items-center gap-1 text-xs text-muted transition-colors hover:text-accent">
@@ -90,8 +90,8 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
             )}
 
             {/*
-              一张纸，宽屏分两栏：左边个人信息（随滚动固定），右边正文；手机上个人信息排在正文上方。
-              纸面用 overflow-clip 裁圆角：overflow-hidden 会让纸面变成滚动容器，左栏的 sticky 就跟着页面滚不起来了
+              One sheet of paper, two columns on wide screens: profile on the left (sticky while scrolling), body on the right; on phones the profile sits above the body.
+              The paper uses overflow-clip to clip its rounded corners: overflow-hidden would make the paper a scroll container, and the left column's sticky would stop following the page scroll
             */}
             <div class="resume-frame mx-auto max-w-[68rem]">
                 <div data-resume-title={resume.data.title} class="resume-paper overflow-clip bg-card sm:rounded-2xl sm:border sm:border-light sm:shadow-sm md:grid md:grid-cols-[16.5rem_minmax(0,1fr)]">
@@ -113,7 +113,7 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
                                 <slot />
                             </Sealed>
                         </div>
-                        {/* 删减版和正文平级，直接套用正文的排版 */}
+                        {/* The redacted version is a sibling of the body and reuses the body's typography directly */}
                         {previewHtml && <div data-resume-preview hidden class="resume-article prose max-w-none" set:html={previewHtml} />}
                     </article>
                 </div>
@@ -126,11 +126,11 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
                 display: none;
             }
 
-            /* 预览时不能分享、打印 */
+            /* No sharing or printing in preview */
             body[data-resume-mode='preview'] :is(#resume-share, .resume-print) {
                 display: none;
             }
-            /* 遮挡条：盖住公司、职位和学校；点了回到输入密码页 */
+            /* Redaction bars: cover company, job title and school; clicking one returns to the password screen */
             .resume-redact {
                 display: inline-block;
                 height: 0.95em;
@@ -147,12 +147,12 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
                 cursor: pointer;
             }
 
-            /* 简历用无衬线字体，不跟博客正文的字体走；想换可以在站点样式里改 --resume-font */
+            /* The resume uses a sans-serif font rather than the blog body font; to change it, set --resume-font in the site styles */
             .resume-paper,
             .resume-toc {
                 font-family: var(--resume-font, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
             }
-            /* .prose 和标题自带博客的正文、标题字体，这里一律改成跟纸面走 */
+            /* .prose and headings carry the blog's body and heading fonts; make them all follow the paper here */
             .resume-paper .prose,
             .resume-paper :is(h1, h2, h3, h4, strong) {
                 font-family: inherit;
@@ -160,17 +160,17 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
 
 
             /*
-             * 简历正文。Markdown 约定：## 是分组（工作经历、开源贡献…），### 是一段经历或一个项目，
-             * 紧跟在 ### 后面只有一段斜体的那一行是时间（*2022.05 - 2024.09*）。
-             * 所有间距都只写在 margin-top 上：宽屏下正文是网格（时间要和标题排在同一行），网格里的外边距不会合并
+             * Resume body. Markdown conventions: ## is a section (work experience, open source contributions…), ### is one role or project,
+             * and the line right after ### that holds only one italic run is the date range (*2022.05 - 2024.09*).
+             * All spacing goes on margin-top only: on wide screens the body is a grid (the date shares a row with the heading), and margins inside a grid do not collapse
              */
             .resume-article {
                 font-size: 0.975rem;
                 line-height: 1.7;
-                /* .prose 默认 overflow-x: auto，时间贴着右边时最后一个数字会被裁掉一点 */
+                /* .prose defaults to overflow-x: auto, which clips the last digit slightly when the date hugs the right edge */
                 overflow: visible;
             }
-            /* 简历标题不需要悬停出现的锚点图标，它还会把标题行撑高 */
+            /* Resume headings do not need the hover anchor icon, which also makes the heading row taller */
             .resume-article .heading-anchor {
                 display: none;
             }
@@ -189,7 +189,7 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
                 letter-spacing: 0.06em;
                 scroll-margin-top: 4.5rem;
             }
-            /* 分组标题前面一小段强调色竖条 */
+            /* A short accent-colored bar before section headings */
             .resume-article > h2::before {
                 content: '';
                 width: 4px;
@@ -246,7 +246,7 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
                 font-weight: 600;
             }
 
-            /* 宽屏和打印：时间排在标题右边 */
+            /* Wide screens and print: the date sits to the right of the heading */
             @media (min-width: 640px), print {
                 .resume-article {
                     display: grid;
@@ -270,8 +270,8 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
 
             @media print {
                 /*
-                 * 页脚：右边是署名和页码；左边的「姓名 · 标题」由 resume-vault.ts 在解锁后加上，
-                 * 加密的简历里姓名不能以明文出现在页面上。较新的 Chrome（131 起）支持页边距里的内容
+                 * Footer: credit and page numbers on the right; the "Name · Title" on the left is added by resume-vault.ts after unlocking,
+                 * because in an encrypted resume the name must not appear in plain text on the page. Newer Chrome (131+) supports content in the page margins
                  */
                 @page {
                     size: A4;
@@ -284,12 +284,12 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
                         font-size: 7.5pt;
                     }
                 }
-                /* 打印保留屏幕上的两栏设计：侧栏底色、头像、强调色都要打出来 */
+                /* Print keeps the on-screen two-column design: the sidebar background, avatar and accent colors must all print */
                 html {
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
                 }
-                /* 暗色模式下打印前会切回亮色（见 resume-vault.ts）；这里兜底，万一没切回来也是浅底深字 */
+                /* In dark mode the page switches back to light before printing (see resume-vault.ts); this is a fallback so it still prints dark text on a light background if that fails */
                 html.dark {
                     --text-main: #1f1f1f !important;
                     --text-secondary: #3a3a3a !important;
@@ -306,14 +306,14 @@ const previewHtml = preview ? redactSections(await Astro.slots.render('default')
                 .skip-link {
                     display: none !important;
                 }
-                /* 纸面正好和 A4 内容区一样宽时，右边 1px 的边框会落在可打印区域外被裁掉，左右各收一点 */
+                /* When the paper is exactly as wide as the A4 content area, the 1px right border falls outside the printable area and gets clipped, so inset both sides slightly */
                 .resume-frame {
                     max-width: none !important;
                     padding: 0 0.5mm !important;
                 }
                 /*
-                 * 和屏幕上一样是一张带边框的圆角纸。只有开头和结尾是圆角，分页处是开口（box-decoration-break 默认的 slice），
-                 * 看得出纸还接着下一页。A4 的内容宽度不到 md 断点，屏幕上的两栏在这里单独写一遍
+                 * A bordered sheet with rounded corners, same as on screen. Only the start and end are rounded; page breaks stay open (box-decoration-break's default slice),
+                 * so you can tell the paper continues on the next page. The A4 content width is below the md breakpoint, so the on-screen two columns are written out again here
                  */
                 .resume-paper {
                     display: grid !important;

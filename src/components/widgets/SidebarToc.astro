@@ -21,7 +21,7 @@ const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 4);
 <aside class="toc-sidebar max-h-[70vh] flex flex-col pb-2" data-toc-root>
     {tocHeadings.length > 0 && (
         <>
-            {/* 固定标题栏 */}
+            {/* Fixed header */}
             <div class="px-4 pt-4 pb-2 shrink-0">
                 <button
                     type="button"
@@ -43,7 +43,7 @@ const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 4);
                 </button>
             </div>
 
-            {/* 可滚动导航区 */}
+            {/* Scrollable nav area */}
             <div class="flex-1 overflow-y-auto px-4 pb-3 min-h-0">
                 <div class="toc-nav-wrapper transition-all duration-300 ease-in-out overflow-hidden" data-toc-wrapper>
                     <nav class="border-l border-muted space-y-1" data-toc-nav>

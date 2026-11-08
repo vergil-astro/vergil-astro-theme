@@ -12,7 +12,7 @@
     gap: var(--sites-gap);
 }
 
-/* 卡片容器 */
+/* Card container */
 .md-sites-cell {
     position: relative;
 }
@@ -23,10 +23,10 @@
     text-decoration: none;
     color: inherit;
     position: relative;
-    /* 无背景、无边框、无阴影 — 文字融入页面 */
+    /* No background, border, or shadow — the text blends into the page */
 }
 
-/* 封面图 — 卡片本体，带圆角和阴影 */
+/* Cover image — the card body itself, with rounded corners and a shadow */
 .md-sites-cover {
     position: relative;
     aspect-ratio: var(--sites-cover-ratio);
@@ -42,7 +42,7 @@
     transform: translateY(-4px);
 }
 
-/* 显式禁止悬停时文字区域背景/颜色变化 */
+/* Explicitly prevent background/color changes on the text area on hover */
 .md-sites-link:hover,
 .md-sites-link:hover .md-sites-info {
     background: transparent;
@@ -68,12 +68,12 @@
     transform: scale(1.05);
 }
 
-/* 封面图加载失败 */
+/* Cover image failed to load */
 .md-sites-cover.md-sites-cover-fallback {
     background: linear-gradient(135deg, var(--bg-muted) 0%, var(--border-light) 100%);
 }
 
-/* 信息区 — 融入页面背景 */
+/* Info area — blends into the page background */
 .md-sites-info {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -118,7 +118,7 @@
     white-space: nowrap;
 }
 
-/* 标签 — 定位在封面图右上角 */
+/* Tag — positioned at the top-right corner of the cover image */
 .md-sites-labels {
     position: absolute;
     top: 6px;
@@ -147,7 +147,7 @@
     transform: translateY(-3px);
 }
 
-/* 响应式 */
+/* Responsive */
 @media (min-width: 640px) {
     .md-sites-grid {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));

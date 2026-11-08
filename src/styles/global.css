@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-/* 框架代码作为 npm 包装在站点的 node_modules 里，Tailwind 默认不扫描那里，这里把框架自己的源码加进扫描范围 */
+/* The framework code ships as an npm package inside the site's node_modules, which Tailwind does not scan by default, so add the framework's own source to the scan here */
 @source '../';
 
 @import './base/tokens.css';

@@ -1,4 +1,6 @@
-export const splash = {
+import type { SplashConfig } from '@vergil-astro/theme/types';
+
+export const splash: SplashConfig = {
     enabled: true,
     /** 开屏背景。主题自带的门面图放在 public/assets/defaults/ 下，不走外部图床 */
     backgroundImage: [

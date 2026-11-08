@@ -244,8 +244,8 @@
   text-overflow: ellipsis;
   cursor: default;
   letter-spacing: 0.005em;
-  /* 事件色相由插件写进 --evt-hue，底色和文字色按当前配色混出来：
-     亮色下是浅底深字，暗色下自动变成深底浅字，不用再单独写暗色 */
+  /* The plugin writes the event hue into --evt-hue, and the background and text colors are mixed from the current scheme:
+     light background with dark text in light mode, automatically dark background with light text in dark mode, so no separate dark styles are needed */
   --evt-bg: color-mix(in srgb, var(--evt-hue, #5f6368) 14%, var(--cal-bg));
   --evt-text: color-mix(in srgb, var(--evt-hue, #5f6368) 78%, var(--cal-text));
   background: var(--evt-bg);
@@ -333,7 +333,7 @@
   flex-shrink: 0;
 }
 
-/* 暗色模式不用单独写：上面的颜色全部取自配色变量，事件色也是按配色混出来的 */
+/* Dark mode needs no separate rules: every color above comes from scheme variables, and event colors are mixed from the scheme too */
 
 /* ─── Responsive ─── */
 @media (max-width: 640px) {

@@ -32,7 +32,7 @@ const sets = await getDocSets();
 const currentSet = sets.find((s) => s.id === docId);
 const metaTitle = (currentSet?.meta.data.title as string) ?? docId;
 
-// 构建面包屑：从 slug 路径中提取层级
+// Build breadcrumbs: extract the levels from the slug path
 const slugParts = slug.split('/');
 const tree = await getDocTree(docId);
 
@@ -41,13 +41,13 @@ const crumbs: { text: string; href?: string }[] = [
     { text: metaTitle, href: `/views/minimal/?type=docs&cat=${docId}` }
 ];
 
-// 根据 slug 路径查找每一层的 group 名称
+// Look up the group name for each level of the slug path
 let currentNodes = tree;
 for (let i = 0; i < slugParts.length - 1; i++) {
     const dirPath = i === 0 ? slugParts[0] : slugParts.slice(0, i + 1).join('/');
     const group = currentNodes.find((n: any) => n.type === 'group' && n.dirPath === dirPath);
     if (group) {
-        // 中间层级都跳回该知识库的列表页
+        // Intermediate levels all link back to this knowledge base's list page
         crumbs.push({ text: group.title, href: `/views/minimal/?type=docs&cat=${docId}` });
         currentNodes = group.children;
     }

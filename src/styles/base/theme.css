@@ -12,7 +12,7 @@ html {
 
 /* ══════════════════════════════════════════
    Built-in Color Schemes  A–I, K
-   其余配色由皮肤自带，见 src/appearance/integration.mjs
+   Other schemes ship with each skin; see src/appearance/integration.mjs
    ══════════════════════════════════════════ */
 
 /* ── Palette A: Warm Parchment ── */
@@ -29,8 +29,8 @@ html[data-theme="A"] {
     --border-light: #e0dfdb;
     --accent-color: #4a7c59;
     --accent-hover: #3d6649;
-    /* 压在强调色上的文字。亮色配色白字都够看；暗色配色的强调色偏亮，白字对比度只有 2～3.7，
-       统一换成当前配色的页面底色，见下面 html.dark 的规则 */
+    /* Text on top of the accent color. White text is readable enough in light schemes; in dark schemes the accent is light and white text only reaches a contrast of 2–3.7,
+       so it switches to the current scheme's page background color; see the html.dark rule below */
     --accent-text: #ffffff;
 }
 html[data-theme="A"].dark {
@@ -336,7 +336,7 @@ html.dark {
     .border-light { border-color: var(--border-light); }
     .text-accent { color: var(--accent-color); }
     .bg-accent { background-color: var(--accent-color); }
-    /* 按钮、选中态这类「强调色底 + 白字」的组合，文字色跟着配色走 */
+    /* For "accent background + white text" combinations such as buttons and selected states, the text color follows the scheme */
     .bg-accent.text-white { color: var(--accent-text); }
     .hover\:text-accent:hover { color: var(--accent-color); }
     .hover\:bg-accent:hover { background-color: var(--accent-color); }

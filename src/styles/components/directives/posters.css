@@ -11,7 +11,7 @@
     gap: var(--posters-gap);
 }
 
-/* 卡片容器 */
+/* Card container */
 .md-posters-cell {
     position: relative;
     overflow: hidden;
@@ -36,7 +36,7 @@
     color: inherit;
 }
 
-/* 封面图 */
+/* Cover image */
 .md-posters-cover {
     position: absolute;
     inset: 0;
@@ -55,7 +55,7 @@
     transform: scale(1.08);
 }
 
-/* 标题覆盖层 */
+/* Title overlay */
 .md-posters-meta {
     position: absolute;
     inset: 0;
@@ -93,7 +93,7 @@
     display: none;
 }
 
-/* 固定列数（任何屏幕下保持不变） */
+/* Fixed column count (stays the same on every screen size) */
 .md-directive-posters[data-cols="2"] .md-posters-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -118,7 +118,7 @@
     grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
-/* 响应式（无固定列数时） */
+/* Responsive (when no fixed column count is set) */
 @media (min-width: 640px) {
     .md-posters-grid {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));

@@ -11,7 +11,7 @@ import { getIconSvg } from './shared.mjs';
  *
  *   | Key Result | Target | Current | Description | Status |
  *   | ---------- | ------ | ------- | ----------- | ------ |
- *   | ...        | ...    | ...     | ...         | 正常   |
+ *   | ...        | ...    | ...     | ...         | ontrack |
  *   :::
  */
 export function processOkrDirective(node, options = {}) {

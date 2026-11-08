@@ -126,8 +126,8 @@ function flattenTree(nodes: DocTreeNode[], out: DocArticleNode[]) {
         if (node.type === 'article') {
             out.push(node);
         } else {
-            // Group 有 index.md 页面时，把它也当作 article 加入 flat 列表，
-            // 这样 getAdjacentDocs 才能找到 group 首页的相邻文档
+            // When a group has an index.md page, add it to the flat list as an article too,
+            // so getAdjacentDocs can find the docs adjacent to the group's index page
             if (node.slug) {
                 out.push({
                     type: 'article',
@@ -161,7 +161,7 @@ function findFirstArticle(nodes: DocTreeNode[]): DocArticleNode | undefined {
     return undefined;
 }
 
-// 扁平化 dirs 数组，递归提取所有目录路径
+// Flatten the dirs array, recursively collecting all directory paths
 function flattenDirs(dirs: (string | Record<string, string[] | null | undefined>)[]): { path: string; order: number }[] {
     const result: { path: string; order: number }[] = [];
     let order = 0;
@@ -196,8 +196,8 @@ function buildTree(
     const groupMap = new Map<string, DocGroupNode>();
     const dirOrderMap = new Map<string, number>();
 
-    // 1. 为每个注册的目录创建 group 节点，标题从 index.md 读取
-    // Astro glob loader 中 index.md 的 entry.id 格式为 docId/path（不带 /index 后缀）
+    // 1. Create a group node for each registered directory, reading its title from index.md
+    // In the Astro glob loader, index.md's entry.id has the form docId/path (without the /index suffix)
     for (const { path, order } of flatDirs) {
         const lowerPath = path.toLowerCase();
         dirOrderMap.set(lowerPath, order);
@@ -215,7 +215,7 @@ function buildTree(
         });
     }
 
-    // 2. 建立 group 父子关系
+    // 2. Build the group parent-child relationships
     const root: DocTreeNode[] = [];
     for (const [, group] of groupMap) {
         const lastSlash = group.dirPath.lastIndexOf('/');
@@ -228,20 +228,20 @@ function buildTree(
         }
     }
 
-    // 3. 遍历文章，填充到对应 group
+    // 3. Walk the articles and place each in its group
     const articles = entries.filter((e) => !isMetaEntry(e));
 
     for (const entry of articles) {
         const relativeId = entry.id.slice(docId.length + 1);
         const lowerRelativeId = relativeId.toLowerCase();
 
-        // 计算 groupPath：
-        // - index.md 的 entry.id 格式为 docId/dir（不带 /index 后缀）
-        //   如果 relativeId 对应一个已注册的目录，说明这是 index.md
-        // - 普通文件的 entry.id 格式为 docId/dir/file
+        // Compute groupPath:
+        // - index.md's entry.id has the form docId/dir (without the /index suffix);
+        //   if relativeId matches a registered directory, this is an index.md
+        // - a regular file's entry.id has the form docId/dir/file
         let groupPath = '';
         if (groupMap.has(lowerRelativeId)) {
-            // index.md：relativeId 本身就是目录路径
+            // index.md: relativeId is itself the directory path
             groupPath = lowerRelativeId;
         } else {
             const segments = relativeId.split('/');
@@ -250,7 +250,7 @@ function buildTree(
             }
         }
 
-        // 未在 dirs 中注册的目录，文章不显示
+        // Articles in directories not registered in dirs are not shown
         if (groupPath && !groupMap.has(groupPath)) {
             continue;
         }
@@ -267,7 +267,7 @@ function buildTree(
         if (groupPath && groupMap.has(groupPath)) {
             const group = groupMap.get(groupPath)!;
 
-            // index.md 的 entry.id 格式为 docId/groupPath（不带 /index 后缀）
+            // index.md's entry.id has the form docId/groupPath (without the /index suffix)
             const isIndex = lowerRelativeId === groupPath;
             if (isIndex) {
                 group.slug = slug;
@@ -282,7 +282,7 @@ function buildTree(
         }
     }
 
-    // 4. 排序
+    // 4. Sort
     sortNodes(root, dirOrderMap);
 
     return root;

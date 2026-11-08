@@ -1,10 +1,10 @@
 /**
- * 加密简历的预览版，构建时生成。没有密码的访客点「预览」看到的就是它，所以它是明文放在页面里的：
- * 要遮住的内容在这里直接删掉，换成遮挡条，页面里没有原文，访客也就展开不了。
+ * Preview version of an encrypted resume, generated at build time. It is what visitors without the password see after clicking "Preview", so it sits in the page as plaintext:
+ * content to hide is deleted right here and replaced with redaction bars, so the original text is not in the page and visitors cannot reveal it.
  */
 import { parse, HTMLElement } from 'node-html-parser';
 
-/** 估算文字宽度（em），让遮挡条的长短大致和原文相当：中文全角约 1em，英文数字约 0.55em */
+/** Estimate text width (em) so redaction bars roughly match the original length: full-width Chinese characters are about 1em, Latin letters and digits about 0.55em */
 function textWidth(text: string): number {
     let width = 0;
     for (const ch of text) {
@@ -15,7 +15,7 @@ function textWidth(text: string): number {
     return Math.max(1.5, Math.round(width * 10) / 10);
 }
 
-/** 「公司 · 职位」分段各给一根遮挡条，保留中间的分隔点，看得出是两段信息 */
+/** Give each part of "Company · Title" its own redaction bar and keep the separator dot, so it still reads as two pieces of info */
 function bars(text: string): string {
     return text
         .split(/\s*·\s*/)
@@ -24,15 +24,15 @@ function bars(text: string): string {
         .join('<span class="resume-redact-sep">·</span>');
 }
 
-/** 标题的纯文本，去掉悬停出现的锚点（锚点的 aria-label 里也带着标题原文） */
+/** Plain text of a heading, without the hover anchor (whose aria-label also contains the heading text) */
 function headingText(el: HTMLElement): string {
     el.querySelectorAll('.heading-anchor').forEach((a) => a.remove());
     return el.text.trim();
 }
 
 /**
- * 把 sections 里列出的分组（按 ## 标题的文字匹配）中，每段经历的标题（###）换成遮挡条。
- * 换掉的是整个 h3，原来的 id（由标题文字生成）也一起去掉
+ * In the sections listed in sections (matched by ## heading text), replace each entry heading (###) with redaction bars.
+ * The whole h3 is replaced, and its original id (generated from the heading text) is removed with it
  */
 export function redactSections(html: string, sections: string[], label: string): string {
     if (sections.length === 0) return html;

@@ -9,8 +9,8 @@ import { getAllSeries, getPostDir, getPostsBySeries, sortItemsByDateDesc } from 
 export async function getStaticPaths() {
     const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
     const defs = (await getCollection('series')).map((s) => ({ id: s.id, name: s.data.name, dir: s.data.dir }));
-    // 专栏可能完全靠 dir 认领目录，文章里一个 series 都没写，
-    // 只从文章 frontmatter 推导会漏掉这种专栏
+    // A series may claim a directory purely through dir, with no post setting series;
+    // deriving series from post frontmatter alone would miss it
     const fromPosts = getAllSeries(posts);
     const fromDirs = defs.filter((d) => d.dir && posts.some((p) => getPostDir(p)?.toLowerCase() === d.dir!.toLowerCase()));
     const allSeries = [...fromPosts, ...fromDirs.filter((d) => !fromPosts.some((f) => f.id === d.id))];

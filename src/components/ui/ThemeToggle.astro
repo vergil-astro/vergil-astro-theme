@@ -120,7 +120,7 @@ const schemeById = new Map(schemes.map((s) => [s.id, s]));
         var slash = document.getElementById('fa-toggle-slash');
         if (!btn || !slash) return;
 
-        // 避免重复绑定点击事件
+        // Avoid binding the click handler twice
         if (btn.dataset.faToggleBound) return;
         btn.dataset.faToggleBound = '1';
 
@@ -141,7 +141,7 @@ const schemeById = new Map(schemes.map((s) => [s.id, s]));
         }
       }
 
-      // 全局事件监听：每次触发时动态查询当前 DOM 元素，兼容 ViewTransitions
+      // Global event listeners: look up the current DOM elements each time they fire, for ViewTransitions compatibility
       if (!window._faToggleGlobalListeners) {
         document.addEventListener('fa-expanded', function () {
           var btn = document.getElementById('fa-toggle-btn');

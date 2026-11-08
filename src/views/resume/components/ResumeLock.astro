@@ -1,13 +1,13 @@
 ---
 /**
- * 加密简历的锁屏。锁着的时候工具栏和纸面都隐藏，页面上只剩这一块；配置了预览时可以先看删减版；
- * 解锁逻辑在 src/views/resume/scripts/resume-vault.ts，解开后整块移除
+ * Lock screen for an encrypted resume. While locked, the toolbar and paper are hidden and only this block remains; when a preview is configured, the redacted version can be viewed first;
+ * unlock logic lives in src/views/resume/scripts/resume-vault.ts, and the whole block is removed once unlocked
  */
 import { Lock, LoaderCircle, ChevronLeft, Eye } from '@lucide/astro';
 import { t } from '../../../i18n';
 
 interface Props {
-    /** 简历配置了 preview 时，锁屏上多一个「预览」按钮 */
+    /** When the resume configures preview, the lock screen gets an extra "Preview" button */
     preview?: boolean;
 }
 
@@ -69,7 +69,7 @@ const { preview = false } = Astro.props;
 </div>
 
 <script is:inline>
-    // 链接里带了口令，或者这个标签页解锁过，先显示「正在解锁」，免得密码框闪一下
+    // If the link carries a token or this tab has unlocked before, show "Unlocking" first so the password field does not flash
     (function () {
         var lock = document.getElementById('resume-lock');
         try {

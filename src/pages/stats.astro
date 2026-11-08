@@ -25,7 +25,7 @@ const configJson = JSON.stringify({
     showSidebar={false}
     showRightSidebar={false}
 >
-    <!-- 下面的脚本是打包脚本，拿不到 t，运行时用到的文案通过 data-i18n-* 透传；带参数的是模板串 -->
+    <!-- The script below is bundled and has no access to t, so runtime strings are passed through data-i18n-*; strings with parameters are templates -->
     <div
         class="stats-page"
         data-config={configJson}
@@ -41,7 +41,7 @@ const configJson = JSON.stringify({
         data-i18n-month={t.time.month('{m}')}
         data-i18n-md={t.time.md('{m}', '{d}')}
     >
-        <!-- 配置缺失提示 -->
+        <!-- Missing config notice -->
         <div id="stats-config-error" class="hidden config-error">
             <div class="config-error-inner">
                 <h2>{t.stats.notConfigured}</h2>
@@ -55,7 +55,7 @@ const configJson = JSON.stringify({
             </div>
         </div>
 
-        <!-- 正常页面内容 -->
+        <!-- Normal page content -->
         <div id="stats-content" class="hidden">
             <header class="stats-header">
                 <div class="stats-header-left">
@@ -70,20 +70,20 @@ const configJson = JSON.stringify({
                 </div>
             </header>
 
-            <!-- 加载状态 -->
+            <!-- Loading state -->
             <div id="stats-loading" class="stats-loading">
                 <div class="loading-spinner"></div>
                 <span>{t.stats.loading}...</span>
             </div>
 
-            <!-- 错误状态 -->
+            <!-- Error state -->
             <div id="stats-error" class="hidden stats-error">
                 <p>{t.stats.loadFailed}</p>
                 <p id="stats-error-detail" class="stats-error-detail"></p>
                 <button id="retry-btn" class="retry-btn">{t.stats.retry}</button>
             </div>
 
-            <!-- 数据内容 -->
+            <!-- Data content -->
             <div id="stats-data" class="hidden">
                 <!-- Overview -->
                 <section data-module="overview" class="stats-section">
@@ -178,7 +178,7 @@ const configJson = JSON.stringify({
     }
 
     // ── i18n ──
-    // 打包脚本拿不到 t，文案从 .stats-page 的 data-i18n-* 读；用时再读，兼容视图切换后重新进入本页
+    // Bundled scripts have no access to t, so strings are read from .stats-page's data-i18n-*; read them on use so re-entering this page after a view switch still works
     function tr(key: string): string {
         const el = document.querySelector('.stats-page') as HTMLElement | null;
         return el?.dataset[key] ?? '';
@@ -349,7 +349,7 @@ const configJson = JSON.stringify({
             return;
         }
 
-        // 少于 2 个点时显示单点提示
+        // With fewer than 2 points, show the single-point hint
         if (points.length < 2) {
             const p = points[0];
             const date = new Date(p.x);

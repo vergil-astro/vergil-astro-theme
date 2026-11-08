@@ -220,10 +220,12 @@ export function labelTextColor(hex) {
 /** Get website screenshot URL */
 export function getScreenshotUrl(url, service) {
     if (service === 'mshots') {
-        // w/h 是截图的视口尺寸，1280×800 是 3:2，正好是 sites 卡片的比例
+        // w/h is the screenshot viewport size. 1280×800 is 16:10, close to the 3:2 sites cards (--sites-cover-ratio);
+        // the card's object-fit: cover trims the small difference
         return `https://s0.wp.com/mshots/v1/${encodeURIComponent(url)}?w=1280&h=800`;
     }
-    // noanimate：不要返回转圈的动画占位图，直接等最终截图；allowJPG：体积更小。
-    // thum.io 默认视口 1200 宽，crop/800 截成 3:2，正好是 sites 卡片的比例，不用再裁
+    // noanimate: don't return the spinning placeholder animation, wait for the final screenshot; allowJPG: smaller files.
+    // width/1280 with crop/800 keeps the top 1280×800 (16:10) of the page, close to the 3:2 sites cards;
+    // the card's object-fit: cover trims the small difference
     return `https://image.thum.io/get/width/1280/crop/800/noanimate/allowJPG/${url}`;
 }

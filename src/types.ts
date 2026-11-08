@@ -1,3 +1,14 @@
+/// <reference types="astro/client" />
+
+import type zhCN from './i18n/zh-CN';
+import type { DeepPartial } from './i18n/merge';
+
+/**
+ * UI text overridden by the site: same structure as the theme's UI text dictionary (src/i18n/zh-CN.ts), listing only the lines to change,
+ * e.g. { page: { moments: { signature: '……' } } }. Anything left out uses the theme's text
+ */
+export type UiText = DeepPartial<typeof zhCN>;
+
 export type ImageInput = {
     src: ImageMetadata | string;
     alt?: string;
@@ -61,18 +72,18 @@ export type Subscribe = {
     form?: SubscribeForm;
 };
 
-/** 开屏页控件的样式：solid 普通，frosted 毛玻璃，liquid 液态玻璃 */
+/** Style of splash page controls: solid is plain, frosted is frosted glass, liquid is liquid glass */
 export type SplashGlassStyle = 'solid' | 'frosted' | 'liquid';
 
 /**
- * 开屏页控件的玻璃效果。没写的项按 solid 处理；没有背景图时一律退回 solid。
- * 液态玻璃在 Chromium 内核的浏览器上有边缘折射，Safari、Firefox 上是清透玻璃。
- * 知识库的 _meta.md 里也可以写 splash.glass，只写想改的项，其余沿用这里的站点配置。
+ * Glass effect for splash page controls. Items left out are treated as solid; without a background image everything falls back to solid.
+ * Liquid glass has edge refraction in Chromium-based browsers and is clear glass in Safari and Firefox.
+ * A knowledge base's _meta.md can also set splash.glass with only the items to change; the rest comes from the site config here.
  */
 export type SplashGlassConfig = {
-    /** 首页的导航胶囊；知识库封面上是「开始阅读」按钮 */
+    /** The nav pill on the home page; the start-reading button on knowledge base covers */
     nav?: SplashGlassStyle;
-    /** 玻璃底色的浓度，默认 0.1，越大越不透明，0 完全透明。模糊、提亮等细节见 styles/components/splash.css 开头 */
+    /** Glass tint strength, default 0.1: higher is more opaque, 0 is fully transparent. For blur, brightening, and other details see the top of styles/components/splash.css */
     tint?: number;
 };
 
@@ -81,21 +92,21 @@ export type SplashConfig = {
     backgroundImage?: string | string[];
     overlay?: string;
     textShadow?: boolean;
-    /** 无背景图时的 fallback 背景色，默认 bg-main */
+    /** Fallback background color when there is no background image, default bg-main */
     fallbackBg?: string;
-    /** 底部渐变末尾颜色，默认跟随主题色 */
+    /** End color of the bottom gradient, follows the theme color by default */
     gradientColor?: string;
-    /** 底部渐变高度，默认 h-56 */
+    /** Height of the bottom gradient, default h-56 */
     gradientHeight?: string;
-    /** 底部渐变毛玻璃模糊强度，默认 12px */
+    /** Frosted blur strength of the bottom gradient, default 12px */
     backdropBlur?: string;
-    /** 轮播图单张停留时长（秒），默认 18 */
+    /** How long each carousel slide stays (seconds), default 18 */
     slideDuration?: number;
     title?: string;
     subtitle?: string;
     description?: string;
     nav?: { text: string; href: string; icon?: string }[];
-    /** 开屏页上各个控件的玻璃效果，见 SplashGlassConfig */
+    /** Glass effect for each control on the splash page; see SplashGlassConfig */
     glass?: SplashGlassConfig;
 };
 
@@ -113,15 +124,17 @@ export type IcpRecord = {
 
 export type SiteConfig = {
     website: string;
-    /** 建站日期 YYYY-MM-DD；留空时使用最早的非草稿文章发布日期 */
+    /** Site launch date YYYY-MM-DD; if empty, the publish date of the earliest non-draft post is used */
     startDate?: string;
-    /** 备案信息，留空则不显示 */
+    /** ICP filing info; hidden if empty */
     icp?: IcpRecord[];
-    /** 主题界面文案语言，见 src/i18n */
+    /** Language of the theme's UI text; see src/i18n */
     locale?: string;
-    /** 访客没选过时用哪个界面皮肤，见 src/utils/skin.ts */
+    /** Override a few lines of the theme's UI text; see UiText */
+    uiText?: UiText;
+    /** Which UI skin to use when the visitor has not picked one; see src/utils/skin.ts */
     skin?: string;
-    /** 启用的皮肤名，对应站点根目录的 skins/<名字>/ */
+    /** Names of enabled skins, matching skins/<name>/ in the site root */
     skins?: string[];
     fonts: FontConfig;
     avatar?: ImageInput;
@@ -155,6 +168,8 @@ export type SiteConfig = {
         artalk?: {
             server: string;
             site?: string;
+            /** Artalk UI language, e.g. 'zh-CN' or 'en'; defaults to the site's UI language */
+            locale?: string;
         };
     };
     splash?: SplashConfig;
@@ -164,10 +179,10 @@ export type SiteConfig = {
         resume: { name: string; path: string };
         minimal: { name: string; path: string; enabled?: boolean };
     };
-    /** 左侧栏底部的社交图标。留空则只显示 RSS 和动态。 */
+    /** Social icons at the bottom of the left sidebar. If empty, only RSS and Moments are shown. */
     socials?: { github?: string };
     links?: SiteConfigLinks;
-    /** 网站卡片封面截图服务，默认 thumio */
+    /** Screenshot service for site card covers, default thumio */
     screenshotService?: 'thumio' | 'mshots';
     sidebar?: SidebarConfig;
     floatingAudio?: {
@@ -180,13 +195,13 @@ export type SiteConfig = {
     serviceWorker?: {
         enabled: boolean;
     };
-    /** 文章版权提示，如 "本文著作权归作者所有" */
+    /** Copyright notice on posts, e.g. "All rights reserved by the author" */
     copyright?: string;
-    /** 文章分享功能 */
+    /** Post sharing */
     share?: {
         enabled: boolean;
     };
-    /** 站点分析 */
+    /** Site analytics */
     analytics?: AnalyticsConfig;
 };
 
@@ -223,8 +238,8 @@ export type AgentConfig = {
     live2d?: {
         modelPath: string;
         /**
-         * live2d-widget 脚本的地址，默认从 jsDelivr 加载固定版本（带完整性校验）。
-         * 想自己托管时，把 L2Dwidget.min.js 和 L2Dwidget.0.min.js 放进 public/ 的同一个目录，这里写前者的地址
+         * URL of the live2d-widget script; by default a pinned version is loaded from jsDelivr (with an integrity check).
+         * To self-host, put L2Dwidget.min.js and L2Dwidget.0.min.js in the same directory under public/ and set the former's URL here
          */
         widgetSrc?: string;
     };
@@ -265,7 +280,7 @@ export type SidebarComponentConfig = {
         user?: string;
         bio?: string;
     };
-    // 允许任意自定义便签卡片或其他组件配置
+    // Allow any custom sticky-note card or other component config
     [key: string]: unknown;
 };
 

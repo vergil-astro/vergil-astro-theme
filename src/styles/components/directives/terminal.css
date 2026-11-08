@@ -1,10 +1,10 @@
-/* 窗口结构按 mac 终端：标题栏比内容区亮一档，下面接一整块铺满的内容区，中间一条细分隔线。
-   外框的底色就是标题栏的颜色，内容区自己铺满到窗口边缘，底部圆角由外框的 overflow 裁出来 */
+/* The window follows the macOS Terminal layout: the title bar is one shade lighter than the content area, with a full-bleed content area below and a thin divider in between.
+   The frame's background is the title bar color, the content area fills out to the window edges on its own, and the bottom corners are clipped by the frame's overflow */
 .md-terminal {
     margin: 1.25rem 0;
     border-radius: var(--md-radius-sm);
     overflow: hidden;
-    /* 窗口始终是深色，但往深色里混一点当前配色的强调色，切换配色时代码窗口也带上对应的色调 */
+    /* The window is always dark, but a little of the current scheme's accent color is mixed in, so the code window picks up the matching tint when the scheme changes */
     --code-bar: color-mix(in srgb, var(--accent-color, #64748b) 10%, #1d1f25);
     --code-bg: color-mix(in srgb, var(--accent-color, #64748b) 8%, #121318);
     --code-chrome: color-mix(in srgb, var(--accent-color, #64748b) 18%, #94a3b8);
@@ -16,8 +16,8 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-/* 标题栏按 mac 终端排：左边红黄绿三个圆点，标题居中，复制按钮靠右。
-   圆点用伪元素画，插件输出的 HTML 不用变 */
+/* The title bar follows the macOS Terminal layout: red, yellow, and green dots on the left, the title centered, the copy button on the right.
+   The dots are drawn with pseudo-elements, so the plugin's HTML output does not need to change */
 .md-terminal-header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -50,7 +50,7 @@
     text-overflow: ellipsis;
 }
 
-/* 复制按钮带着全局 .md-copy-btn 的 3px 外边距，会把标题栏撑高，这里清掉 */
+/* The copy button carries the 3px margin from the global .md-copy-btn, which would make the title bar taller, so clear it here */
 .md-terminal-header .md-terminal-copy {
     justify-self: end;
     margin: 0;
@@ -89,8 +89,8 @@
     border: none !important;
     border-radius: 0 !important;
     background: var(--code-bg) !important;
-    /* 窗口始终是深色，文字用 shiki 暗色主题的值。pre 的行内 style 里带着亮色主题的 color，
-       没有语法高亮的纯文本块会直接继承它，变成深色字压深色底，所以这里必须 !important */
+    /* The window is always dark, so text uses the shiki dark theme's value. The pre's inline style carries the light theme's color,
+       and plain-text blocks without syntax highlighting inherit it directly, ending up as dark text on a dark background, so !important is required here */
     color: var(--shiki-dark, #e2e8f0) !important;
     padding: 12px 0 !important;
     white-space: pre !important;
@@ -100,7 +100,7 @@
     scrollbar-color: transparent transparent;
 }
 
-/* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
+/* The scrollbar only shows while scrolling; see BaseHead for is-scrolling */
 .md-terminal-body pre.is-scrolling {
     scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
 }
@@ -162,7 +162,7 @@
     content: attr(data-line);
 }
 
-/* 命令行前的提示符：写了 path 时由插件插入。不可选中，手动框选复制时也不会带上它 */
+/* The prompt before the command line: inserted by the plugin when path is set. It is not selectable, so selecting and copying by hand does not include it either */
 .md-terminal-prompt {
     user-select: none;
     margin-right: 0.6em;
@@ -182,8 +182,8 @@
     color: var(--shiki-dark) !important;
 }
 
-/* 有命令行时，其余行是命令输出，不按语法上色，统一用淡一些的纯色；
-   输出行也不可选中，手动框选复制时只会拿到命令，和复制按钮的行为一致 */
+/* When there is a command line, the other lines are command output: they are not syntax-colored and all use one lighter solid color;
+   output lines are not selectable either, so selecting and copying by hand only gets the command, matching the copy button's behavior */
 .md-terminal:has(.line-command) .line:not(.line-command) {
     user-select: none;
 }

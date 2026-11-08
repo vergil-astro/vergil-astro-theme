@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title={t.tools.title} description={t.tools.description} showSidebar={false} showRightSidebar={false}>
-    <!-- 下面的脚本是打包脚本，拿不到 t，运行时用到的文案通过 data-i18n-* 透传 -->
+    <!-- The script below is bundled and has no access to t, so runtime strings are passed through data-i18n-* -->
     <div
         id="tools-root"
         class="max-w-3xl mx-auto py-8 px-4"
@@ -218,7 +218,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <script>
     // ===== i18n =====
-    // 打包脚本拿不到 t，文案从根元素的 data-i18n-* 读；带参数的条目是模板串，用时替换占位符
+    // Bundled scripts have no access to t, so strings are read from the root element's data-i18n-*; entries with parameters are templates whose placeholders are replaced on use
     const i18n: Record<string, string | undefined> = (document.getElementById('tools-root') as HTMLElement | null)?.dataset ?? {};
     const tr = (key: string, fallback = ''): string => i18n[key] ?? fallback;
 
@@ -240,7 +240,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             tabContents.forEach(c => c.classList.add('hidden'));
             document.getElementById('tab-' + tab)!.classList.remove('hidden');
 
-            // 切换到 SQL tab 时预加载 sql-formatter（后台静默加载，不阻塞交互）
+            // Preload sql-formatter when switching to the SQL tab (silently in the background, without blocking interaction)
             if (tab === 'sql' && typeof loadSqlFormatter !== 'undefined' && !sqlFormatterModule) {
                 loadSqlFormatter().catch(() => {});
             }

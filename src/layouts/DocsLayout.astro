@@ -324,8 +324,8 @@ const isArticle = head.pageType === 'article';
 
         <script is:inline>
             (function () {
-                // 这段脚本在无刷新切换页面后还会再跑。上一次绑定的监听记在 window 上，先解绑再绑，否则每切换一次就多一个监听。
-                // 三个布局各有一份进度条脚本，data-progress 标明当前页面用的是哪一份。进度用 transform 缩放，不改宽度，滚动时不触发布局
+                // This script runs again after client-side page navigation. The previously bound listener is kept on window; unbind it before binding again, otherwise each navigation adds another listener.
+                // Each of the three layouts has its own progress bar script; data-progress marks which one the current page uses. Progress uses a transform scale instead of width, so scrolling doesn't trigger layout
                 function initProgress() {
                     if (window.__vergilProgressDocs) {
                         window.removeEventListener('scroll', window.__vergilProgressDocs);
@@ -359,8 +359,8 @@ const isArticle = head.pageType === 'article';
         </script>
 
         <script>
-            // medium-zoom 只建一个实例，每次换页解绑旧图片、绑定新图片。
-            // 它一创建就在 document 上挂滚动和按键监听，detach() 不会移除，每页新建一个的话监听会越积越多
+            // Create a single medium-zoom instance and, on each page change, detach old images and attach new ones.
+            // On creation it adds scroll and key listeners to document that detach() doesn't remove, so creating one per page would keep piling up listeners
             let zoomInstance = null;
 
             async function initZoom() {

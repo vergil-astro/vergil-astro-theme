@@ -1,5 +1,6 @@
 ---
 import siteConfig from '@vergil-site/data/site-config';
+import { locale } from '../../i18n';
 
 interface Props {
     pageId?: string;
@@ -13,7 +14,7 @@ const artalkConfig = siteConfig.comments?.artalk;
 ---
 
 <div id="comments" class="mt-10 pt-4">
-    <!-- 评论加载占位 -->
+    <!-- Placeholder while comments load -->
     <div id="comments-skeleton" class="comments-skeleton space-y-4">
         <div class="flex items-start gap-3">
             <div class="skeleton w-10 h-10 rounded-full shrink-0"></div>
@@ -53,7 +54,7 @@ const artalkConfig = siteConfig.comments?.artalk;
         data-emit-metadata={giscusConfig.emitMetadata ? '1' : '0'}
         data-input-position={giscusConfig.inputPosition ?? 'top'}
         data-theme={giscusConfig.theme ?? 'preferred_color_scheme'}
-        data-lang={giscusConfig.lang ?? 'zh-CN'}
+        data-lang={giscusConfig.lang ?? locale}
         data-loading={giscusConfig.loading ?? 'lazy'}
         style="display:none"
     ></div>
@@ -99,7 +100,7 @@ const artalkConfig = siteConfig.comments?.artalk;
                 }
             }
 
-            // 使用 IntersectionObserver 懒加载：评论区域进入视口时才加载
+            // Lazy-load with IntersectionObserver: load only when the comments area enters the viewport
             var commentsEl = document.getElementById('comments');
             if (commentsEl && 'IntersectionObserver' in window) {
                 var observer = new IntersectionObserver(function(entries) {
@@ -119,13 +120,15 @@ const artalkConfig = siteConfig.comments?.artalk;
 )}
 
 {provider === 'artalk' && artalkConfig && (
-    <script is:inline data-page-id={pageId} data-page-title={pageTitle} data-server={artalkConfig.server} data-site={artalkConfig.site ?? 'Vergil Blog'}>
+    <script is:inline data-page-id={pageId} data-page-title={pageTitle} data-server={artalkConfig.server} data-site={artalkConfig.site ?? 'Vergil Blog'} data-locale={artalkConfig.locale ?? (locale === 'en' ? 'en' : 'zh-CN')}>
         (function() {
             const script = document.currentScript;
             const pageId = script.dataset.pageId;
             const pageTitle = script.dataset.pageTitle;
             const server = script.dataset.server;
             const site = script.dataset.site;
+            // Artalk defaults to English; follow the site's UI language unless the site picked one
+            const artalkLocale = script.dataset.locale;
 
             function hideCommentsSkeleton() {
                 var sk = document.getElementById('comments-skeleton');
@@ -149,6 +152,7 @@ const artalkConfig = siteConfig.comments?.artalk;
                         pageTitle: pageTitle,
                         server: server,
                         site: site,
+                        locale: artalkLocale,
                         darkMode: document.documentElement.classList.contains('dark')
                     });
                     hideCommentsSkeleton();
@@ -168,7 +172,7 @@ const artalkConfig = siteConfig.comments?.artalk;
                 document.head.appendChild(artalkCss);
             }
 
-            // 使用 IntersectionObserver 懒加载
+            // Lazy-load with IntersectionObserver
             var commentsEl = document.getElementById('comments');
             if (commentsEl && 'IntersectionObserver' in window) {
                 var observer = new IntersectionObserver(function(entries) {

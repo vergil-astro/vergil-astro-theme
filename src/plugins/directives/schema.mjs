@@ -1,23 +1,23 @@
 /**
- * 内容指令清单：每个指令的写法、属性、正文格式和示例。
+ * Content directive catalog: each directive's syntax, attributes, body format and example.
  *
- * 这是指令的唯一来源。渲染插件按 module 分发，`pnpm directives:check` 按它校验，
- * `pnpm directives:ref` 按它输出参考，vg 和 AI 写作插件也读这一份。
- * 文件只放数据，不引入任何依赖，脚本可以直接 import。
+ * This is the single source of truth for directives. The render plugins dispatch by module, `pnpm directives:check` validates against it,
+ * `pnpm directives:ref` generates the reference from it, and vg and the AI writing plugin read it too.
+ * The file holds only data and imports no dependencies, so scripts can import it directly.
  *
- * 新增或修改指令：先改这里，再改 module 对应的渲染代码，最后改文档。
+ * To add or change a directive: edit it here first, then the render code of its module, and finally the docs.
  */
 
 /**
  * @typedef {object} AttrSpec
  * @property {'string' | 'enum' | 'list' | 'boolean' | 'number' | 'color'} type
- *   enum 只能取 values 之一；list 是逗号分隔的多个值，给了 values 就逐个校验；
- *   boolean 写 "true"/"false"，只写属性名等于 true；color 是颜色名或 CSS 色值
+ *   enum must be one of values; list is several comma-separated values, each checked against values when given;
+ *   boolean is written as "true"/"false", and the bare attribute name means true; color is a color name or a CSS color value
  * @property {string[]} [values]
  * @property {boolean} [required]
  * @property {string} [default]
- * @property {string} [pattern] 值必须匹配的正则（源码字符串）
- * @property {string} [format] pattern 的人话说明，校验报错时显示
+ * @property {string} [pattern] Regex the value must match (as a source string)
+ * @property {string} [format] Plain-language description of pattern, shown in validation errors
  * @property {string} desc
  */
 
@@ -25,20 +25,20 @@
  * @typedef {object} DirectiveSpec
  * @property {string} name
  * @property {string} category
- * @property {string} module 负责渲染的模块：blocks、okr、cards、media、charts、calendar、private、story、mind、inline 在 directives/ 下，image 和 photo 是独立的 remark 插件
- * @property {('container' | 'leaf' | 'text')[]} forms 允许的写法：`:::name` 容器、`::name` 单行、`:name[]` 行内
+ * @property {string} module The module that renders it: blocks, okr, cards, media, charts, calendar, private, story, mind and inline live under directives/; image and photo are standalone remark plugins
+ * @property {('container' | 'leaf' | 'text')[]} forms Allowed forms: `:::name` container, `::name` single-line, `:name[]` inline
  * @property {string} summary
  * @property {Record<string, AttrSpec>} attrs
- * @property {string[][]} [oneOf] 每组里至少要写一个属性
+ * @property {string[][]} [oneOf] At least one attribute from each group must be set
  * @property {{ kind: 'markdown' | 'text' | 'none' | 'list' | 'table' | 'json' | 'images' | 'code', desc: string, columns?: string[], requiredColumns?: string[] }} [body]
- *   行内指令的 body 指方括号里的内容
- * @property {string[]} [notes] 容易写错的地方
+ *   For inline directives, body is the content inside the square brackets
+ * @property {string[]} [notes] Common mistakes
  * @property {string} example
  */
 
 export const CATEGORIES = ['结构排版', '内容展示', '媒体嵌入', '卡片与链接', '文字与交互', '图表可视化', '时间规划', '可视化叙事'];
 
-/** 颜色名，shared.mjs 的 NAMED_COLORS */
+/** Color names, the NAMED_COLORS from shared.mjs */
 export const NAMED_COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'cyan', 'accent'];
 
 const ALIGN = { type: 'enum', values: ['left', 'center', 'right'], default: 'left', desc: '对齐方式' };
@@ -50,7 +50,7 @@ const textColor = (def) => ({ color: color('颜色', def) });
 
 /** @type {DirectiveSpec[]} */
 export const DIRECTIVES = [
-    // ── 结构排版 ──────────────────────────────────────────────
+    // ── Structure & layout ────────────────────────────────────
     {
         name: 'grid',
         category: '结构排版',
@@ -193,7 +193,7 @@ export const DIRECTIVES = [
         example: ':::reel{title="兰亭集序" author="王羲之" date="东晋"}\n竖排文字\n:::',
     },
 
-    // ── 内容展示 ──────────────────────────────────────────────
+    // ── Content display ───────────────────────────────────────
     {
         name: 'callout',
         category: '内容展示',
@@ -297,7 +297,7 @@ export const DIRECTIVES = [
         example: ':::private{password="vergil" hint="主题名"}\n加密内容\n:::',
     },
 
-    // ── 媒体嵌入 ──────────────────────────────────────────────
+    // ── Media embeds ──────────────────────────────────────────
     {
         name: 'image',
         category: '媒体嵌入',
@@ -402,7 +402,7 @@ export const DIRECTIVES = [
         example: ':::audio{netease="25706282" title="晴天" artist="歌手" mode="card"}\n:::',
     },
 
-    // ── 卡片与链接 ────────────────────────────────────────────
+    // ── Cards & links ─────────────────────────────────────────
     {
         name: 'ghcard',
         category: '卡片与链接',
@@ -505,7 +505,7 @@ export const DIRECTIVES = [
         example: ':button[查看文档]{href="/" color="accent" icon="lucide:search"}',
     },
 
-    // ── 文字与交互 ────────────────────────────────────────────
+    // ── Text & interaction ────────────────────────────────────
     {
         name: 'mark',
         category: '文字与交互',
@@ -679,7 +679,7 @@ export const DIRECTIVES = [
         example: ':ann[空山]{note="雨后的安静" direction="top-right" color="green"}新雨后',
     },
 
-    // ── 图表可视化 ────────────────────────────────────────────
+    // ── Charts & visualization ────────────────────────────────
     {
         name: 'mermaid',
         category: '图表可视化',
@@ -704,7 +704,7 @@ export const DIRECTIVES = [
         example: ':::echart{height="300px"}\n{\n  "xAxis": { "type": "category", "data": ["一月", "二月", "三月"] },\n  "yAxis": { "type": "value" },\n  "series": [{ "type": "bar", "data": [120, 200, 150] }]\n}\n:::',
     },
 
-    // ── 时间规划 ──────────────────────────────────────────────
+    // ── Time planning ─────────────────────────────────────────
     {
         name: 'deadline',
         category: '时间规划',
@@ -788,7 +788,7 @@ export const DIRECTIVES = [
         example: ':::plan{title="发布计划" views="board,table,timeline" dateCol="截止" statusCol="状态" titleCol="任务"}\n| 任务:text | 状态:status | 截止:date | 进度:progress |\n|-----------|-------------|-----------|---------------|\n| 写规格 | done | 2026-01-10 | 100% |\n| 开发 | doing | 2026-02-01 | 60% |\n:::',
     },
 
-    // ── 可视化叙事 ────────────────────────────────────────────
+    // ── Visual storytelling ───────────────────────────────────
     {
         name: 'story',
         category: '可视化叙事',
@@ -812,7 +812,7 @@ export const DIRECTIVES = [
     },
 ];
 
-/** 适用于所有指令的写法规则 */
+/** Syntax rules that apply to all directives */
 export const SYNTAX_RULES = [
     '行内指令 `:name[内容]{属性}` 嵌在段落里；单行指令 `::name{属性}` 独占一行、没有正文；容器指令以 `:::name{属性}` 开头、单独一行 `:::` 结尾',
     '没有正文的容器（banner、ghcard、video 等）也要写结尾的 `:::`',
@@ -822,7 +822,7 @@ export const SYNTAX_RULES = [
     '`tab:`、`folder:` 是容器里的普通行，不是指令，各占一行，前后空行',
 ];
 
-/** 不是指令、但写文章时同样要知道的语法 */
+/** Syntax that isn't a directive but is just as important to know when writing posts */
 export const EXTRAS = [
     {
         name: 'code',
@@ -846,5 +846,5 @@ export const EXTRAS = [
     },
 ];
 
-/** 按名字查指令 */
+/** Look up a directive by name */
 export const DIRECTIVE_MAP = new Map(DIRECTIVES.map((d) => [d.name, d]));

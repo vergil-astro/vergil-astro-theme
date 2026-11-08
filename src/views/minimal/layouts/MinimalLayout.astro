@@ -36,7 +36,7 @@ const isArticle = head.pageType === 'article';
 
         <main id="main-content" class="min-h-screen flex flex-col">
             <div class="flex-1 w-full max-w-3xl mx-auto px-6 pt-12 pb-20">
-                <!-- 顶部栏：返回链接 + ThemeToggle -->
+                <!-- Top bar: back link + ThemeToggle -->
                 <div class="flex items-center justify-between mb-6">
                     {showBackLink ? (
                         <a href={backHref} class="text-sm text-secondary hover:text-accent transition-colors inline-flex items-center gap-1">
@@ -48,7 +48,7 @@ const isArticle = head.pageType === 'article';
                     <ThemeToggle />
                 </div>
 
-                <!-- 面包屑插槽 -->
+                <!-- Breadcrumb slot -->
                 {showBreadcrumb && (
                     <div id="minimal-breadcrumb" class="mb-6">
                         <slot name="breadcrumb" />
@@ -125,8 +125,8 @@ const isArticle = head.pageType === 'article';
         {isArticle && (
             <script is:inline>
                 (function () {
-                    // 这段脚本在无刷新切换页面后还会再跑。上一次绑定的监听记在 window 上，先解绑再绑，否则每切换一次就多一个监听。
-                    // 三个布局各有一份进度条脚本，data-progress 标明当前页面用的是哪一份。进度用 transform 缩放，不改宽度，滚动时不触发布局
+                    // This script runs again after client-side page navigation. The previously bound listener is stored on window, so unbind it before binding again, or every navigation adds one more listener.
+                    // Each of the three layouts has its own progress bar script, and data-progress marks which one the current page uses. Progress uses a transform scale instead of width, so scrolling does not trigger layout
                     function initProgress() {
                         if (window.__vergilProgressMinimal) {
                             window.removeEventListener('scroll', window.__vergilProgressMinimal);

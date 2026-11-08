@@ -1,9 +1,9 @@
-// 有哪些皮肤、配色来自外观注册结果，见 src/appearance/integration.mjs
+// The available skins and color schemes come from the appearance registry; see src/appearance/integration.mjs
 import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtual:vergil/appearance';
 
 (function () {
     var root = document.documentElement;
-    // 每个皮肤的默认配色，和这个皮肤下能选的配色
+    // Each skin's default color scheme, and the schemes available under that skin
     var SKIN_DEFAULTS = Object.create(null);
     var SKIN_SCHEMES = Object.create(null);
     REGISTERED_SKINS.forEach(function (s) {
@@ -11,16 +11,16 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
         SKIN_SCHEMES[s.name] = s.schemes;
     });
     var SCHEMES = REGISTERED_SCHEMES.map(function (s) { return s.id; });
-    // 选中某套配色后调色盘图标的颜色
+    // Palette icon color when a given scheme is selected
     var SCHEME_COLORS = Object.create(null);
     REGISTERED_SCHEMES.forEach(function (s) { SCHEME_COLORS[s.id] = s.icon; });
 
-    // 当前皮肤的默认配色
+    // Default color scheme of the current skin
     function getDefaultScheme() {
         return SKIN_DEFAULTS[root.getAttribute('data-skin')] || 'C';
     }
 
-    // 访客选过的皮肤；没选过或者皮肤已经不存在就返回 null，用配置里的默认皮肤
+    // Skin the visitor picked; returns null if none was picked or the skin no longer exists, so the configured default skin is used
     function getStoredSkin() {
         try {
             var skin = localStorage.getItem('skin');
@@ -37,7 +37,7 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
         if (skin) root.setAttribute('data-skin', skin);
     }
 
-    // 访客选过的配色；没选过或者不属于当前皮肤（比如站长停用了带它的皮肤）就用当前皮肤的默认配色
+    // Color scheme the visitor picked; if none was picked or it does not belong to the current skin (e.g. the site owner disabled the skin that provided it), use the current skin's default scheme
     function getStoredScheme() {
         var allowed = SKIN_SCHEMES[root.getAttribute('data-skin')] || [];
         try {
@@ -88,7 +88,7 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
         }
     }
 
-    // 面板上只显示当前皮肤自己的配色
+    // The panel shows only the current skin's own schemes
     function updateSkinOptions(skin) {
         document.querySelectorAll('[data-skin-option]').forEach(function (btn) {
             btn.setAttribute('aria-pressed', btn.getAttribute('data-skin-option') === skin ? 'true' : 'false');
@@ -155,7 +155,7 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
         }
     }
 
-    // 切皮肤不关面板，访客接着就能挑配色
+    // Switching skins keeps the panel open so the visitor can pick a scheme right away
     function setupSkinPicker() {
         var picker = document.getElementById('theme-skin-picker');
         if (!picker) return;
@@ -169,7 +169,7 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
             storeSkin(clicked);
             root.setAttribute('data-skin', clicked);
             updateSkinOptions(clicked);
-            // 每个皮肤只能选自己的配色，切皮肤时配色换成新皮肤的默认配色
+            // Each skin can only use its own schemes, so switching skins resets the scheme to the new skin's default
             var scheme = getDefaultScheme();
             storeScheme(scheme);
             applyTheme(scheme, root.classList.contains('dark'));
@@ -214,8 +214,8 @@ import { skins as REGISTERED_SKINS, schemes as REGISTERED_SCHEMES } from 'virtua
     }
 
     restoreAppearance();
-    // 换页时 ClientRouter 会把 <html> 的属性换成新页面服务端渲染的那份：data-skin 回到配置里的默认皮肤，
-    // data-theme 和 dark 类都没了。要在新页面画出来之前补回去，等到 page-load 再补，暗色模式下会先闪一下亮色
+    // On page change, ClientRouter replaces the <html> attributes with the new page's server-rendered ones: data-skin reverts to the configured default skin,
+    // and data-theme and the dark class are gone. They must be restored before the new page paints; waiting until page-load would flash light mode first in dark mode
     document.addEventListener('astro:after-swap', restoreAppearance);
     document.addEventListener('astro:page-load', setup);
 })();

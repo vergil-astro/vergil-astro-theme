@@ -1,10 +1,10 @@
 ---
 /**
- * 页面绘制前把访客选过的皮肤、配色和暗色模式写到 <html> 上，免得先闪一下默认的样子。
- * 访客存的皮肤如果已经不存在（比如站长停用了那个皮肤）就退回默认皮肤；存的配色不属于当前皮肤，就用当前皮肤的默认配色。
- * 有哪些皮肤、配色从外观注册结果里取，见 src/utils/skin.ts；换页以后的同步由 src/scripts/theme-toggle.js 负责。
+ * Before the page paints, writes the visitor's chosen skin, scheme and dark mode onto <html>, so the default look doesn't flash first.
+ * If the stored skin no longer exists (e.g. the site owner disabled it), falls back to the default skin; if the stored scheme doesn't belong to the current skin, uses that skin's default scheme.
+ * The available skins and schemes come from the appearance registry, see src/utils/skin.ts; syncing after page navigation is handled by src/scripts/theme-toggle.js.
  *
- * 相册页有自己的一套颜色，只跟随皮肤，传 skinOnly。
+ * The album page has its own colors and only follows the skin; pass skinOnly there.
  */
 import { defaultSchemes, skinSchemes } from '../../utils/skin';
 

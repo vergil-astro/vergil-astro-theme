@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * 把演示文章的发布日期挪到最近八周内。
+ * Moves the publish dates of the demo posts into the last eight weeks.
  *
- * 右侧栏热力图只统计最近 8 周。演示文章的日期是写死在 frontmatter 里的，
- * 时间一长就全部掉出窗口，用户克隆下来看到的是一片空白的格子——
- * 等于这个功能在演示站上不存在。
+ * The right sidebar heatmap only counts the last 8 weeks. The demo posts' dates are hardcoded in frontmatter,
+ * so over time they all fall out of that window and users who clone the repo see a grid of empty cells,
+ * which means the feature effectively does not exist on the demo site.
  *
- * 这个脚本按下面的排期重新分配日期，让热力图始终有内容，
- * 并且刻意让某两天各有两篇，好把颜色深浅的分级也展示出来。
+ * This script reassigns dates according to the schedule below so the heatmap always has content,
+ * and deliberately gives two of the days two posts each, to show the color intensity levels as well.
  *
- * 发版前跑一次即可：pnpm samples:dates。只看不改用 pnpm samples:dates:dry。
- * 只改下面 SCHEDULE 里列出的示例文章，用户自己的文章不受影响。
+ * Run it once before a release: pnpm samples:dates. To preview without changing anything, use pnpm samples:dates:dry.
+ * It only changes the sample posts listed in SCHEDULE below; users' own posts are not affected.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,27 +20,27 @@ const DRY = process.argv.includes('--dry');
 const BLOG = path.join(process.cwd(), 'starter/src/content/blog');
 
 /**
- * 距今天多少天。同一个数字出现两次，那天就有两篇，热力图会显示更深的颜色。
+ * Days before today. If the same number appears twice, that day has two posts and the heatmap shows a deeper color.
  *
- * 这里刻意不包含 backend-evolution-2024 和 frontend-trends-2025：
- * 它们的标题里写死了年份，挪日期会让标题和发布时间对不上。
+ * backend-evolution-2024 and frontend-trends-2025 are deliberately left out here:
+ * their titles hardcode the year, so moving their dates would make the title and publish date disagree.
  */
 const SCHEDULE = {
-    // 普通文章最早，排在首页最后：读完总览和专栏，最后看到一篇真实的文章
+    // The regular post is the oldest and comes last on the home page: after the overview and the series, readers end on a real post
     'a-weekend-in-the-mountains': 23,
-    // 专栏按阅读顺序排，日期必须递增，专栏页才会正着排
+    // The series is listed in reading order; dates must increase so the series page shows it in the right order
     '搭建你的第一个站点/01-run-in-ten-minutes': 20,
     '搭建你的第一个站点/02-first-post': 18,
     '搭建你的第一个站点/03-directives-in-writing': 16,
     '搭建你的第一个站点/04-organize-and-style': 14,
-    // 总览最新，新用户打开首页第一篇就是它
+    // The overview is the newest, so it is the first post new users see on the home page
     'welcome-to-vergil': 2,
 };
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const pad = (n) => String(n).padStart(2, '0');
 
-/** 沿用文件原本的日期写法，不要顺手统一格式，免得 diff 里混进无关改动 */
+/** Keep the file's original date format; do not normalize it along the way, so no unrelated changes slip into the diff */
 function format(date, sample) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(sample)) {
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

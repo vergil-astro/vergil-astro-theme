@@ -1,5 +1,5 @@
 /* ── Private Directive ── */
-/* 颜色全部取自当前配色，亮暗模式和各套配色都会跟着变，不再单独写一套暗色 */
+/* All colors come from the current color scheme, so they follow light/dark mode and every scheme; there is no separate dark set anymore */
 .md-directive-private {
     --private-bg: var(--bg-card);
     --private-border: var(--border-light);
@@ -11,7 +11,7 @@
     --private-input-bg: var(--bg-main);
     --private-input-border: var(--border-light);
     --private-btn-bg: var(--accent-color, #4a7c59);
-    /* 按钮字用卡片色：亮色配色下接近白，暗色配色的强调色偏亮时自动变成深色字 */
+    /* Button text uses the card color: near white in light schemes, and automatically dark text when a dark scheme's accent color is light */
     --private-btn-color: var(--bg-card);
     --private-error: #ef4444;
     position: relative;

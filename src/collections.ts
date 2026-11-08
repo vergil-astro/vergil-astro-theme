@@ -1,5 +1,20 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, z, type ImageFunction } from 'astro:content';
+import zhCN from './i18n/zh-CN';
+import en from './i18n/en';
+import { mergeText, type DeepPartial } from './i18n/merge';
+
+/**
+ * Build messages in the site's UI language, picked the same way as src/i18n/index.ts.
+ * This file cannot import src/i18n: sites type-check it as part of their own content config, where the @vergil-site alias
+ * that src/i18n reads the site config through does not exist. import.meta.glob resolves /src/ from the site root instead,
+ * the same way utils/image-utils.ts finds the site's images; if the file is missing, the default language is used.
+ */
+type Identity = { siteInfo?: { locale?: string; uiText?: DeepPartial<typeof zhCN> } };
+const siteInfo = Object.values(import.meta.glob<Identity>('/src/data/config/identity.ts', { eager: true }))[0]?.siteInfo;
+const dictionaries = { 'zh-CN': zhCN, en } as const;
+const locale = siteInfo?.locale && Object.hasOwn(dictionaries, siteInfo.locale) ? (siteInfo.locale as keyof typeof dictionaries) : 'zh-CN';
+const t = mergeText(dictionaries[locale], siteInfo?.uiText);
 
 const imageSchema = (image: ImageFunction) =>
     z.object({
@@ -8,11 +23,11 @@ const imageSchema = (image: ImageFunction) =>
     });
 
 /**
- * 内容里的封面图：推荐写 @img/ 别名指向 src/assets/img/ 下的文件，会被优化；
- * 也兼容 / 开头的 public 路径和外链，那两种原样输出。
+ * Cover images in content: the @img/ alias pointing to files under src/assets/img/ is recommended, since those get optimized;
+ * public paths starting with / and external links also work, and both are output as is.
  *
- * 字符串分支必须排在前面：image() 遇到 / 开头的路径会直接报「图片不存在」，
- * 不会让给后面的分支。
+ * The string branch must come first: image() fails right away with an "image not found" error on paths starting with /,
+ * instead of falling through to the next branch.
  */
 const imageOrPath = (image: ImageFunction) => z.union([z.string().regex(/^(\/|https?:\/\/)/), image()]);
 
@@ -80,7 +95,7 @@ const photoSchema = (image: ImageFunction) =>
         featured: z.boolean().default(false),
         exif: z.object({
             camera: z.string().optional(),
-            /** 机型。演示内容一直在写这个字段，但 schema 里漏了，zod 会静默丢弃 */
+            /** Device model. The demo content has always set this field, but it was missing from the schema, so zod silently dropped it */
             model: z.string().optional(),
             lens: z.string().optional(),
             focal: z.string().optional(),
@@ -144,12 +159,13 @@ const docs = defineCollection({
                 backgroundImage: z.string().optional(),
                 overlay: z.string().optional(),
                 textShadow: z.boolean().default(true),
-                buttonText: z.string().default('开始阅读'),
+                /** Text of the button on the knowledge base cover; when omitted, the page uses the dictionary's "start reading" text in the site's UI language */
+                buttonText: z.string().optional(),
                 fallbackBg: z.string().optional(),
                 gradientColor: z.string().optional(),
                 gradientHeight: z.string().default('h-56'),
                 backdropBlur: z.string().default('12px'),
-                /** 开屏控件的玻璃效果，只写想改的项，其余沿用站点配置 splash.glass */
+                /** Glass effect for splash controls; set only the items to change, the rest comes from the site config splash.glass */
                 glass: z.object({
                     nav: z.enum(['solid', 'frosted', 'liquid']).optional(),
                     tint: z.number().min(0).max(1).optional()
@@ -164,7 +180,7 @@ const resume = defineCollection({
         z.object({
             title: z.string(),
             name: z.string(),
-            // 姓名下面的一行，比如「高级前端工程师」，不写就不显示
+            // The line under the name, e.g. "Senior Frontend Engineer"; hidden if omitted
             headline: z.string().optional(),
             avatar: z.string().optional(),
             contact: z.object({
@@ -172,21 +188,21 @@ const resume = defineCollection({
                 phone: z.string().optional(),
                 location: z.string().optional(),
                 website: z.string().optional(),
-                // GitHub 主页地址，比如 https://github.com/zhangsan
+                // GitHub profile URL, e.g. https://github.com/zhangsan
                 github: z.string().optional()
             }).optional(),
-            // 这些信息先模糊显示，访客点一下才看得清，比如 [phone, email]
+            // These fields start out blurred and become readable once the visitor clicks, e.g. [phone, email]
             blur: z.array(z.enum(['name', 'headline', 'email', 'phone', 'location', 'github', 'website'])).default([]),
-            // 加密的简历允许没有密码的访客预览删减版：redact 里的分组（## 标题）中，每段经历的标题（###）用遮挡条盖住；
-            // hide 里的联系方式换成模糊的占位符。这些内容在构建时就删掉了，页面里没有原文，访客也展开不了
+            // An encrypted resume lets visitors without the password preview a redacted version: in the sections (## headings) listed in redact, each entry's title (###) is covered by a redaction bar;
+            // contact fields listed in hide become blurred placeholders. This content is removed at build time, so the page has no original text and visitors cannot reveal it
             preview: z
                 .object({
                     redact: z.array(z.string()).default([]),
                     hide: z.array(z.enum(['email', 'phone', 'location', 'github', 'website'])).default(['email', 'phone'])
                 })
                 .optional(),
-            // 写了就加密：页面里只放密文，访客输入密码，或者打开分享链接（/views/resume/#口令，口令由密码派生）才能看到。
-            // 拿到链接的人都能看，它不是登录密码，只用来挡住搜索引擎和随手点进来的人
+            // Setting it turns on encryption: the page holds only ciphertext, viewable once the visitor enters the password or opens a share link (/views/resume/#<token>, where the token is derived from the password).
+            // Anyone with the link can view it; it is not a login password, only a way to keep out search engines and casual visitors
             password: z.string().min(1).optional()
         })
 });
@@ -209,14 +225,14 @@ const series = defineCollection({
             cover: imageOrPath(image).optional(),
             icon: z.string().optional(),
             /**
-             * 这个专栏的文章目录，相对于 src/content/blog/，只能是一级目录。
-             * 填了之后该目录下的文章自动属于本专栏，不必每篇再写 series。
-             * 目录名不参与 URL，文章地址仍然是 /blog/<文件名>/。
+             * This series' post directory, relative to src/content/blog/; must be a single-level directory.
+             * Once set, posts in that directory automatically belong to this series, without setting series in each post.
+             * The directory name is not part of the URL; post URLs are still /blog/<filename>/.
              */
             dir: z
                 .string()
                 .optional()
-                .refine((v) => !v || !v.includes('/'), { message: 'dir 只能填一级目录，不要带斜杠' })
+                .refine((v) => !v || !v.includes('/'), { message: t.build.seriesDirNested })
         })
 });
 

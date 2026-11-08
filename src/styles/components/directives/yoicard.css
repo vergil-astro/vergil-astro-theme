@@ -127,7 +127,7 @@
     background: var(--yc-bg-gradient);
 }
 
-/* 背景图是一张铺满的 <img>，垫在最底层：遮罩在 1 层，正文在 2 层，装饰线和 logo 在 3 层 */
+/* The background image is a full-cover <img> on the bottom layer: the overlay is on layer 1, the body on layer 2, and the decorative lines and logo on layer 3 */
 .md-directive-yoicard .md-yc-bg-img {
     position: absolute;
     inset: 0;
@@ -160,7 +160,7 @@
     object-position: right center;
 }
 
-/* left / right 模式：图片从一侧淡出，渐变盖在图片上 */
+/* left / right modes: the image fades out from one side, with the gradient laid over the image */
 .md-directive-yoicard.md-yc-has-image.md-yc-bg-mode-left::before,
 .md-directive-yoicard.md-yc-has-image.md-yc-bg-mode-right::before {
     content: '';

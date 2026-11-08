@@ -1,6 +1,6 @@
 import { getIconSvg, encryptPrivateContent, serializeToHtml, escapeHtml } from './shared.mjs';
 
-/* 中文兜底文案；实际文案由 processPrivateDirective 的 options.i18n.private 传入，跟着站点语言走 */
+/* Chinese fallback copy; the actual copy is passed in via processPrivateDirective's options.i18n.private and follows the site language */
 const I18N_FALLBACK = {
     title: '私密内容',
     desc: '这部分内容已加密，输入密码后查看',

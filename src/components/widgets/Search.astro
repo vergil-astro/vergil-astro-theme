@@ -1,5 +1,5 @@
 ---
-import { t } from '../../i18n';
+import { t, locale } from '../../i18n';
 
 const searchDataUrl = '/search-data.json';
 ---
@@ -68,12 +68,12 @@ const searchDataUrl = '/search-data.json';
     window.__loadFuse = () => import('fuse.js').then((m) => m.default);
 </script>
 
-<script is:inline data-search-url={searchDataUrl} define:vars={{ i18n: { loading: t.search.loading, hint: t.search.hint, empty: t.search.empty, resultsZero: t.search.results(0), types: t.search.types, failed: t.search.failed } }}>
+<script is:inline data-search-url={searchDataUrl} define:vars={{ i18n: { loading: t.search.loading, hint: t.search.hint, empty: t.search.empty, resultsZero: t.search.results(0), resultsOne: t.search.results(1), resultsMany: t.search.results(9999), types: t.search.types, failed: t.search.failed, locale } }}>
 (function() {
     const script = document.currentScript;
     const searchUrl = script.dataset.searchUrl;
 
-    // 全局状态 — 跨 ViewTransitions 页面切换保持
+    // Global state — persists across ViewTransitions page swaps
     const S = window._searchState = window._searchState || {
         fuse: null,
         searchData: [],
@@ -123,8 +123,8 @@ const searchDataUrl = '/search-data.json';
     function setLoading(loading) {
         S.isLoading = loading;
         if (loading) { showMessage(i18n.loading); return; }
-        // 载入失败时不能把错误提示冲掉，否则界面看起来一切正常，
-        // 但输入什么都没有反应，根本看不出是索引没加载上。
+        // After a load failure, don't overwrite the error message, otherwise the UI looks perfectly normal
+        // but typing does nothing, with no sign that the index failed to load.
         showMessage(S.error ? i18n.failed : i18n.hint);
     }
 
@@ -133,8 +133,8 @@ const searchDataUrl = '/search-data.json';
         try {
             S.error = null;
             const response = await fetch(S.searchUrl);
-            // 不检查状态码的话，404 返回的 HTML 会在 json() 里炸掉，
-            // 报出来的错跟真正的原因毫无关系。
+            // Without checking the status code, the HTML from a 404 blows up in json(),
+            // and the reported error has nothing to do with the real cause.
             if (!response.ok) throw new Error('search-data.json HTTP ' + response.status);
             S.searchData = await response.json();
             if (!Array.isArray(S.searchData) || S.searchData.length === 0) {
@@ -144,15 +144,15 @@ const searchDataUrl = '/search-data.json';
             S.fuse = new Fuse(S.searchData, {
                 keys: ['title', 'description', 'content', 'tags'],
                 threshold: 0.35,
-                // Fuse 默认只在字段开头 distance(100) 个字符内找匹配。正文动辄几千字，
-                // 不关掉位置权重的话，出现在文章中后段的词一律搜不到。
+                // By default Fuse only matches within distance (100) characters of the field start. Post bodies often run to thousands of characters,
+                // so without turning off location weighting, words in the middle or later parts of a post are never found.
                 ignoreLocation: true,
                 includeScore: true,
                 includeMatches: true
             });
         } catch (error) {
             S.error = error;
-            console.error('[search] 索引加载失败:', error);
+            console.error('[search] Failed to load the search index:', error);
             showMessage(i18n.failed);
         }
     }
@@ -216,7 +216,8 @@ const searchDataUrl = '/search-data.json';
     function formatDate(dateStr) {
         if (!dateStr) return '';
         try {
-            return new Date(dateStr).toLocaleDateString();
+            // Format in the site's UI language, not the visitor's browser language, like the rest of the page
+            return new Date(dateStr).toLocaleDateString(i18n.locale);
         } catch (e) {
             return '';
         }
@@ -289,7 +290,9 @@ const searchDataUrl = '/search-data.json';
             `;
         }).join('');
         els.results.innerHTML = html;
-        setStatus(results.length + ' 条结果');
+        // The dictionary's results(n) is a function and can't be passed to this inline script, so the
+        // page carries it rendered for 1 and for the placeholder 9999; the real count replaces the placeholder
+        setStatus(results.length === 1 ? i18n.resultsOne : i18n.resultsMany.replace('9999', String(results.length)));
 
         const query = document.getElementById('search-input')?.value.trim();
         if (query) {
@@ -321,9 +324,9 @@ const searchDataUrl = '/search-data.json';
         });
     }
 
-    // 全局事件只绑定一次
+    // Bind global events only once
     if (!S.listenersBound) {
-        // open-search 事件
+        // open-search event
         document.addEventListener('open-search', async () => {
             if (!S.fuse && !S.isLoading) {
                 setLoading(true);
@@ -335,7 +338,7 @@ const searchDataUrl = '/search-data.json';
             setTimeout(() => els.input?.focus(), 50);
         });
 
-        // 键盘快捷键 — 始终使用最新的 DOM 引用
+        // Keyboard shortcuts — always use the latest DOM references
         document.addEventListener('keydown', (e) => {
             if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
@@ -374,17 +377,17 @@ const searchDataUrl = '/search-data.json';
             }
         });
 
-        // 事件委托：处理 search-results 内点击 和 dialog backdrop 点击
+        // Event delegation: handles clicks inside search-results and on the dialog backdrop
         document.addEventListener('click', (e) => {
             const els = getEls();
 
-            // dialog backdrop 点击关闭
+            // Clicking the dialog backdrop closes it
             if (els.dialog && e.target === els.dialog) {
                 els.dialog.close();
                 return;
             }
 
-            // 搜索结果点击关闭
+            // Clicking a search result closes the dialog
             if (els.results && els.results.contains(e.target)) {
                 const link = e.target.closest('.search-result-item');
                 if (link && els.dialog) {
@@ -393,7 +396,7 @@ const searchDataUrl = '/search-data.json';
             }
         });
 
-        // 事件委托：input 输入
+        // Event delegation: input events
         document.addEventListener('input', (e) => {
             if (e.target.id !== 'search-input') return;
             const els = getEls();
@@ -405,13 +408,13 @@ const searchDataUrl = '/search-data.json';
                 return;
             }
             if (!S.fuse) {
-                // 静默 return 会让人以为是「搜不到结果」，其实是索引压根没加载
+                // A silent return would look like "no results", when in fact the index never loaded
                 if (S.error) { showMessage(i18n.failed); return; }
                 if (S.isLoading) { showMessage(i18n.loading); return; }
                 setLoading(true);
                 initSearch().then(() => {
                     setLoading(false);
-                    // 载入期间用户已经打好的关键词，补跑一次；失败时不再重试，避免死循环
+                    // Re-run once for the query the user typed while loading; don't retry on failure, to avoid an endless loop
                     if (S.error) return;
                     const el = document.getElementById('search-input');
                     if (el && el.value.trim()) el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -428,9 +431,9 @@ const searchDataUrl = '/search-data.json';
 </script>
 
 <style is:global>
-    /* 原来用 m-auto 垂直居中，结果条数一变，对话框高度跟着变，
-       居中又把它重新摆到中间，于是每敲一个字整个框都在上下跳。
-       改成钉在距顶部固定距离的位置，只往下长，顶边不动。 */
+    /* It used to be vertically centered with m-auto: whenever the result count changed, the dialog height changed,
+       and centering moved it back to the middle, so the whole box jumped up and down with every keystroke.
+       Now it is pinned at a fixed distance from the top and only grows downward; the top edge stays put. */
     #search-dialog {
         margin: 10vh auto auto;
     }

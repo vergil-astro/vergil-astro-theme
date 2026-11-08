@@ -370,10 +370,10 @@ function renderPlanTable(data, attrs, uid, mapping) {
     return `<div class="md-plan-table-wrap" data-plan-id="${uid}" data-plan-rows='${dataJson}' data-plan-cols='${colsJson}' data-plan-coltypes='${colTypesJson}' data-plan-status="${escapeHtml(statusCol)}" data-plan-priority="${escapeHtml(priorityCol)}">${toolbarHtml}${tableHtml}${js}</div>`;
 }
 
-// 当前指令的语言，processPlanDirective 入口处赋值。remark 是同步逐节点处理，不会串。
+// Locale of the current directive, set at the entry of processPlanDirective. remark processes nodes synchronously one at a time, so values don't leak between directives.
 let currentLocale = 'zh-CN';
 
-// 中文兜底文案，同样在 processPlanDirective 入口处按 options 覆盖。
+// Chinese fallback copy, likewise overridden from options at the entry of processPlanDirective.
 const PLAN_I18N_FALLBACK = {
     all: '全部',
     search: '搜索',
@@ -394,6 +394,15 @@ const PLAN_I18N_FALLBACK = {
     nthReview: (n) => `第 ${n} 次复习`,
     reviewToday: '今天该复习',
     reviewPending: '待复习',
+    views: {
+        board: '看板',
+        list: '列表',
+        table: '表格',
+        timeline: '时间轴',
+        milestone: '里程碑',
+        progress: '进度',
+        ebbinghaus: '复习',
+    },
 };
 const PLAN_TIME_FALLBACK = {
     month: (m) => `${m}月`,
@@ -401,7 +410,7 @@ const PLAN_TIME_FALLBACK = {
 let currentI18n = PLAN_I18N_FALLBACK;
 let currentTime = PLAN_TIME_FALLBACK;
 
-// 插进运行时脚本单引号字符串字面量里的文案：先做 HTML 转义（顺带处理引号），再转义反斜杠。
+// Copy inserted into single-quoted string literals in the runtime script: HTML-escape it first (which also handles quotes), then escape backslashes.
 function jsStr(text) {
     return escapeHtml(text).replace(/\\/g, '\\\\');
 }
@@ -998,15 +1007,7 @@ export function processPlanDirective(node, options = {}) {
 
         const uid = `plan-${Math.random().toString(36).slice(2, 9)}`;
 
-        const viewLabels = {
-            board: '\u770b\u677f',
-            list: '\u5217\u8868',
-            table: '\u8868\u683c',
-            timeline: '\u65f6\u95f4\u8f74',
-            milestone: '\u91cc\u7a0b\u7891',
-            progress: '\u8fdb\u5ea6',
-            ebbinghaus: '\u590d\u4e60'
-        };
+        const viewLabels = currentI18n.views ?? PLAN_I18N_FALLBACK.views;
 
         const viewIcons = {
             board: '<svg class="md-plan-tab__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>',
@@ -1028,7 +1029,7 @@ export function processPlanDirective(node, options = {}) {
 
         let navHtml = '<nav class="md-plan-tabs">';
         views.forEach((view, i) => {
-            const label = viewLabels[view] || view;
+            const label = escapeHtml(Object.hasOwn(viewLabels, view) ? viewLabels[view] : view);
             const icon = viewIcons[view] || '';
             const badge = totalRows > 0 ? `<span class="md-plan-tab__badge">${totalRows}</span>` : '';
             navHtml += `<label for="${uid}-${view}" class="md-plan-tab md-plan-tab--${i}" data-view="${view}">${icon}<span class="md-plan-tab__label">${label}</span>${badge}</label>`;

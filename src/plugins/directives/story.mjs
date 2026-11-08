@@ -148,7 +148,7 @@ function renderStoryHtml(data, i18n, images) {
 export function processStoryDirective(node, options = {}) {
     const i18n = options.i18n?.story ?? { empty: '暂无分镜内容' };
     const data = parseStoryTable(node);
-    // 镜头图片可以是本地图片（@img/ 或相对路径），交给 Astro 处理
+    // Shot images can be local images (@img/ or a relative path), processed by Astro
     const images = createDirectiveImages();
     const html = renderStoryHtml(data, i18n, images);
 

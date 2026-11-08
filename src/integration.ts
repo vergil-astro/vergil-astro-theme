@@ -1,13 +1,13 @@
 /**
- * Vergil 的 Astro 集成。站点的 astro.config.mjs 里只需要：
+ * Vergil's Astro integration. A site's astro.config.mjs only needs:
  *
  *   import vergil from '@vergil-astro/theme';
  *   import siteConfig from './src/data/site-config';
  *   export default defineConfig({ site: siteConfig.website, integrations: [vergil({ config: siteConfig })] });
  *
- * 它负责框架的全部接线：注入页面路由、Markdown 插件、代码高亮、Tailwind、外观（皮肤）注册，
- * 以及让框架代码读到站点自己的配置（别名 @vergil-site 指向站点的 src/）。
- * 站点仓库里只留内容、图片、配置和 public，升级框架就是升级这个包。
+ * It handles all of the framework's wiring: injecting page routes, Markdown plugins, code highlighting, Tailwind, appearance (skin) registration,
+ * and letting framework code read the site's own config (the @vergil-site alias points to the site's src/).
+ * The site repo keeps only content, images, config, and public; upgrading the framework means upgrading this package.
  */
 import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +21,7 @@ import remarkDirective from 'remark-directive';
 import remarkMath from 'remark-math';
 import zhCN from './i18n/zh-CN';
 import en from './i18n/en';
+import { mergeText } from './i18n/merge';
 import type { SiteConfig } from './types';
 import { rehypeMathDispatcher } from './plugins/rehype-math-dispatcher.mjs';
 import { rehypeHeadingAnchors } from './plugins/rehype-heading-anchors.mjs';
@@ -32,14 +33,14 @@ import { remarkTerminal, transformerTerminal } from './plugins/shiki-terminal.mj
 import appearance from './appearance/integration.mjs';
 
 export interface VergilOptions {
-    /** 站点配置，也就是站点 src/data/site-config.ts 默认导出的那个对象 */
+    /** Site config, i.e. the object default-exported by the site's src/data/site-config.ts */
     config: SiteConfig;
 }
 
 const dictionaries = { 'zh-CN': zhCN, en } as const;
 const pagesDir = fileURLToPath(new URL('./pages/', import.meta.url));
 
-/** 框架自带的页面：pages/ 下的每个文件按目录结构注入成路由，和放在站点 src/pages 里效果一样 */
+/** Pages bundled with the framework: every file under pages/ is injected as a route following the directory structure, same as placing it in the site's src/pages */
 function frameworkRoutes(): { pattern: string; entrypoint: string }[] {
     const routes: { pattern: string; entrypoint: string }[] = [];
     for (const rel of readdirSync(pagesDir, { recursive: true }) as string[]) {
@@ -55,8 +56,9 @@ function frameworkRoutes(): { pattern: string; entrypoint: string }[] {
 }
 
 export default function vergil({ config }: VergilOptions): AstroIntegration {
-    const locale = config.locale in dictionaries ? (config.locale as keyof typeof dictionaries) : 'zh-CN';
-    const t = dictionaries[locale];
+    const locale = config.locale && config.locale in dictionaries ? (config.locale as keyof typeof dictionaries) : 'zh-CN';
+    // Same as src/i18n/index.ts: apply the site's uiText overrides on top, so text inside content directives changes too
+    const t = mergeText(dictionaries[locale], config.uiText);
 
     return {
         name: '@vergil-astro/theme',
@@ -71,15 +73,16 @@ export default function vergil({ config }: VergilOptions): AstroIntegration {
                     vite: {
                         plugins: [tailwindcss()],
                         resolve: {
-                            // 框架代码通过这个别名读站点自己的配置：@vergil-site/data/config/identity
+                            // Framework code reads the site's own config through this alias: @vergil-site/data/config/identity
                             alias: { '@vergil-site': siteSrc }
                         },
                         optimizeDeps: {
                             include: ['mermaid', 'echarts']
                         }
                     },
-                    // 皮肤按 identity.ts 里的名字从站点的 skins/ 目录加载，见 appearance/integration.mjs
-                    integrations: [sitemap(), appearance({ skins: config.skins })],
+                    // Skins are loaded from the site's skins/ directory by the names in identity.ts; see appearance/integration.mjs.
+                    // Its errors and warnings run in the config phase, before the @vergil-site alias that src/i18n relies on exists, so the messages are passed in here
+                    integrations: [sitemap(), appearance({ skins: config.skins, messages: t.build.appearance })],
                     markdown: {
                         processor: unified({
                             remarkPlugins: [
@@ -90,8 +93,8 @@ export default function vergil({ config }: VergilOptions): AstroIntegration {
                                 [remarkContentDirectives, { links: config.links, screenshotService: config.screenshotService, locale, i18n: t.directive, time: t.time }],
                                 remarkTerminal
                             ],
-                            // rehypeHeadingIds 要显式排在前面：Astro 自己那一次在用户插件之后才跑，
-                            // 那时 rehypeHeadingAnchors 还读不到标题 id。这个插件是幂等的，跑两次无副作用。
+                            // rehypeHeadingIds must be listed explicitly first: Astro's own run only happens after user plugins,
+                            // by which point rehypeHeadingAnchors could not read the heading ids. The plugin is idempotent, so running it twice has no side effects.
                             rehypePlugins: [
                                 rehypeMathDispatcher,
                                 rehypeTitleHeadings,

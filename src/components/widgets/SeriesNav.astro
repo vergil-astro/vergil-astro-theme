@@ -19,7 +19,7 @@ const currentIndex = seriesPosts.findIndex((p) => p.id === currentPostId);
 const total = seriesPosts.length;
 const needsCollapse = total > 5;
 
-// 默认可见范围：始终显示 5 篇，当前项居中（边界处自动调整）
+// Default visible range: always show 5 posts with the current one centered (adjusted at the edges)
 const visibleStart = total > 5 ? Math.max(0, Math.min(currentIndex - 2, total - 5)) : 0;
 const visibleEnd = Math.min(total - 1, visibleStart + 4);
 const visibleIndices = new Set<number>();
@@ -83,7 +83,7 @@ for (let i = visibleStart; i <= visibleEnd; i++) {
     document.addEventListener('astro:page-load', () => {
         const STORAGE_KEY = 'vergil:read-posts';
 
-        // 1. 记录当前文章为已读
+        // 1. Record the current post as read
         const nav = document.querySelector('[data-series-nav]');
         const currentPostId = nav?.getAttribute('data-current-post-id');
         if (currentPostId) {
@@ -94,11 +94,11 @@ for (let i = visibleStart; i <= visibleEnd; i++) {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(readPosts));
                 }
             } catch {
-                // localStorage 不可用，静默忽略
+                // localStorage unavailable; ignore silently
             }
         }
 
-        // 2. 标记已读文章
+        // 2. Mark read posts
         try {
             const readPosts: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             document.querySelectorAll('.series-link').forEach((link) => {
@@ -108,10 +108,10 @@ for (let i = visibleStart; i <= visibleEnd; i++) {
                 }
             });
         } catch {
-            // 静默忽略
+            // Ignore silently
         }
 
-        // 3. 展开/收起
+        // 3. Expand/collapse
         document.querySelectorAll('.series-toggle').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const seriesNav = btn.closest('[data-series-nav]');
@@ -123,7 +123,7 @@ for (let i = visibleStart; i <= visibleEnd; i++) {
                 const iconEl = btn.querySelector('.toggle-icon');
 
                 if (isExpanded) {
-                    // 收起：只显示当前附近的 5 篇
+                    // Collapse: show only the 5 posts around the current one
                     const newStart = total > 5 ? Math.max(0, Math.min(currentIndex - 2, total - 5)) : 0;
                     const newEnd = Math.min(total - 1, newStart + 4);
                     list?.querySelectorAll('.series-item').forEach((item) => {
@@ -136,7 +136,7 @@ for (let i = visibleStart; i <= visibleEnd; i++) {
                     if (textEl) textEl.textContent = btn.getAttribute('data-i18n-expand') || '';
                     iconEl?.classList.remove('rotate-180');
                 } else {
-                    // 展开：显示全部
+                    // Expand: show all
                     list?.querySelectorAll('.series-item').forEach((item) => {
                         item.classList.remove('hidden');
                     });

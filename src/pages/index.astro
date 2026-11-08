@@ -28,7 +28,7 @@ const page = {
     lastPage: totalPages
 };
 
-/** 字段要和 src/pages/moments/index.astro 保持一致，否则首页会少渲染内容 */
+/** Fields must match src/pages/moments/index.astro, or the homepage renders less content */
 interface MomentData {
     content: string;
     date: string;
@@ -39,7 +39,7 @@ interface MomentData {
 }
 
 const momentsDir = path.join(process.cwd(), 'src', 'content', 'moments');
-// 头像可以写 public/ 下的路径字符串，也可以在 site-config.ts 里 import 成图片对象
+// The avatar can be a path string under public/, or an image object imported in site-config.ts
 const avatarSrc = typeof siteConfig.avatar?.src === 'string' ? siteConfig.avatar.src : siteConfig.avatar?.src.src;
 let latestMoment: MomentData | null = null;
 if (fs.existsSync(momentsDir)) {

@@ -66,7 +66,7 @@ function renderImageDirective(attrs, images) {
         style: imgStyle && !ratio ? imgStyle : undefined,
         loading: 'lazy',
         decoding: 'async',
-        // 处理函数定义在 BaseHead 里；调用不带引号，本地图片交给 Astro 后属性才不会被转义坏
+        // The handlers are defined in BaseHead; the calls contain no quotes so the attributes aren't mangled by escaping once local images go to Astro
         onerror: 'vergilImgError(this)',
         onload: 'vergilImgLoad(this)'
     });
@@ -78,7 +78,7 @@ function renderImageDirective(attrs, images) {
         const href = download === 'true' ? src : download;
         const downloadAttr = alt ? ` download="${escapeHtml(alt)}"` : '';
         if (isLocalImage(href)) {
-            // 本地图片构建后才有真实地址，点击时取页面上这张图实际加载的地址
+            // Local images only get a real URL after the build, so on click take the URL this image actually loaded on the page
             inner += `<a class="md-image-download" target="_blank"${downloadAttr} href="#" onclick="this.href=this.closest('.md-image-bg').querySelector('img').currentSrc">${DOWNLOAD_ICON}</a>`;
         } else {
             inner += `<a class="md-image-download" target="_blank"${downloadAttr} href="${escapeHtml(href)}">${DOWNLOAD_ICON}</a>`;
@@ -148,7 +148,7 @@ export function remarkImageDirectives() {
             const nodes = images.toNodes(html);
 
             if (nodes.length > 1) {
-                // 含本地图片：保留成带子节点的元素，让里面的图片节点交给 Astro 处理
+                // Contains local images: keep it as an element with children so the image nodes inside are processed by Astro
                 if (parent && parent.type === 'paragraph') {
                     parent.data = { hName: 'div', hProperties: {} };
                     parent.children = nodes;

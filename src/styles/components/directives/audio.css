@@ -799,7 +799,7 @@
     border-radius: 2px;
 }
 
-/* 滚动条只在滚动时显示，is-scrolling 见 BaseHead */
+/* The scrollbar only shows while scrolling; see BaseHead for is-scrolling */
 .md-fa-playlist-items.is-scrolling::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.15);
 }

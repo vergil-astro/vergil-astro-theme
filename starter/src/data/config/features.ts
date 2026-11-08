@@ -17,7 +17,7 @@ export const comments = {
         emitMetadata: false,
         inputPosition: 'top' as const,
         theme: 'preferred_color_scheme' as const,
-        lang: 'zh-CN' as const,
+        // lang: 'zh-CN',  // giscus 界面语言，不写就跟着站点的界面语言（identity.ts 的 locale）
         loading: 'lazy' as const
     },
     artalk: {

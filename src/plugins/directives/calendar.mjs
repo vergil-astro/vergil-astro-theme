@@ -3,13 +3,13 @@
  *
  * Features:
  *   • Fixed 6-row grid (42 cells) with equal row heights
- *   • Title always shows YYYY年M月
+ *   • Title always shows the year and month, formatted by time.ym
  *   • Lunar dates + Gregorian dates in each cell
- *   • Solar terms (节气) as auto-detected events
+ *   • Solar terms (jieqi) as auto-detected events
  *   • Legal holidays with cross-day bars for consecutive rest days
  *   • Holiday name shown separately on the target date
- *   • Work-day makeup (调休) shown in orange-red
- *   • Traditional / solar festivals (e.g. 儿童节, 建党节)
+ *   • Work-day makeup (tiaoxiu) shown in orange-red
+ *   • Traditional / solar festivals (e.g. Children's Day, Party Founding Day)
  *   • User-defined events from markdown table with auto color assignment
  *   • Supports user-specified color via table column
  */
@@ -17,7 +17,7 @@ import { Solar, HolidayUtil } from 'lunar-javascript';
 import { getIconSvg } from './shared.mjs';
 
 /* Color palette — auto-assigned to unknown tag types.
-   只有 text 作为色相输出到 --evt-hue，底色和文字色由 CSS 按当前配色和亮暗模式混出来；bg 留作备查 */
+   Only text is output to --evt-hue as the hue; the background and text colors are mixed in CSS from the current color scheme and light/dark mode. bg is kept for reference */
 const TAG_PALETTE = [
     { cls: 'md-event-blue',   bg: '#e8f0fe', text: '#1967d2' },
     { cls: 'md-event-green',  bg: '#e6f4ea', text: '#137333' },
@@ -35,7 +35,7 @@ const WEEKDAYS   = ['日', '一', '二', '三', '四', '五', '六'];
 const NAV_RANGE  = 12;
 const GRID_CELLS = 42;
 
-/* 中文兜底文案；processCalendarDirective 入口处按 options 覆盖。remark 是同步逐节点处理，不会串。 */
+/* Chinese fallback copy; overridden from options at the entry of processCalendarDirective. remark processes nodes synchronously one at a time, so values don't leak between directives. */
 const I18N_FALLBACK = {
     prev: '上月',
     next: '下月',
@@ -45,11 +45,13 @@ const I18N_FALLBACK = {
     holiday: '休',
     lunarFirst: '初一',
     lunarMonthFirst: (month) => `${month}月初一`,
+    holidayTag: (name, tag) => `${name}（${tag}）`,
 };
 const TIME_FALLBACK = {
     weekdaysSunFirst: WEEKDAYS,
     day: (d) => `${d}日`,
     md: (m, d) => `${m}月${d}日`,
+    ym: (y, m) => `${y}年${m}月`,
 };
 let currentI18n = I18N_FALLBACK;
 let currentTime = TIME_FALLBACK;
@@ -112,11 +114,8 @@ const NAV_SCRIPT = `<script>
     if(nxt!==cur){
       months[cur].style.display='none';
       months[nxt].style.display='block';
-      var parts=months[nxt].id.split('-');
-      var yy=parts[parts.length-2];
-      var mm=parseInt(parts[parts.length-1]);
       var title=cal.querySelector('.md-calendar-title');
-      if(title)title.textContent=yy+'年'+mm+'月';
+      if(title)title.textContent=months[nxt].dataset.title||'';
       var prev=cal.querySelector('.md-calendar-btn--prev');
       var next=cal.querySelector('.md-calendar-btn--next');
       if(prev){prev.style.opacity=nxt>0?'1':'0.3';prev.style.pointerEvents=nxt>0?'auto':'none';}
@@ -215,12 +214,12 @@ function collectAllEvents(userEvents, targetMonth) {
 
                 if (isWork) {
                     map[dk].push({
-                        content: holidayName + '（' + currentI18n.workday + '）',
+                        content: currentI18n.holidayTag(holidayName, currentI18n.workday),
                         auto: true, priority: 2, kind: 'work'
                     });
                 } else {
                     map[dk].push({
-                        content: holidayName + '（' + currentI18n.holiday + '）',
+                        content: currentI18n.holidayTag(holidayName, currentI18n.holiday),
                         auto: true, priority: 0, kind: 'bar', barName: holidayName,
                         isHoliday: true, isWorkDay: false
                     });
@@ -299,7 +298,8 @@ function renderMonth(monthStr, allEvents, parentId, isDefault) {
 
     const html = cells.map((c, i) => renderCell(c, positions[i])).join('');
 
-    return `<div id="${parentId}-${monthStr}" class="md-calendar-month" style="display:${isDefault ? 'block' : 'none'}">
+    // The title for this month, rendered with the locale's format; the client script reads it when switching months
+    return `<div id="${parentId}-${monthStr}" class="md-calendar-month" data-title="${escapeHtml(formatMonthLabel(monthStr))}" style="display:${isDefault ? 'block' : 'none'}">
   <div class="md-calendar-grid">${html}</div>
 </div>`;
 }
@@ -438,7 +438,7 @@ function formatMonth(d) {
 
 function formatMonthLabel(s) {
     const [y, m] = s.split('-');
-    return `${y}年${parseInt(m)}月`;
+    return (currentTime.ym ?? TIME_FALLBACK.ym)(y, parseInt(m));
 }
 
 function isSameDay(a, b) {

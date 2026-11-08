@@ -7,7 +7,7 @@ import {
 } from '@lucide/astro';
 
 /**
- * Lucide 1.0 起不再收录品牌图标，GitHub 图标按 0.x 的线条（ISC 许可）在这里补上，样子和原来一样
+ * Lucide dropped brand icons in 1.0, so the GitHub icon is added back here using the 0.x paths (ISC license) and looks the same as before
  */
 export const Github = createLucideIcon({
     name: 'github',
@@ -19,7 +19,7 @@ export const Github = createLucideIcon({
 }) as AstroComponent;
 
 export const lucideNavIcons: Record<string, any> = {
-    // 导航图标（kebab-case key → PascalCase 组件）。key 是站点配置里写的名字，Lucide 改了名的图标保留旧 key
+    // Nav icons (kebab-case key → PascalCase component). Keys are the names used in the site config; icons that Lucide renamed keep their old key
     'home': House,
     'database': Database,
     'heart': Heart,
@@ -41,7 +41,7 @@ export const lucideNavIcons: Record<string, any> = {
     'message-circle': MessageCircle,
     'bookmark': Bookmark,
     'book-text': BookText,
-    // 内部固定图标
+    // Fixed internal icons
     'chevron-down': ChevronDown,
     'chevron-right': ChevronRight,
     'search': Search,

@@ -1,0 +1,18 @@
+{
+    // Generates .d.ts for the package's main entry (the theme integration) and the config types; prepack runs it before publishing. The content collections entry does not need this: its types are inferred by zod, so checking its source directly works fine.
+    // Sites read these declarations when type-checking instead of checking the theme's source again
+    "compilerOptions": {
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "allowJs": true,
+        "outDir": "dist",
+        "rootDir": "src",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "target": "ESNext",
+        "strict": true,
+        "skipLibCheck": true,
+        "types": ["astro/client"]
+    },
+    "include": ["src/integration.ts", "src/types.ts"]
+}

@@ -1,6 +1,6 @@
 import type zhCN from './zh-CN';
 
-/** 类型从中文基准推导：少一个 key、多一个 key 都会在类型检查时报错 */
+/** Typed from the Chinese base: a missing or extra key fails type checking */
 const en: typeof zhCN = {
     common: {
         expand: 'Expand',
@@ -32,6 +32,7 @@ const en: typeof zhCN = {
         unknownTitle: 'Untitled',
         uncategorized: 'Uncategorized',
         result: 'Result',
+        colon: ':',
     },
 
     time: {
@@ -218,6 +219,10 @@ const en: typeof zhCN = {
             dawn: 'Dawn', morning: 'Morning', forenoon: 'Late morning', noon: 'Noon',
             afternoon: 'Afternoon', dusk: 'Dusk', night: 'Night', lateNight: 'Late night',
         },
+    },
+
+    hero: {
+        defaultTitle: "Hello, I'm **Ethan**!",
     },
 
     page: {
@@ -456,6 +461,7 @@ const en: typeof zhCN = {
             holiday: 'off',
             lunarFirst: '1st',
             lunarMonthFirst: (month: string) => `${month} 1st`,
+            holidayTag: (name: string, tag: string) => `${name} (${tag})`,
         },
         okr: {
             overall: 'Overall progress',
@@ -488,10 +494,22 @@ const en: typeof zhCN = {
             nthReview: (n: number) => `Review #${n}`,
             reviewToday: 'Review today',
             reviewPending: 'Pending',
+            views: {
+                board: 'Board',
+                list: 'List',
+                table: 'Table',
+                timeline: 'Timeline',
+                milestone: 'Milestones',
+                progress: 'Progress',
+                ebbinghaus: 'Review',
+            },
         },
         story: { empty: 'No storyboard content' },
         mind: { empty: 'Mind map is empty' },
-        charts: { echartParseError: 'Failed to parse ECharts config' },
+        charts: {
+            echartParseError: 'Failed to parse ECharts config',
+            mermaidRenderError: 'Mermaid failed to render',
+        },
         photo: {
             brands: {
                 Canon: 'Canon',
@@ -511,6 +529,42 @@ const en: typeof zhCN = {
                 Realme: 'Realme',
                 Meizu: 'Meizu',
             } as Record<string, string>,
+        },
+    },
+
+    build: {
+        duplicateSlug: (slug: string, first: string, second: string) =>
+            `[Vergil] Two posts would get the same URL /blog/${slug}/:\n` +
+            `  src/content/blog/${first}.md\n` +
+            `  src/content/blog/${second}.md\n` +
+            `Directory names are not part of the URL, so posts in different directories cannot share a file name either. Rename one of them.`,
+        imageNotFound: (src: string) => `Image ${src} not found. Make sure the file is under src/assets/img/`,
+        seriesDirNested: 'dir must be a single directory, without slashes',
+        appearance: {
+            prefix: '[vergil appearance]',
+            skinFallback: (skin: string) => `skin in identity.ts is "${skin}", but that skin is not enabled or not installed; falling back to classic`,
+            builtinSkinListed: 'classic is a built-in skin and does not need to be listed in skins',
+            duplicateName: (field: string, name: string) => `"${name}" is listed twice in ${field}`,
+            skinNotInstalled: (name: string) => `Skin "${name}" is not installed and was skipped: put it in skins/${name}/`,
+            schemeAt: (where: string, index: number) => `${where}, schemes[${index}]`,
+            duplicateScheme: (where: string, id: string) => `${where}: color scheme ID "${id}" is already used by another skin or scheme; pick a different one`,
+            noSchemes: (where: string) => `${where}: schemes needs at least one color scheme, since visitors can only pick a skin's own schemes`,
+            notObject: (where: string) => `${where} should be an object`,
+            invalidSchemeId: (where: string) => `${where}.id is invalid: use only lowercase letters, digits and hyphens, starting with a letter`,
+            duplicateShort: (where: string, short: string) => `${where}: short "${short}" is the same as another scheme of this skin, so the panel could not tell them apart`,
+            badRecommendedScheme: (where: string, ids: string[]) => `${where}: recommendedScheme must be one of this skin's own schemes: ${ids.join(', ')}`,
+            notNameArray: (field: string) => `${field} in identity.ts should be an array of names, e.g. ['island']`,
+            invalidName: (field: string, name: string) => `${name} in ${field} in identity.ts is not a valid name: use only lowercase letters, digits and hyphens, starting with a letter`,
+            outsideDir: (kind: string, name: string) => `${kind}/${name} points outside ${kind}/ and is not loaded, for safety`,
+            missingFile: (where: string) => `Missing ${where}`,
+            invalidJson: (where: string, error: string) => `${where} is not valid JSON: ${error}`,
+            contractMismatch: (where: string, found: string, expected: string | number) =>
+                `contract in ${where} is ${found}, but this version of Vergil uses appearance contract ${expected}; they must match`,
+            invalidShort: (where: string) => `${where}: short is the 1–2 letters or digits shown under the color dot`,
+            invalidSwatch: (where: string) => `${where}: swatch accepts only a hex color (e.g. #a9521f) or one CSS variable (e.g. var(--text-main))`,
+            invalidIcon: (where: string) => `${where}: icon accepts only a hex color or one CSS variable`,
+            invalidLabels: (where: string) => `${where}: labels should be an object like { "zh-CN": "...", "en": "..." }`,
+            invalidLabel: (where: string, lang: string) => `${where}: labels.${lang} should be a string of 1–40 characters`,
         },
     },
 };

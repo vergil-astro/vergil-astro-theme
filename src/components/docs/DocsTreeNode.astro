@@ -45,7 +45,7 @@ function isAncestorActive(node: DocTreeNode, current: string): boolean {
     return false;
 }
 
-// 计算当前路径上所有被展开的目录
+// Collect all expanded directories along the current path
 function getExpandedDirs(nodes: DocTreeNode[], current: string, expanded: Set<string> = new Set()): Set<string> {
     for (const node of nodes) {
         if (node.type === 'group') {
@@ -60,7 +60,7 @@ function getExpandedDirs(nodes: DocTreeNode[], current: string, expanded: Set<st
 
 const expandedDirs = getExpandedDirs(nodes, currentSlug);
 
-// 层级样式配置
+// Per-level style config
 const levelConfig = [
     { textSize: 'text-[13px]', fontWeight: 'font-semibold', opacity: 'opacity-100' },
     { textSize: 'text-[13px]', fontWeight: 'font-medium',   opacity: 'opacity-95'  },
@@ -113,7 +113,7 @@ function getLevelConfig(l: number) {
                 <span class="active-indicator" aria-hidden="true" />
                 <span class="indent-spacer" aria-hidden="true" data-level={level} />
 
-                {/* 箭头 — 标识为目录，同时指示展开状态 */}
+                {/* Chevron — marks a directory and shows its expanded state */}
                 {hasChildren ? (
                     <span class="chevron-indicator">
                         <span class={`chevron-icon chevron-expanded ${expanded ? '' : 'hidden'}`}>
@@ -127,7 +127,7 @@ function getLevelConfig(l: number) {
                     <span class="chevron-placeholder" />
                 )}
 
-                {/* 目录标题 */}
+                {/* Directory title */}
                 <span class="title-scroll flex-1 min-w-0">
                     <span class={`title-scroll-text ${cfg.textSize} ${cfg.fontWeight} ${active ? 'text-accent' : ''}`}>
                         {node.title}
@@ -159,7 +159,7 @@ function getLevelConfig(l: number) {
                     </div>
                 )}
 
-                {/* 子内容 */}
+                {/* Children */}
                 {hasChildren && (
                     <div class={`doc-children-wrapper ${expanded ? '' : 'collapsed'}`}>
                         <div class="doc-children-inner">
@@ -173,7 +173,7 @@ function getLevelConfig(l: number) {
 </ul>
 
 <style>
-    /* ── 列表容器 ── */
+    /* ── List container ── */
     .docs-tree-list {
         list-style: none;
         padding: 0;
@@ -184,17 +184,17 @@ function getLevelConfig(l: number) {
         position: relative;
     }
 
-    /* ── 列表项 ── */
+    /* ── List item ── */
     .docs-tree-item {
         position: relative;
     }
 
-    /* 顶级组之间增加间距 */
+    /* Extra spacing between top-level groups */
     .docs-tree-list[data-level="0"] > .docs-tree-group-item:not(:first-child) {
         margin-top: 6px;
     }
 
-    /* ── 缩进占位 ── */
+    /* ── Indent spacer ── */
     .indent-spacer {
         display: inline-block;
         flex-shrink: 0;
@@ -205,7 +205,7 @@ function getLevelConfig(l: number) {
     .indent-spacer[data-level="2"] { width: 24px; }
     .indent-spacer[data-level="3"] { width: 36px; }
 
-    /* ── 文章链接 ── */
+    /* ── Article link ── */
     .docs-tree-link {
         display: flex;
         align-items: center;
@@ -234,7 +234,7 @@ function getLevelConfig(l: number) {
         background-color: color-mix(in srgb, var(--accent-color) 12%, transparent);
     }
 
-    /* ── 目录标题行 ── */
+    /* ── Directory header row ── */
     .docs-tree-group-header {
         display: flex;
         align-items: center;
@@ -261,7 +261,7 @@ function getLevelConfig(l: number) {
         background-color: color-mix(in srgb, var(--accent-color) 8%, transparent);
     }
 
-    /* ── 箭头指示 ── */
+    /* ── Chevron indicator ── */
     .chevron-indicator {
         display: flex;
         align-items: center;
@@ -279,7 +279,7 @@ function getLevelConfig(l: number) {
         flex-shrink: 0;
     }
 
-    /* ── 激活指示条 ── */
+    /* ── Active indicator bar ── */
     .active-indicator {
         position: absolute;
         left: 0;
@@ -299,7 +299,7 @@ function getLevelConfig(l: number) {
         opacity: 1;
     }
 
-    /* ── 子内容展开动画 ── */
+    /* ── Children expand animation ── */
     .doc-children-wrapper {
         display: grid;
         grid-template-rows: 1fr;
@@ -321,7 +321,7 @@ function getLevelConfig(l: number) {
         padding-bottom: 2px;
     }
 
-    /* 深色模式边框淡化 */
+    /* Fainter borders in dark mode */
     :global(.dark) .doc-children-wrapper {
         border-left-color: color-mix(in srgb, var(--border-light) 60%, transparent);
     }
@@ -386,7 +386,7 @@ function getLevelConfig(l: number) {
         var isNowCollapsed = !wrapper.classList.contains('collapsed');
         wrapper.classList.toggle('collapsed');
 
-        // 切换箭头图标
+        // Toggle the chevron icon
         if (header) {
             var expandedIcon = header.querySelector('.chevron-expanded');
             var collapsedIcon = header.querySelector('.chevron-collapsed');
@@ -401,7 +401,7 @@ function getLevelConfig(l: number) {
             }
         }
 
-        // 同步 localStorage
+        // Sync localStorage
         var expandedDirs = getExpandedDirs();
         if (isNowCollapsed) {
             expandedDirs = expandedDirs.filter(function(p) { return p !== dirPath; });
@@ -414,12 +414,12 @@ function getLevelConfig(l: number) {
     }
 
     function init() {
-        // 先把当前页面展开的目录（含自动展开）同步到 localStorage
+        // First sync the directories expanded on the current page (including auto-expanded ones) to localStorage
         syncCurrentExpanded();
-        // 再恢复所有记录的展开状态
+        // Then restore all saved expanded states
         applyManualExpand();
 
-        // 箭头独立点击 → 展开/收起，阻止导航
+        // Clicking the chevron itself → expand/collapse, without navigating
         document.querySelectorAll('.chevron-indicator').forEach(function(chevron) {
             if (chevron.dataset.chevronBound) return;
             chevron.dataset.chevronBound = 'true';
@@ -432,13 +432,13 @@ function getLevelConfig(l: number) {
             });
         });
 
-        // div header（已进入的目录）点击 → 展开/收起
+        // Clicking a div header (a directory already entered) → expand/collapse
         document.querySelectorAll('.docs-tree-group-header[data-expandable="true"]').forEach(function(header) {
             if (header.dataset.expandBound) return;
             header.dataset.expandBound = 'true';
 
             header.addEventListener('click', function(e) {
-                if (header.tagName === 'A') return; // 未进入的目录，走默认导航
+                if (header.tagName === 'A') return; // A directory not yet entered: use default navigation
                 var groupItem = header.closest('.docs-tree-group-item');
                 toggleDir(groupItem);
             });

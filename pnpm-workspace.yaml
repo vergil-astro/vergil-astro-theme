@@ -1,11 +1,11 @@
 packages:
   - starter
 
-# 依赖自带的安装脚本一律不跑，构建用不到它们。这份声明要跟着仓库提交：
-# pnpm 11 起，没声明过的安装脚本会让 pnpm install 直接失败
+# Never run the install scripts that dependencies ship with; the build does not need them. Commit this declaration with the repo:
+# since pnpm 11, undeclared install scripts make pnpm install fail outright
 allowBuilds:
   esbuild: false
   sharp: false
 
 minimumReleaseAgeExclude:
-  - '@vergil-astro/vergil-cli@0.2.0'
+  - '@vergil-astro/vergil-cli@0.2.0 || 0.2.1'

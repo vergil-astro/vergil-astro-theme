@@ -31,7 +31,7 @@ function normalizeQuotes(text) {
 
 /** Process chart directives (mermaid / echart) */
 export function processChartDirective(node, options = {}) {
-    const i18n = options.i18n?.charts ?? { echartParseError: 'ECharts 配置解析失败' };
+    const i18n = options.i18n?.charts ?? { echartParseError: 'ECharts 配置解析失败', mermaidRenderError: 'Mermaid 渲染失败' };
     const name = node.name;
     const attrs = node.attributes || {};
     const rawText = extractRawContent(node.children).trim();
@@ -45,6 +45,8 @@ export function processChartDirective(node, options = {}) {
                     class: 'md-directive md-directive-mermaid',
                     'data-mermaid': '1',
                     'data-mermaid-id': uid,
+                    // Diagrams render in the browser, where the dictionary is not available; charts-init.mjs reads the error label from here
+                    'data-error-label': i18n.mermaidRenderError,
                 },
             };
             node.children = [

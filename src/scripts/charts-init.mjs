@@ -86,8 +86,8 @@ function watchThemeChange(callback) {
 // ========== Mermaid ==========
 
 /**
- * Mermaid 12 起默认用 ELK 布局和 neo 外观，图表会整体换个样子。固定成 classic + dagre，
- * 和之前的图表保持一致（也省掉 ELK 那块代码的加载）；单个图表仍可在自己的 front matter 里改
+ * Since Mermaid 12 the defaults are the ELK layout and the neo look, which changes how every diagram looks. Pin classic + dagre
+ * to stay consistent with earlier diagrams (and skip loading the ELK code); individual diagrams can still override this in their own front matter
  */
 function mermaidConfig() {
     return {
@@ -139,10 +139,12 @@ async function renderMermaid() {
                 outputEl.innerHTML = svg || '';
                 markLoaded(outputEl);
             } catch (err) {
-                // \u9519\u8bef\u4fe1\u606f\u91cc\u4f1a\u5e26\u4e0a\u56fe\u8868\u6e90\u7801\u7247\u6bb5\uff0c\u5f53\u6587\u672c\u653e\u8fdb\u53bb\uff0c\u4e0d\u5f53 HTML \u89e3\u6790
+                // The error message quotes parts of the diagram source, so insert it as text rather than parsing it as HTML.
+                // The localized label comes from data-error-label, set by the mermaid directive in the site's UI language
                 const msg = document.createElement('div');
                 msg.className = 'md-echart-error-msg';
-                msg.textContent = 'Mermaid \u6e32\u67d3\u5931\u8d25: ' + (err && err.message ? err.message : String(err));
+                const label = container.dataset.errorLabel || 'Mermaid';
+                msg.textContent = label + ': ' + (err && err.message ? err.message : String(err));
                 outputEl.replaceChildren(msg);
                 markLoaded(outputEl);
             }

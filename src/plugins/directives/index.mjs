@@ -17,7 +17,7 @@ import { processMindDirective } from './mind.mjs';
 import { getOgImage } from './og-image.mjs';
 import { DIRECTIVES } from './schema.mjs';
 
-/** schema 里 module 对应的容器指令渲染函数；image、photo、inline 由别的插件或 textDirective 处理 */
+/** Container directive renderers for each module in the schema; image, photo and inline are handled by other plugins or textDirective */
 const CONTAINER_PROCESSORS = {
     blocks: processBlockDirective,
     okr: processOkrDirective,
@@ -30,12 +30,12 @@ const CONTAINER_PROCESSORS = {
     mind: processMindDirective,
 };
 
-/** 容器指令名 → 渲染函数，从 schema 生成；schema 里没登记的指令不会被渲染 */
+/** Container directive name → renderer, generated from the schema; directives not registered in the schema are not rendered */
 const containerHandlers = new Map(
     DIRECTIVES.filter((d) => CONTAINER_PROCESSORS[d.module]).map((d) => [d.name, CONTAINER_PROCESSORS[d.module]]),
 );
 
-/** 本页 :::sites 里没填 cover 的站点，先在线查好 og:image，渲染时当默认封面 */
+/** For sites in this page's :::sites without a cover, look up their og:image online first and use it as the default cover when rendering */
 async function resolveSiteCovers(tree, links) {
     const urls = new Set();
     visit(tree, 'containerDirective', (node) => {
@@ -49,7 +49,7 @@ async function resolveSiteCovers(tree, links) {
     return new Map(entries.filter(([, image]) => image));
 }
 
-/** 没人认领的行内指令（比如 a:b 里被当成指令的 :b）还原成原文，否则会渲染成空 div，吞掉文字还截断段落 */
+/** Restore unclaimed inline directives (e.g. the :b in a:b parsed as a directive) to their original text; otherwise they render as an empty div, swallowing the text and cutting the paragraph short */
 function restoreAsText(node, file) {
     const { start, end } = node.position ?? {};
     const value = start && end ? String(file.value).slice(start.offset, end.offset) : `:${node.name}`;

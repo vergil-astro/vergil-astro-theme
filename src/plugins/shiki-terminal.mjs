@@ -27,9 +27,9 @@ function escapeHtml(value) {
 
 const readAttr = (meta, name) => meta.match(new RegExp(`${name}=["']([^"']+)["']`))?.[1];
 
-// 所有 ``` 代码块默认都套上 mac 窗口外观（三个圆点 + 标题栏 + 复制按钮）。
-// shell 语言额外按终端处理：识别 "$" 命令、显示提示符、只复制命令。
-// 不套窗口的情况：markdown 示例（保持原来的渲染）、写了 no-title 的、代码面板里的（面板自己有标签和复制按钮）
+// Every ``` code block gets a Mac window look by default (three dots + title bar + copy button).
+// Shell languages are also treated as a terminal: detect "$" commands, show the prompt, and copy only the commands.
+// No window for: markdown examples (they keep their original rendering), blocks with no-title, and blocks inside a code panel (the panel has its own tabs and copy button)
 const SHELL_LANGS = new Set(['bash', 'sh', 'shell', 'zsh', 'console', 'fish']);
 const PLAIN_LANGS = new Set(['markdown', 'md', 'mdx']);
 const LANG_NAMES = {
@@ -57,10 +57,10 @@ export function remarkTerminal() {
             let copyText = node.value;
             let extraMeta = ' codewin';
 
-            // shell 代码里带 "$ " 的行算命令：第一个没被转义的 "$"（后面跟空格或在行尾）之前的内容整体当作这一行的路径，
-            // 不再解析其中的符号，`~/www$ git pull` 的路径就是 `~/www`；"$" 前面什么都没有时路径是 `~`。
-            // 输出行里要显示 "$" 就写成 "\$"，渲染时去掉反斜杠；命令本身里的 "\$" 是 shell 语法，原样保留。
-            // 复制按钮只复制命令；一行命令都没有时整段原样复制
+            // In shell code, a line with "$ " is a command: everything before the first unescaped "$" (followed by a space or at line end) is taken as that line's path,
+            // with no further parsing of its symbols, so the path of `~/www$ git pull` is `~/www`; when nothing precedes "$", the path is `~`.
+            // To show "$" in an output line, write "\$" and the backslash is removed when rendering; "\$" inside a command itself is shell syntax and is kept as-is.
+            // The copy button copies only the commands; if there are no command lines at all, the whole block is copied as-is
             if (isShell) {
                 const prompts = {};
                 const commands = [];
@@ -97,13 +97,13 @@ export function remarkTerminal() {
             };
 
             parent.children[index] = wrapper;
-            // 包好的节点不再往里走，避免访问到包在里面的同一个代码块
+            // Don't descend into the wrapped node, to avoid visiting the same code block wrapped inside it
             return [SKIP, index + 1];
         });
     };
 }
 
-// 命令行前面的提示符：路径 + ❯。单独成一个元素，不可选中，也不进复制内容
+// The prompt before a command line: path + ❯. It is a separate element that can't be selected and isn't included in copied content
 function promptNode(path) {
     return {
         type: 'element',

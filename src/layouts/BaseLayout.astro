@@ -322,8 +322,8 @@ const isArticle = head.pageType === 'article';
 
         <script is:inline>
             (function () {
-                // 这段脚本在无刷新切换页面后还会再跑。上一次绑定的监听记在 window 上，先解绑再绑，否则每切换一次就多一个监听。
-                // 三个布局各有一份进度条脚本，data-progress 标明当前页面用的是哪一份。进度用 transform 缩放，不改宽度，滚动时不触发布局
+                // This script runs again after client-side page navigation. The previously bound listener is kept on window; unbind it before binding again, otherwise each navigation adds another listener.
+                // Each of the three layouts has its own progress bar script; data-progress marks which one the current page uses. Progress uses a transform scale instead of width, so scrolling doesn't trigger layout
                 function initProgress() {
                     if (window.__vergilProgressMain) {
                         window.removeEventListener('scroll', window.__vergilProgressMain);
@@ -341,7 +341,7 @@ const isArticle = head.pageType === 'article';
                             return;
                         }
                         var scrollTop = window.scrollY;
-                        // 以 <main> 内容高度为基准，更准确反映"文章阅读进度"
+                        // Based on the height of <main>'s content, to better reflect "post reading progress"
                         var contentHeight = main.scrollHeight;
                         var viewportH = window.innerHeight;
                         var readableHeight = Math.max(0, contentHeight - viewportH);
@@ -361,7 +361,7 @@ const isArticle = head.pageType === 'article';
 
                     window.__vergilProgressMain = onScroll;
                     window.addEventListener('scroll', onScroll, { passive: true });
-                    // ViewTransitions 后延迟一帧，确保 DOM 已更新
+                    // Wait one frame after ViewTransitions so the DOM is updated
                     requestAnimationFrame(update);
                 }
                 if (!window.__vergilProgressMainInit) {
@@ -410,9 +410,9 @@ const isArticle = head.pageType === 'article';
         {siteConfig.floatingAudio?.enabled && <FloatingAudioPlayer />}
 
         <script>
-            // medium-zoom 按需加载：只在页面有可缩放图片时才导入。
-            // 只建一个实例，每次换页解绑旧图片、绑定新图片：它一创建就在 document 上挂滚动和按键监听，
-            // detach() 不会移除，每页新建一个的话监听会越积越多
+            // Load medium-zoom on demand: import it only when the page has zoomable images.
+            // Create a single instance and, on each page change, detach old images and attach new ones: on creation it adds scroll and key listeners to document
+            // that detach() doesn't remove, so creating one per page would keep piling up listeners
             let zoomInstance = null;
 
             async function initZoom() {
@@ -462,7 +462,7 @@ const isArticle = head.pageType === 'article';
                         var api = card.dataset.api;
                         if (!api) return;
 
-                        // 显示骨架屏
+                        // Show the skeleton
                         card.dataset.loading = 'true';
 
                         var fill = function (data) {
@@ -517,11 +517,11 @@ const isArticle = head.pageType === 'article';
                                 }
                             })
                             .then(function () {
-                                // 数据加载完成，移除骨架屏
+                                // Data loaded; remove the skeleton
                                 delete card.dataset.loading;
                             })
                             .catch(function () {
-                                // 请求失败也移除骨架屏，避免一直闪烁
+                                // Remove the skeleton on failure too, so it doesn't keep flickering
                                 delete card.dataset.loading;
                             });
                     });
@@ -536,7 +536,7 @@ const isArticle = head.pageType === 'article';
             })();
         </script>
 
-        <!-- 滚动显现（reveal） -->
+        <!-- Reveal on scroll -->
         <script>
             import '../scripts/search.js';
             import '../scripts/reveal-scroll.js';

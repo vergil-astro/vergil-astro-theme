@@ -1,9 +1,9 @@
 /**
- * 键盘可达性。
+ * Keyboard accessibility.
  *
- * 之前全站没有任何 focus-visible 规则，用键盘 Tab 时看不出焦点落在哪。
- * 这里给一条统一的焦点环，用 :where() 把优先级压到 0，组件想覆盖随时能盖。
- * 只在 :focus-visible 下出现，所以鼠标点击不会看到轮廓。
+ * The site used to have no focus-visible rules at all, so when tabbing with the keyboard you could not tell where focus was.
+ * This adds one shared focus ring, using :where() to drop its specificity to 0 so any component can override it.
+ * It only appears under :focus-visible, so mouse clicks do not show an outline.
  */
 :where(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
     outline: 2px solid var(--accent-color, #4a7c59);
@@ -11,7 +11,7 @@
     border-radius: var(--radius-xs);
 }
 
-/* 跳过导航：默认藏在视口外，键盘聚焦时滑进来 */
+/* Skip link: hidden outside the viewport by default, slides in on keyboard focus */
 .skip-link {
     position: fixed;
     top: 0;
@@ -33,7 +33,7 @@
     translate: -50% 0;
 }
 
-/* 跳过去之后标题不要被吸顶导航挡住 */
+/* After skipping, keep the heading from being hidden behind the sticky nav */
 main:target,
 main:focus {
     scroll-margin-top: 4rem;

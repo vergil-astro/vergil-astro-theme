@@ -179,7 +179,7 @@ const faConfig = siteConfig.floatingAudio || { enabled: false, autoplay: false }
         var seen = new Set();
         S.playlist = [];
 
-        // 收集本地音频（src 模式）
+        // Collect local audio (src mode)
         document.querySelectorAll('.md-directive-audio[data-src]').forEach(function (el) {
             var src = el.dataset.src;
             if (!src || seen.has(src)) return;
@@ -199,7 +199,7 @@ const faConfig = siteConfig.floatingAudio || { enabled: false, autoplay: false }
             });
         });
 
-        // 收集网易云音乐（iframe 嵌入模式，仅展示，点击跳转）
+        // Collect NetEase Cloud Music tracks (iframe embed mode; display only, clicking jumps to them)
         document.querySelectorAll('.md-directive-audio[data-netease]').forEach(function (el) {
             var neteaseId = el.dataset.netease;
             if (!neteaseId || seen.has(neteaseId)) return;
@@ -520,7 +520,7 @@ const faConfig = siteConfig.floatingAudio || { enabled: false, autoplay: false }
         if (!track) return;
 
         if (track.type === 'netease') {
-            // 网易云歌曲：滚动到页面对应位置
+            // NetEase track: scroll to its position on the page
             var neteaseEl = document.querySelector('.md-directive-audio[data-netease="' + track.neteaseId + '"]');
             if (neteaseEl) {
                 neteaseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -571,7 +571,7 @@ const faConfig = siteConfig.floatingAudio || { enabled: false, autoplay: false }
     }
 
     function init() {
-        // 首页不显示浮动播放器
+        // No floating player on the home page
         if (location.pathname === '/' || /^\/page\/\d+/.test(location.pathname)) {
             E.playerEl.setAttribute('data-state', 'hidden');
             document.dispatchEvent(new CustomEvent('fa-collapsed'));

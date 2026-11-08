@@ -1,9 +1,9 @@
 ---
 /**
- * 简历的个人信息栏：头像、姓名、头衔和联系方式。宽屏时放在纸面左侧，手机上排在正文上方，打印时变成页面顶部的抬头。
- * frontmatter 的 blur 里列出的信息先模糊显示，点一下才看得清（逻辑在 resume-vault.ts）；
- * 链接类的联系方式只模糊文字，图标照常显示，没点开之前点链接只会显示内容，不会拨号或发邮件。
- * 预览版（masked）里列出的联系方式换成占位符再模糊，不带链接，页面里没有原文
+ * Resume profile panel: avatar, name, headline and contact info. On wide screens it sits on the left of the paper, on phones above the body, and in print it becomes the header at the top of the page.
+ * Fields listed in the frontmatter blur start blurred and become readable on click (logic in resume-vault.ts);
+ * for link-type contacts only the text is blurred and the icon shows as usual; until revealed, clicking the link only reveals the content and does not dial or send email.
+ * In the preview version, contacts listed in masked are replaced with blurred placeholders without links, so the original text is not in the page
  */
 import { t } from '../../../i18n';
 import { Mail, Phone, MapPin, Globe } from '@lucide/astro';
@@ -13,17 +13,17 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
     resume: CollectionEntry<'resume'>;
-    /** 预览版里要藏起来的联系方式 */
+    /** Contacts to hide in the preview version */
     masked?: string[];
 }
 
 const { name, headline, avatar, contact, blur } = Astro.props.resume.data;
 const masked = new Set(Astro.props.masked ?? []);
-/** 占位符的长度和原文相近，只是看起来像一串被模糊的字 */
+/** The placeholder is about as long as the original and just looks like a run of blurred text */
 const placeholder = (text: string) => '•'.repeat(Math.min(Math.max(text.length, 6), 18));
 const avatarSrc = avatar ?? siteConfig.avatar?.src;
 
-/** 网址只显示域名和路径，去掉 https:// 和末尾的斜杠 */
+/** Show only the domain and path of a URL, dropping https:// and the trailing slash */
 const displayUrl = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
 const hidden = new Set(blur);
@@ -82,7 +82,7 @@ const items = [
 </div>
 
 <style>
-    /* 和 :blur[] 指令一样的模糊程度，但悬停不会显示，只有点了才显示 */
+    /* Same blur strength as the :blur[] directive, but hovering does not reveal it; only clicking does */
     [data-resume-blur] {
         transition: filter 0.3s ease;
     }
@@ -91,14 +91,14 @@ const items = [
         cursor: pointer;
         user-select: none;
     }
-    /* 预览版的占位符：一直模糊，点了也不会显示 */
+    /* Preview placeholders: always blurred, not revealed even on click */
     .resume-masked {
         filter: blur(4px);
         user-select: none;
     }
 
     @media print {
-        /* 打印出来的简历要能直接联系到人，模糊的信息一律显示 */
+        /* A printed resume must let people contact you directly, so all blurred info is shown */
         [data-resume-blur] {
             filter: none !important;
             transition: none !important;
@@ -114,7 +114,7 @@ const items = [
         .resume-headline {
             font-size: 9pt;
         }
-        /* 打印纸宽不到 md 断点，联系方式在这里单独排成竖列 */
+        /* The printed page is narrower than the md breakpoint, so contacts are stacked in a column here */
         .resume-contact {
             display: block !important;
             margin-top: 5mm;

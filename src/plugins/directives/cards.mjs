@@ -4,7 +4,7 @@ import { createDirectiveImages } from '../directive-images.mjs';
 
 export function processCardDirective(node, options = {}) {
     const { links, screenshotService, ogImages } = options;
-    // 封面、图标、logo、背景图可以是本地图片（@img/ 或相对路径），交给 Astro 处理
+    // Covers, icons, logos and background images can be local images (@img/ or a relative path), processed by Astro
     const images = createDirectiveImages();
     const attrs = node.attributes || {};
 
@@ -97,8 +97,8 @@ export function processCardDirective(node, options = {}) {
                 node.children = [{ type: 'html', value: `<p style="color:var(--text-secondary);font-size:0.875rem;">Group "${escapeHtml(group)}" has no site data</p>` }];
             } else {
                 const cells = items.map(item => {
-                    // 封面：自己填的 cover → 站点的 og:image → 截图服务。
-                    // 用 og:image 时把截图地址放在 data-fallback-src，og:image 日后失效也能换成截图
+                    // Cover: the user-provided cover → the site's og:image → the screenshot service.
+                    // When using og:image, put the screenshot URL in data-fallback-src so it can switch to the screenshot if og:image breaks later
                     const screenshot = getScreenshotUrl(item.url, screenshotService);
                     const ogImage = !item.cover && ogImages?.get(item.url);
                     const cover = item.cover || ogImage || screenshot;
@@ -288,7 +288,7 @@ export function processCardDirective(node, options = {}) {
             if (bgImage) {
                 cardClasses.push('md-yc-has-image');
                 cardClasses.push(`md-yc-bg-mode-${/^[a-z0-9-]+$/i.test(bgMode) ? bgMode : 'full'}`);
-                // 背景图用铺满的 <img>（见下方 bgImageHtml），而不是 CSS 背景图，这样本地图片也能被 Astro 优化
+                // The background image is a full-bleed <img> (see bgImageHtml below) rather than a CSS background image, so local images can also be optimized by Astro
                 if (bgMode === 'full' && bgOverlay !== 'none') {
                     const overlayMap = {
                         dark: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%)',

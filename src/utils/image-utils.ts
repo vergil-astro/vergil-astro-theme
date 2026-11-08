@@ -1,14 +1,15 @@
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { t } from '../i18n';
 
-/** frontmatter 里 imageOrPath 字段的值：/ 开头的路径或外链、image() 解析出的图片、或 SVG 组件 */
+/** Value of an imageOrPath frontmatter field: a path starting with / or an external URL, an image resolved by image(), or an SVG component */
 export type ImageOrPath = string | ImageMetadata | ({ src: string } & ((...args: never[]) => unknown));
 
 const IMG_ALIAS = '@img/';
 
 /**
- * src/assets/img/ 下的所有图片，给不经过 Astro 内容处理的字符串路径用，
- * 比如图文动态 JSON 里的 images。
+ * All images under src/assets/img/, for string paths that do not go through Astro content processing,
+ * such as images in the moments JSON files.
  */
 const imgModules = import.meta.glob<{ default: ImageOrPath }>('/src/assets/img/**/*.{png,jpg,jpeg,webp,gif,avif,svg}', {
     eager: true
@@ -16,16 +17,16 @@ const imgModules = import.meta.glob<{ default: ImageOrPath }>('/src/assets/img/*
 
 function lookupImgAlias(src: string): ImageOrPath {
     const image = imgModules[`/src/assets/img/${decodeURI(src.slice(IMG_ALIAS.length))}`]?.default;
-    if (!image) throw new Error(`找不到图片 ${src}，请确认文件在 src/assets/img/ 下`);
+    if (!image) throw new Error(t.build.imageNotFound(src));
     return image;
 }
 
 /**
- * 转成可以直接放进 <img src> 的地址。
- * - @img/ 开头的字符串：找到 src/assets/img/ 下对应的图片再处理
- * - 其他字符串原样返回
- * - SVG 不需要优化，直接用原地址（Astro 会把 SVG 解析成组件，地址挂在它的 src 上）
- * - 其他图片按 width 缩放并转成 WebP
+ * Convert to a URL that can go straight into <img src>.
+ * - Strings starting with @img/: find the matching image under src/assets/img/, then process it
+ * - Other strings are returned as-is
+ * - SVGs need no optimization and use their original URL (Astro parses SVGs into components, with the URL on their src)
+ * - Other images are resized to width and converted to WebP
  */
 export async function resolveImageUrl(input: ImageOrPath | undefined, width: number): Promise<string | undefined> {
     if (!input) return undefined;
@@ -39,8 +40,8 @@ export async function resolveImageUrl(input: ImageOrPath | undefined, width: num
 }
 
 /**
- * 把 Markdown 里 ![](@img/...) 的路径换成真实地址，给用 marked 渲染的图文动态正文用。
- * 代码块里的写法示例不动。
+ * Replace ![](@img/...) paths in Markdown with real URLs, for moment bodies rendered with marked.
+ * Syntax examples inside code blocks are left untouched.
  */
 export async function resolveImgAliasInMarkdown(markdown: string, width = 800): Promise<string> {
     if (!markdown.includes(IMG_ALIAS)) return markdown;

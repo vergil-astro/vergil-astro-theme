@@ -14,7 +14,7 @@ const seriesDefs = allSeries.map((s) => ({ id: s.id, name: s.data.name, dir: s.d
 const seriesWithMeta = (await Promise.all(allSeries
     .map(async (s) => {
         const seriesPosts = getPostsBySeries(posts, s.id, seriesDefs);
-        // getPostsBySeries 现在是正序，取最新要算最大值，不能再取第一个
+        // getPostsBySeries now returns ascending order, so the latest date is the max, not the first item
         const latestDate = seriesPosts.length > 0
             ? Math.max(...seriesPosts.map((p) => new Date(p.data.publishDate).getTime()))
             : 0;
@@ -25,8 +25,8 @@ const seriesWithMeta = (await Promise.all(allSeries
             latestDate,
         };
     })))
-    // 专栏详情页只为「有文章的专栏」生成，所以这里也必须过滤掉空专栏，
-    // 否则列表上会出现一个点进去 404 的入口。
+    // Series detail pages are generated only for series that have posts, so empty series must be filtered out here too,
+    // otherwise the list shows an entry that leads to a 404.
     .filter((s) => s.postCount > 0)
     .sort((a, b) => b.latestDate - a.latestDate);
 ---

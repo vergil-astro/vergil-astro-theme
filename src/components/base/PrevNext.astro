@@ -1,19 +1,19 @@
 ---
 import { t } from '../../i18n';
 /**
- * 文章 / 文档底部的上下篇导航。
+ * Prev/next navigation at the bottom of posts and docs.
  *
- * 原先文章和文档各写了一套：文章是浅色细分割线加纯文字，文档是深色虚线加卡片，
- * 中间间距差了近一倍。统一成文章那一套，文档跟过来。
+ * Posts and docs used to have separate versions: posts used a light thin divider with plain text, docs a dark dashed line with cards,
+ * and their spacing differed by nearly 2x. Unified on the post version; docs now follow it.
  */
 import { ChevronLeft, ChevronRight } from '@lucide/astro';
 
 export interface PrevNextItem {
     href: string;
     title: string;
-    /** 覆盖默认的「上一篇」「下一篇」，比如跨专栏推荐时写「推荐」 */
+    /** Overrides the default t.nav.prev / t.nav.next label, e.g. t.nav.recommend for a cross-series recommendation */
     label?: string;
-    /** 标题下面的补充说明，比如「来自专栏「x」」 */
+    /** Extra note under the title, e.g. t.nav.fromSeries(name) */
     note?: string;
 }
 

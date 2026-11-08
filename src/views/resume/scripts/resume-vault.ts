@@ -1,19 +1,19 @@
 /**
- * 简历视图的前端逻辑：解锁加密的简历，分享简历链接，点开模糊显示的联系方式。
+ * Frontend logic for the resume view: unlock an encrypted resume, share the resume link, and reveal blurred contact info.
  *
- * 密文在构建时生成（src/utils/resume-crypto.ts）。解锁用的是一个 128 位密钥，有两种来源：
- * - 分享链接 # 后面的口令，就是这个密钥的 base64url，直接导入，不用等
- * - 访客手动输入的密码，用和构建时一样的 PBKDF2 参数派生出同一个密钥
- * 解开以后记在这个标签页里（只记口令，不记密码），分享出去的链接也只带口令。
+ * The ciphertext is generated at build time (src/utils/resume-crypto.ts). Unlocking uses a 128-bit key from one of two sources:
+ * - the token after # in a share link, which is the key's base64url and is imported directly, with no wait
+ * - a password the visitor types in, from which the same key is derived with the same PBKDF2 parameters as the build
+ * Once unlocked, it is remembered in this tab (the token only, never the password), and shared links carry only the token.
  */
 
 const STORAGE_KEY = 'vergil:resume-key';
-/** 链接口令：128 位密钥的 base64url，正好 22 个字符 */
+/** Link token: the base64url of the 128-bit key, exactly 22 characters */
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{22}$/;
 
-/** 当前页面解锁用的口令，分享链接要带上它；简历没加密时是 null */
+/** Token that unlocked the current page, which share links must include; null when the resume is not encrypted */
 let unlockedToken: string | null = null;
-/** 每次进入页面重新绑定事件，离开时把上一页绑在 document 上的监听一起撤掉 */
+/** Events are rebound on every page entry; on leaving, the listeners the previous page bound on document are removed as well */
 let pageAbort: AbortController | null = null;
 
 function fromBase64(value: string): Uint8Array<ArrayBuffer> {
@@ -29,7 +29,7 @@ function toBase64Url(bytes: Uint8Array): string {
     return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-/** 手动输入的密码换成链接口令，参数取自密文块上的 data-salt、data-iter */
+/** Turn a typed password into a link token, with parameters taken from data-salt and data-iter on the ciphertext block */
 async function passwordToToken(password: string, salt: string, iterations: number): Promise<string> {
     const { subtle } = window.crypto;
     const encoder = new TextEncoder();
@@ -38,7 +38,7 @@ async function passwordToToken(password: string, salt: string, iterations: numbe
     return toBase64Url(new Uint8Array(bits));
 }
 
-/** 全部解开才算成功，任何一块失败（口令不对）就返回 null */
+/** Succeeds only if every block decrypts; if any block fails (wrong token), return null */
 async function openAll(blocks: HTMLElement[], token: string): Promise<string[] | null> {
     if (!TOKEN_PATTERN.test(token)) return null;
     try {
@@ -75,9 +75,9 @@ function storeToken(token: string | null) {
 }
 
 /**
- * 把密文块换回原来的内容，和没加密时渲染出来的结构完全一样。
- * 这段 HTML 是构建时从简历 Markdown 渲染出来的，和不加密时直接输出的 HTML 是同一份；
- * AES-GCM 带校验，没有密钥的人改不了密文，链接里的 # 只提供密钥，不会变成页面内容
+ * Swap the ciphertext blocks back to their original content, with exactly the same structure as an unencrypted render.
+ * This HTML was rendered from the resume Markdown at build time and is the same HTML that is output directly without encryption;
+ * AES-GCM is authenticated, so nobody without the key can alter the ciphertext, and the # in the link only supplies the key and never becomes page content
  */
 function reveal(blocks: HTMLElement[], htmls: string[], lock: HTMLElement) {
     blocks.forEach((block, i) => {
@@ -93,8 +93,8 @@ function reveal(blocks: HTMLElement[], htmls: string[], lock: HTMLElement) {
 }
 
 /**
- * 预览：没有密码的访客先看删减版（构建时生成，遮住的内容不在页面里）。
- * 预览时点遮挡条或模糊的联系方式，回到输入密码页并提示
+ * Preview: visitors without the password see the redacted version first (generated at build time; the hidden content is not in the page).
+ * Clicking a redaction bar or a blurred contact while previewing returns to the password screen with a hint
  */
 function setupPreview(lock: HTMLElement, showForm: (message?: string) => void, input: HTMLInputElement, signal: AbortSignal) {
     const open = lock.querySelector('[data-resume-preview-open]');
@@ -150,7 +150,7 @@ async function setupLock(signal: AbortSignal) {
         error.textContent = message;
     };
 
-    // Web Crypto 只在 https 和 localhost 下可用，用局域网 IP 打开开发服务器时会走到这里
+    // Web Crypto is only available over https and on localhost; opening the dev server via a LAN IP ends up here
     if (!window.crypto?.subtle) {
         showForm(lock.dataset.msgInsecure);
         input.disabled = true;
@@ -190,14 +190,14 @@ async function setupLock(signal: AbortSignal) {
     if (remembered && remembered !== fromLink && (await tryUnlock(remembered))) return;
     if (signal.aborted) return;
 
-    // 记住的口令解不开，说明博主换过密码，忘掉它
+    // The remembered token no longer works, meaning the author changed the password, so forget it
     if (remembered) storeToken(null);
     showForm(fromLink ? lock.dataset.msgInvalidLink : '');
 }
 
 /**
- * 加密简历的地址栏里放着口令（#口令），点目录、跳过导航这些页内锚点时只滚动，不改地址，
- * 否则 # 后面变成标题，刷新以后就解不开了；预览时也一样，免得刷新后把标题当成口令
+ * An encrypted resume keeps the token in the address bar (#token), so in-page anchors such as the table of contents and the skip link only scroll and leave the URL alone;
+ * otherwise the part after # would become a heading and the resume could not be unlocked after a refresh. The same goes for preview, so a refresh does not treat a heading as the token
  */
 function keepTokenInUrl(signal: AbortSignal) {
     document.addEventListener(
@@ -223,8 +223,8 @@ function keepTokenInUrl(signal: AbortSignal) {
 }
 
 /**
- * 侧栏里模糊显示的信息（frontmatter 的 blur）：点一下才显示。
- * 模糊的是链接里的文字时，第一下只显示内容，不跟着链接拨号或发邮件
+ * Blurred info in the sidebar (frontmatter blur): revealed on click.
+ * When the blurred text is inside a link, the first click only reveals it and does not follow the link to dial or send email
  */
 function setupBlur(signal: AbortSignal) {
     const reveal = (event: Event) => {
@@ -281,7 +281,7 @@ function setupShare(signal: AbortSignal) {
             }
             const url = shareUrl();
 
-            // 手机上优先用系统分享面板，能直接发到聊天软件；电脑上的系统分享不如复制链接顺手
+            // On phones prefer the system share sheet, which can send straight to chat apps; on desktop, copying the link is handier than the system share
             if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
                 try {
                     await navigator.share({ title: document.title, url });
@@ -327,13 +327,13 @@ function setupShare(signal: AbortSignal) {
     );
 }
 
-/** CSS 字符串里的引号、反斜杠和尖括号转义掉，内容来自简历的 frontmatter */
+/** Escape quotes, backslashes and angle brackets for a CSS string; the content comes from the resume frontmatter */
 function cssString(text: string): string {
     return `"${text.replace(/\\/g, '\\5C ').replace(/"/g, '\\22 ').replace(/</g, '\\3C ').replace(/\s+/g, ' ')}"`;
 }
 
 /**
- * 打印页脚左边的「姓名 · 标题」。姓名在加密的简历里要解锁后才有，所以在这里按页面上的内容补上
+ * The "Name · Title" on the left of the print footer. In an encrypted resume the name only exists after unlocking, so it is filled in here from the page content
  */
 function applyPrintFooter() {
     const name = Array.from(document.querySelectorAll('.resume-profile .resume-name'))
@@ -349,8 +349,8 @@ function applyPrintFooter() {
 }
 
 /**
- * 打印时按当前配色的亮色版本输出：暗色模式下打印前先去掉 dark，打印完再加回来。
- * 只在简历页生效，其他页面不受影响
+ * Print using the light variant of the current color scheme: in dark mode, remove dark before printing and add it back afterwards.
+ * Only applies on the resume page; other pages are unaffected
  */
 let restoreDark = false;
 window.addEventListener('beforeprint', () => {
