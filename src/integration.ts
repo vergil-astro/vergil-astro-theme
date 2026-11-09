@@ -77,7 +77,17 @@ export default function vergil({ config }: VergilOptions): AstroIntegration {
                             alias: { '@vergil-site': siteSrc }
                         },
                         optimizeDeps: {
-                            include: ['mermaid', 'echarts']
+                            // Pre-bundle the chart libraries in dev. They are the theme's dependencies, and with pnpm a site
+                            // can't resolve them from its own root, so name them through the theme package. Without
+                            // pre-bundling, mermaid fails in the browser on its CommonJS dependency dayjs.
+                            // ECharts is listed by the subpaths that scripts/echarts-core.mjs imports.
+                            include: [
+                                '@vergil-astro/theme > mermaid',
+                                '@vergil-astro/theme > echarts/core',
+                                '@vergil-astro/theme > echarts/renderers',
+                                '@vergil-astro/theme > echarts/charts',
+                                '@vergil-astro/theme > echarts/components'
+                            ]
                         }
                     },
                     // Skins are loaded from the site's skins/ directory by the names in identity.ts; see appearance/integration.mjs.
